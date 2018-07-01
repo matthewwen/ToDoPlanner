@@ -5,15 +5,16 @@ import android.app.job.JobService;
 
 //Author Matthew Wen
 
-public class TaskJobService extends JobService {
+public class TaskJobService extends com.firebase.jobdispatcher.JobService {
+
 
     @Override
-    public boolean onStartJob(JobParameters jobParameters) {
+    public boolean onStartJob(com.firebase.jobdispatcher.JobParameters job) {
         return false;
     }
 
     @Override
-    public boolean onStopJob(JobParameters jobParameters) {
+    public boolean onStopJob(com.firebase.jobdispatcher.JobParameters job) {
         return false;
     }
 }
