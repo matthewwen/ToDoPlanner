@@ -12,6 +12,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
 
+    //use intent filters to determine if the device is connected to wifi or not
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
