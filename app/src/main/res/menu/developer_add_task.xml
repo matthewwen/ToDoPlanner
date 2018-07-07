@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/developer_menu_add_task"
+        android:title="@string/developer_menu_add_task"
+        />
+
+    <item
+        android:title="@string/developer_menu_clear_all"
+        android:id="@+id/developer_menu_clear_task"/>
+
+</menu>

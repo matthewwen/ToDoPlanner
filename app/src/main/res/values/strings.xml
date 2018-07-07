@@ -3,4 +3,19 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <!-- Menu Options for the Main Today View -->
+    <string name="developer_view">Developer</string>
+
+    <!-- Button Title for the developer view -->
+    <string name="developer_task_list">Tasks Database</string>
+    <string name="developer_notes_list">Notes Database</string>
+    <string name="developer_heading_notification">Notifications</string>
+    <string name="developer_heading_job_services">Job Services</string>
+    <string name="developer_heading_database">Databases</string>
+    <string name="developer_menu_add_task">Add Dummy Task</string>
+    <string name="developer_menu_add_note">Add Dummy Note</string>
+    <string name="developer_menu_clear_all">Clear All</string>
+
+
 </resources>

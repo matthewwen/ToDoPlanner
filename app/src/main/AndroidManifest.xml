@@ -21,22 +21,15 @@
 
         <provider
             android:authorities="com.todoplanner.matthewwen.todoplanner"
-            android:name="com.todoplanner.matthewwen.todoplanner.data.DataProvider"
+            android:name=".data.TheDataProvider"
             android:exported="false"/>
 
-        <service android:name=".sync.NotesJobService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECTUE"/>
-            </intent-filter>
-        </service>
-
-        <service android:name=".sync.TaskJobService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECTUE"/>
-            </intent-filter>
-        </service>
+        <activity android:name=".developerActivities.DeveloperMainActivity"
+            android:label="@string/developer_view"/>
+        <activity android:name=".developerActivities.DeveloperTaskActivity"
+            android:label="@string/developer_task_list"/>
+        <activity android:name=".developerActivities.DeveloperNoteActivity"
+            android:label="@string/developer_notes_list"/>
     </application>
 
 </manifest>

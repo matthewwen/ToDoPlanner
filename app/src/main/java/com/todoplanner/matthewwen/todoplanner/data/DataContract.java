@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
 public class DataContract {
 
     //the authority
-    public final static String AUTHORITY = "com.todoplanner.matthewwen.todplanner";
+    public final static String AUTHORITY = "com.todoplanner.matthewwen.todoplanner";
 
     //the uri with the content authority
     public final static Uri BASE_CONTENT_AUTHORITY = Uri.parse("content://" + AUTHORITY);
@@ -14,13 +14,16 @@ public class DataContract {
     //the path to the table
     public static final String PATH_DATA = "userData";
 
+    //this is the full content authority
+    public static String CONTENT_AUTHORITY = AUTHORITY + "/" + PATH_DATA ;
+
     public static final class TaskEntry implements BaseColumns{
 
         //the table names label as TABLE_NAME
         public static final String TABLE_NAME = "userTasks";
 
         //the content uri with the appended path
-        public static final Uri TASK_CONTENT_URI = BASE_CONTENT_AUTHORITY.buildUpon().appendPath(TABLE_NAME).build();
+        public static final Uri TASK_CONTENT_URI = BASE_CONTENT_AUTHORITY.buildUpon().appendPath(PATH_DATA).appendPath(TABLE_NAME).build();
 
         //the column names label as COLUMN_SOMETHING = "text"
         public static final String COLUMN_TASK_NAME = "taskName";
@@ -47,7 +50,7 @@ public class DataContract {
 
 
         //the content uri with the appended path
-        public static final Uri NOTE_CONTENT_URI = BASE_CONTENT_AUTHORITY.buildUpon().appendPath(TABLE_NAME).build();
+        public static final Uri NOTE_CONTENT_URI = BASE_CONTENT_AUTHORITY.buildUpon().appendPath(PATH_DATA).appendPath(TABLE_NAME).build();
 
         //the column names label
         public static final String COLUMN_NOTE_HEADING = "heading";

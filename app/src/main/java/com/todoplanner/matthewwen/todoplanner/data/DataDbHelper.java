@@ -25,10 +25,10 @@ public class DataDbHelper extends SQLiteOpenHelper {
         //create the task table in a string
         final String TASK_CREATE_TABLE = "CREATE TABLE " + TaskEntry.TABLE_NAME + " (" +
                 TaskEntry._ID + " INTEGER PRIMARY KEY, " +
-                TaskEntry.COLUMN_TASK_NAME + "TEXT NOT NULL, " +
-                TaskEntry.COLUMN_TASK_DUE_DATE + "LONG, " +
-                TaskEntry.COLUMN_TASK_HAVE_SUB_TASK + "INTEGER NOT NULL, " +
-                TaskEntry.COLUMN_TASK_PARENT_TASK + "INTEGER NOT NULL);";
+                TaskEntry.COLUMN_TASK_NAME + " TEXT NOT NULL, " +
+                TaskEntry.COLUMN_TASK_DUE_DATE + " LONG, " +
+                TaskEntry.COLUMN_TASK_HAVE_SUB_TASK + " INTEGER NOT NULL, " +
+                TaskEntry.COLUMN_TASK_PARENT_TASK + " INTEGER NOT NULL);";
         //execute in the database by saying sqLiteDatabase.execSQL(CREATE_TABLE);
         sqLiteDatabase.execSQL(TASK_CREATE_TABLE);
 

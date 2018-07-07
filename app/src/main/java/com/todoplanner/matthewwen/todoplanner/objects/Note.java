@@ -8,8 +8,9 @@ public class Note implements Story{
     private String heading;
     private String details;
 
-    public Note(int id, String heading){
-        this.id = id; this.heading = heading;
+    //this is for the developer
+    public Note(int id, String heading, String details){
+        this.id = id; this.heading = heading; this.details = details;
     }
 
     public void setDetails(String details){
