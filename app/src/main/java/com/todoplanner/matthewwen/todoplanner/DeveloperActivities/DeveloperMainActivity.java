@@ -63,4 +63,10 @@ public class DeveloperMainActivity extends AppCompatActivity {
         "(8-21-18) Math Homework",
         "Make sure to turn in this assignment to the teacher");
     }
+
+    public void developerWeatherUpdate(View view) {
+        NotificationsUtils.displayWeatherNotification(this,
+                "Sunny",
+                "It will be Sunny all day long");
+    }
 }

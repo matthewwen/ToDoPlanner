@@ -53,7 +53,8 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/developer_reminder_weather"/>
+            android:text="@string/developer_reminder_weather"
+            android:onClick="developerWeatherUpdate"/>
 
         <!-- This Test The Job Service on the device -->
         <TextView

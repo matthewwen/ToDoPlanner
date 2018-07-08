@@ -3,6 +3,7 @@ package com.todoplanner.matthewwen.todoplanner.notifications;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -24,10 +25,12 @@ public class NotificationsUtils {
     //The identifications for the Notifications
     private static int CALENDAR_NOTIFICATION = 2000;
     private static int REMINDER_NOTIFICATION = 2100;
+    private static int WEATHER_NOTIFICATION = 2200;
 
     //The identifications for the Notification Channel Calendar
     private static final String CALENDAR_NOTIFICATION_CHANNEL = "calendar-notification-channel";
     private static final String REMINDER_NOTIFICATION_CHANNEL = "reminder-notification-channel";
+    private static final String WEATHER_NOTIFICATION_CHANNEL = "weather-notification-channel";
 
     public static void displayCalendarNotification(Context context, String title, String range, String location){
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE) ;
@@ -67,7 +70,7 @@ public class NotificationsUtils {
         }
    }
 
-   public static void displayReminderNotification(Context context, String taskName, String reminder){
+    public static void displayReminderNotification(Context context, String taskName, String reminder){
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         assert manager != null;
 
@@ -82,7 +85,7 @@ public class NotificationsUtils {
 
        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, REMINDER_NOTIFICATION_CHANNEL)
                .setContentTitle("Reminder: " + taskName)
-               .setContentInfo(reminder)
+               .setContentText(reminder)
                .setAutoCancel(true)
                .setStyle(new NotificationCompat.BigTextStyle().bigText(
                        reminder
@@ -106,6 +109,34 @@ public class NotificationsUtils {
 
    }
 
+    public static void displayWeatherNotification(Context context, String weather, String details){
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            CharSequence name = context.getString(R.string.notification_channel_weather_name);
+            String description = context.getString(R.string.notification_channel_weather_description);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(WEATHER_NOTIFICATION_CHANNEL,
+                    name,
+                    importance);
+            channel.setDescription(description);
+            manager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, WEATHER_NOTIFICATION_CHANNEL)
+                .setContentTitle("Weather Update")
+                .setContentText(weather)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(
+                        details
+                ))
+                .setLargeIcon(largeIcon(context))
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                .setAutoCancel(true);
+
+        manager.notify(WEATHER_NOTIFICATION, builder.build());
+    }
 
     /**
      *

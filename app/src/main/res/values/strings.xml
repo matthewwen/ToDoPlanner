@@ -9,6 +9,8 @@
     <string name="notification_channel_calendar_description">Calendar Events</string>
     <string name="notification_channel_reminder_name">Reminders Notification Channel</string>
     <string name="notification_channel_reminder_description">Reminders for Tasks or Upcoming Events</string>
+    <string name="notification_channel_weather_name">Weather Notification Channel</string>
+    <string name="notification_channel_weather_description">Weather Updates from the internet</string>
 
     <!-- Notification Actions for when the user want to select an action -->
     <string name="notification_action_maps">Maps</string>
