@@ -6,7 +6,13 @@
 
     <!-- Notification Channels for devices with sdk greater than or equal to O -->
     <string name="notification_channel_calendar_name">Calendar Notification Channel</string>
-    <string name="notification_channel_calendar_description">High Priority Calendar Events</string>
+    <string name="notification_channel_calendar_description">Calendar Events</string>
+    <string name="notification_channel_reminder_name">Reminders Notification Channel</string>
+    <string name="notification_channel_reminder_description">Reminders for Tasks or Upcoming Events</string>
+
+    <!-- Notification Actions for when the user want to select an action -->
+    <string name="notification_action_maps">Maps</string>
+    <string name="notification_action_completed">Completed</string>
 
     <!-- Menu Options for the Main Today View -->
     <string name="developer_view">Developer</string>

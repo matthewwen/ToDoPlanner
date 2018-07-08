@@ -57,4 +57,10 @@ public class DeveloperMainActivity extends AppCompatActivity {
                 "516 Northwestern Ave, West Lafayette, IN 47906");
 
     }
+
+    public void developerReminderTask(View view) {
+        NotificationsUtils.displayReminderNotification(this,
+        "(8-21-18) Math Homework",
+        "Make sure to turn in this assignment to the teacher");
+    }
 }

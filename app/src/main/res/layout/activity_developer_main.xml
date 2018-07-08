@@ -47,7 +47,8 @@
         <Button
             android:text="@string/developer_reminder_turn_in"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:onClick="developerReminderTask"/>
 
         <Button
             android:layout_width="match_parent"
