@@ -41,7 +41,8 @@
         <Button
             android:text="@string/developer_reminder_calender"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:onClick="developerReminderCalendar"/>
 
         <Button
             android:text="@string/developer_reminder_turn_in"
