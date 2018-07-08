@@ -15,7 +15,7 @@ public class DataDbHelper extends SQLiteOpenHelper {
     //version of the database (keep it at one)
     private static final int VERSION = 1;
 
-    public DataDbHelper(Context context) {
+    DataDbHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION); //factory should be null
     }
 

@@ -10,9 +10,14 @@
     <!-- Button Title for the developer view -->
     <string name="developer_task_list">Tasks Database</string>
     <string name="developer_notes_list">Notes Database</string>
+    <string name="developer_reminder_calender">Calendar Reminder Test</string>
+    <string name="developer_reminder_weather">Weather Reminder Test</string>
+    <string name="developer_reminder_turn_in">Turn In Assignment</string>
+    <!-- Headings and Labels for each section -->
     <string name="developer_heading_notification">Notifications</string>
     <string name="developer_heading_job_services">Job Services</string>
     <string name="developer_heading_database">Databases</string>
+    <!-- Menu Options -->
     <string name="developer_menu_add_task">Add Dummy Task</string>
     <string name="developer_menu_add_note">Add Dummy Note</string>
     <string name="developer_menu_clear_all">Clear All</string>

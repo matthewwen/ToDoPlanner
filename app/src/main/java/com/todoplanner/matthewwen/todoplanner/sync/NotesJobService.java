@@ -1,15 +1,18 @@
 package com.todoplanner.matthewwen.todoplanner.sync;
 
 
-public class NotesJobService extends com.firebase.jobdispatcher.JobService {
+import com.firebase.jobdispatcher.JobParameters;
+import com.firebase.jobdispatcher.JobService;
+
+public class NotesJobService extends JobService{
 
     @Override
-    public boolean onStartJob(com.firebase.jobdispatcher.JobParameters job) {
+    public boolean onStartJob(JobParameters job) {
         return false;
     }
 
     @Override
-    public boolean onStopJob(com.firebase.jobdispatcher.JobParameters job) {
+    public boolean onStopJob(JobParameters job) {
         return false;
     }
 }

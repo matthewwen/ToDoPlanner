@@ -31,11 +31,29 @@
             android:text="@string/developer_notes_list"
             android:onClick="showNotesDatabase"/>
 
+
+        <!--This is for the notifications -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/developer_heading_notification"/>
 
+        <Button
+            android:text="@string/developer_reminder_calender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:text="@string/developer_reminder_turn_in"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/developer_reminder_weather"/>
+
+        <!-- This Test The Job Service on the device -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

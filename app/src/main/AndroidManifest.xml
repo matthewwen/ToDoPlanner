@@ -24,6 +24,7 @@
             android:name=".data.TheDataProvider"
             android:exported="false"/>
 
+
         <activity android:name=".developerActivities.DeveloperMainActivity"
             android:label="@string/developer_view"/>
         <activity android:name=".developerActivities.DeveloperTaskActivity"

@@ -40,7 +40,6 @@ public class DataContract {
             return value == 1;
         }
 
-
     }
 
     public static final class NoteEntry implements BaseColumns{
