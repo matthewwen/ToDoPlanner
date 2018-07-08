@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TaskEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.NoteEntry;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
 
 public class DataDbHelper extends SQLiteOpenHelper {
 
@@ -37,9 +38,19 @@ public class DataDbHelper extends SQLiteOpenHelper {
                 NoteEntry._ID + " INTEGER PRIMARY KEY, " +
                 NoteEntry.COLUMN_NOTE_HEADING + " TEXT NOT NULL, " +
                 NoteEntry.COLUMN_NOTE_NOTES  + " TEXT);";
-
-        //execute int the database
+        //execute into the database
         sqLiteDatabase.execSQL(NOTE_CREATE_TABLE);
+
+        //create the event table in a string
+        final String EVENT_CREATE_TABLE = "CREATE TABLE " + EventEntry.TABLE_NAME + " (" +
+                EventEntry._ID + " INTEGER PRIMARY KEY, " +
+                EventEntry.COLUMN_EVENT_NAME + " TEXT, " +
+                EventEntry.COLUMN_EVENT_START + " LONG NOT NULL, " +
+                EventEntry.COLUMN_EVENT_END + " LONG NOT NULL, " +
+                EventEntry.COLUMN_EVENT_NOTE + " TEXT, " +
+                EventEntry.COLUMN_EVENT_TASK_ID + " INTEGER NOT NULL);";
+        //execute into the database
+        sqLiteDatabase.execSQL(EVENT_CREATE_TABLE);
     }
 
     //Delete current table on then rebuild.

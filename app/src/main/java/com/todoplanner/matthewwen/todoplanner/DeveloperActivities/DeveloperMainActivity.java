@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.todoplanner.matthewwen.todoplanner.R;
+import com.todoplanner.matthewwen.todoplanner.adapters.DeveloperEventAdapter;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Task;
@@ -68,5 +69,10 @@ public class DeveloperMainActivity extends AppCompatActivity {
         NotificationsUtils.displayWeatherNotification(this,
                 "Sunny",
                 "It will be Sunny all day long");
+    }
+
+    public void showEventDatabase(View view) {
+        Intent intent = new Intent(this, DeveloperEventActivity.class);
+        startActivity(intent);
     }
 }

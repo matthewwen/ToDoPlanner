@@ -20,17 +20,25 @@
         </activity>
 
         <provider
+            android:name=".data.DataProvider"
             android:authorities="com.todoplanner.matthewwen.todoplanner"
-            android:name=".data.TheDataProvider"
+            android:exported="false" />
+
+        <activity
+            android:name=".developerActivities.DeveloperMainActivity"
+            android:label="@string/developer_view" />
+        <activity
+            android:name=".developerActivities.DeveloperTaskActivity"
+            android:label="@string/developer_task_list" />
+        <activity
+            android:name=".developerActivities.DeveloperNoteActivity"
+            android:label="@string/developer_notes_list" />
+        <activity android:name=".developerActivities.DeveloperEventActivity"
+            android:label="@string/developer_event_list"/>
+
+        <service android:name=".sync.EventJobService"
             android:exported="false"/>
 
-
-        <activity android:name=".developerActivities.DeveloperMainActivity"
-            android:label="@string/developer_view"/>
-        <activity android:name=".developerActivities.DeveloperTaskActivity"
-            android:label="@string/developer_task_list"/>
-        <activity android:name=".developerActivities.DeveloperNoteActivity"
-            android:label="@string/developer_notes_list"/>
     </application>
 
 </manifest>

@@ -12,6 +12,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- This displays all the databases -->
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,6 +32,13 @@
             android:layout_height="wrap_content"
             android:text="@string/developer_notes_list"
             android:onClick="showNotesDatabase"/>
+
+        <Button
+            android:id="@+id/event_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="showEventDatabase"
+            android:text="@string/developer_event_list"/>
 
 
         <!--This is for the notifications -->

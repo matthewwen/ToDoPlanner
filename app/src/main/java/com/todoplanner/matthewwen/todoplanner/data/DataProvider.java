@@ -1,5 +1,6 @@
 package com.todoplanner.matthewwen.todoplanner.data;
 
+import android.annotation.SuppressLint;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -14,14 +15,14 @@ import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TaskEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.NoteEntry;
-import com.todoplanner.matthewwen.todoplanner.objects.Note;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
 
 import java.util.Objects;
 
-public class TheDataProvider extends ContentProvider {
+public class DataProvider extends ContentProvider {
 
     //the Log Tag
-    private static final String TAG = TheDataProvider.class.getSimpleName();
+    private static final String TAG = DataProvider.class.getSimpleName();
 
     //keep the database as a local variable.
     private DataDbHelper mDbHelper;
@@ -35,6 +36,9 @@ public class TheDataProvider extends ContentProvider {
     //from the table 'userNotes'
     private static final int TABLE_NOTE = 200;
 
+    //from the table 'userEvent
+    private static final int TABLE_EVENT = 300;
+
     private static UriMatcher buildUriMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -43,6 +47,9 @@ public class TheDataProvider extends ContentProvider {
 
         //This is for the notes.
         uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + NoteEntry.TABLE_NAME, TABLE_NOTE);
+
+        //This is for the events
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + EventEntry.TABLE_NAME, TABLE_EVENT);
 
         return uriMatcher;
     }
@@ -62,6 +69,7 @@ public class TheDataProvider extends ContentProvider {
         switch (id){
             case TABLE_TODO: return queryTask(uri, columns, selection, selectionArgs, orderBy);
             case TABLE_NOTE: return queryNotes(uri, columns, selection, selectionArgs, orderBy);
+            case TABLE_EVENT: return queryEvent(uri, columns, selection, selectionArgs, orderBy);
             default:
                 Log.e(TAG, "Url does not work: " + uri.toString());
                 return null;
@@ -84,6 +92,15 @@ public class TheDataProvider extends ContentProvider {
         return cursor;
     }
 
+    private Cursor queryEvent(Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy){
+        SQLiteDatabase sqLiteDatabase = mDbHelper.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.query(EventEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
+        ContentResolver resolver = Objects.requireNonNull(getContext()).getContentResolver();
+        if (resolver == null) return null;
+        cursor.setNotificationUri(resolver, uri);
+        return cursor;
+    }
+
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
@@ -98,6 +115,7 @@ public class TheDataProvider extends ContentProvider {
         switch (id){
             case TABLE_TODO: return taskInsert(uri, contentValues);
             case TABLE_NOTE: return noteInsert(uri, contentValues);
+            case TABLE_EVENT: return eventInsert(uri, contentValues);
         }
         return uri;
     }
@@ -122,12 +140,23 @@ public class TheDataProvider extends ContentProvider {
         return ContentUris.withAppendedId(uri, id);
     }
 
+    private Uri eventInsert(Uri uri, ContentValues contentValues){
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        long id = db.insert(EventEntry.TABLE_NAME, null, contentValues);
+
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
+
+        return ContentUris.withAppendedId(uri, id);
+    }
+
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
         int id = sUriMatcher.match(uri);
         switch (id){
             case TABLE_TODO: return deleteTaskAll(uri);
             case TABLE_NOTE: return deleteNoteAll(uri);
+            case TABLE_EVENT: return deleteAllEvent(uri);
         }
         return 0;
     }
@@ -140,6 +169,11 @@ public class TheDataProvider extends ContentProvider {
     private int deleteTaskAll(Uri uri){
         Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
         return mDbHelper.getWritableDatabase().delete(TaskEntry.TABLE_NAME, null, null);
+    }
+
+    public int deleteAllEvent(Uri uri){
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
+        return mDbHelper.getWritableDatabase().delete(EventEntry.TABLE_NAME, null, null);
     }
 
     @Override

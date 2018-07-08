@@ -22,6 +22,7 @@
     <!-- Button Title for the developer view -->
     <string name="developer_task_list">Tasks Database</string>
     <string name="developer_notes_list">Notes Database</string>
+    <string name="developer_event_list">Event Database</string>
     <string name="developer_reminder_calender">Calendar Reminder Test</string>
     <string name="developer_reminder_weather">Weather Reminder Test</string>
     <string name="developer_reminder_turn_in">Turn In Assignment</string>
@@ -32,6 +33,7 @@
     <!-- Menu Options -->
     <string name="developer_menu_add_task">Add Dummy Task</string>
     <string name="developer_menu_add_note">Add Dummy Note</string>
+    <string name="developer_menu_add_event">Add Dummy Event</string>
     <string name="developer_menu_clear_all">Clear All</string>
 
 

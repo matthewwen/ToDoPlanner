@@ -56,4 +56,21 @@ public class DataContract {
         public static final String COLUMN_NOTE_NOTES = "notes";
 
     }
+
+    public static final class EventEntry implements BaseColumns{
+
+        //the table name
+        public static final String TABLE_NAME = "userEvents";
+
+        //content uri with the appended path
+        public static final Uri EVENT_CONTENT_URI = BASE_CONTENT_AUTHORITY.buildUpon().appendPath(PATH_DATA).appendPath(TABLE_NAME).build();
+
+        //the column names label
+        public static final String COLUMN_EVENT_NAME = "eventName";
+        public static final String COLUMN_EVENT_START = "eventStart";
+        public static final String COLUMN_EVENT_END = "eventEnd";
+        public static final String COLUMN_EVENT_NOTE = "eventNote";
+        public static final String COLUMN_EVENT_TASK_ID = "eventTask"; //if -1, then it is just an event
+
+    }
 }
