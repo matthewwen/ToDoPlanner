@@ -19,6 +19,9 @@
     <!-- Menu Options for the Main Today View -->
     <string name="developer_view">Developer</string>
 
+    <!-- Menu Options -->
+    <string name="menu_options_refresh">Refresh</string>
+
     <!-- Button Title for the developer view -->
     <string name="developer_task_list">Tasks Database</string>
     <string name="developer_notes_list">Notes Database</string>

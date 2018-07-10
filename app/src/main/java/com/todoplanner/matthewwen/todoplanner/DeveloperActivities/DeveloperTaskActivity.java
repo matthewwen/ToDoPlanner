@@ -63,6 +63,7 @@ public class DeveloperTaskActivity extends AppCompatActivity implements
         switch (id){
             case android.R.id.home: super.onBackPressed(); return true;
             case R.id.developer_menu_add_task: return insertDummyData();
+            case R.id.developer_menu_refresh_task: getLoaderManager().restartLoader(LOADER_ID, null, this); return true;
             case R.id.developer_menu_clear_task: getContentResolver().delete(DataContract.TaskEntry.TASK_CONTENT_URI, null, null); getLoaderManager().restartLoader(LOADER_ID, null, this); return true;
         }
         return false;

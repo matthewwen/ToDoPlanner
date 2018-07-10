@@ -58,6 +58,7 @@ public class DeveloperNoteActivity extends AppCompatActivity implements
         switch (id){
             case android.R.id.home: super.onBackPressed(); return true;
             case R.id.developer_menu_add_note: return insertDummyNote();
+            case R.id.developer_menu_refresh_note: getLoaderManager().initLoader(LOADER_ID, null, this); return true;
             case R.id.developer_menu_clear_note:{ getContentResolver().
                     delete(DataContract.NoteEntry.NOTE_CONTENT_URI, null, null);
                 getLoaderManager().restartLoader(LOADER_ID, null, this);

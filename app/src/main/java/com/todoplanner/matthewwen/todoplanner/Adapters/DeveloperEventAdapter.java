@@ -13,6 +13,7 @@ import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAdapter.ViewHolder> {
 
@@ -37,8 +38,8 @@ public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAd
         Event event = allEvents.get(position);
         holder.idtv.setText("ID: " + Integer.toString(event.getID()));
         holder.nameTv.setText("Event Name: " + event.getEventName());
-        holder.startTv.setText("Start: " + Long.toString(event.getEventStart()));
-        holder.endTv.setText("End: " + Long.toString(event.getEventEnd()));
+        holder.startTv.setText("Start: " + new Date(event.getEventStart()).toString());
+        holder.endTv.setText("End: " + new Date(event.getEventEnd()).toString());
         holder.taskIDTv.setText("Task ID: " + Integer.toString(event.getTaskId()));
     }
 

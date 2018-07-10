@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import com.todoplanner.matthewwen.todoplanner.developerActivities.DeveloperMainActivity;
 
-class NotificationPendingIntent {
+public class NotificationPendingIntent {
 
     //The identifications for each pending intent
     private static final int CALENDAR_PENDING_INTENT_ID = 1000;

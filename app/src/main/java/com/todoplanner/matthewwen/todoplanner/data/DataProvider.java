@@ -111,7 +111,6 @@ public class DataProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
         int id = sUriMatcher.match(uri);
-        Log.v(TAG, "The ID: " + id);
         switch (id){
             case TABLE_TODO: return taskInsert(uri, contentValues);
             case TABLE_NOTE: return noteInsert(uri, contentValues);

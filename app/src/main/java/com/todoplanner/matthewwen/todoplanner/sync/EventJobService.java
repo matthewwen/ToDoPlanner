@@ -1,44 +1,51 @@
 package com.todoplanner.matthewwen.todoplanner.sync;
 
-import android.content.ContentValues;
-import android.content.Context;
-
-import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
-import com.todoplanner.matthewwen.todoplanner.data.DataContract;
+import com.firebase.jobdispatcher.JobParameters;
+import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import android.annotation.SuppressLint;
+import android.app.IntentService;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+//Author Matthew Xiangyu Wen
+//Date is 7-9-18
 
 public class EventJobService extends JobService {
 
-    private static final String EVENT_NAME = "Job Service";
-    private static final String NOTE = "Job Service Works";
-    private static final int TASK_ID = -1;
+    private AsyncTask<Void, Void, Void> mAsyncTask;
+    private static final String TAG = EventJobService.class.getSimpleName();
 
+    @SuppressLint("StaticFieldLeak")
     @Override
-    public boolean onStartJob(JobParameters job) {
-        return addEvent(this);
+    public boolean onStartJob(final JobParameters job) {
+        mAsyncTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                NotificationsUtils.displayCalendarNotification(EventJobService.this,
+                        "Event Job Service",
+                        "1pm to 5pm",
+                        "Matthew Home");
+                Log.v(TAG, "Notification is created");
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                Log.v(TAG, "saying that the job is finished");
+                jobFinished(job, false);
+            }
+        };
+        mAsyncTask.execute();
+        return true;
     }
 
     @Override
     public boolean onStopJob(JobParameters job) {
-        return false;
-    }
-
-    //add event to the database
-    public boolean addEvent(Context context){
-        long start = new Date().getTime();
-        long end = TimeUnit.MINUTES.toMillis(15) + start;
-        ContentValues values = new ContentValues();
-        values.put(DataContract.EventEntry.COLUMN_EVENT_NAME, EVENT_NAME);
-        values.put(DataContract.EventEntry.COLUMN_EVENT_START, start);
-        values.put(DataContract.EventEntry.COLUMN_EVENT_END, end);
-        values.put(DataContract.EventEntry.COLUMN_EVENT_NOTE, NOTE);
-        values.put(DataContract.EventEntry.COLUMN_EVENT_TASK_ID, TASK_ID);
-
-        context.getContentResolver().insert(DataContract.EventEntry.EVENT_CONTENT_URI, values);
-
+        if (mAsyncTask != null)  mAsyncTask.cancel(true);
         return true;
     }
 }

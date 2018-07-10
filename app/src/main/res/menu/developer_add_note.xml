@@ -6,6 +6,10 @@
         android:id="@+id/developer_menu_add_note"/>
 
     <item
+        android:id="@+id/developer_menu_refresh_note"
+        android:title="@string/menu_options_refresh"/>
+
+    <item
         android:id="@+id/developer_menu_clear_note"
         android:title = "@string/developer_menu_clear_all"/>
 

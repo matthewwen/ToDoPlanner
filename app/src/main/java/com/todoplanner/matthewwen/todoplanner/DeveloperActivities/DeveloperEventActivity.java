@@ -68,9 +68,10 @@ public class DeveloperEventActivity extends AppCompatActivity implements
         switch (id){
             case android.R.id.home: super.onBackPressed(); return true;
             case R.id.developer_menu_add_event: return addEvent();
+            case R.id.developer_menu_refresh_event: getLoaderManager().restartLoader(LOADER_ID, null, this); return true;
             case R.id.developer_menu_clear_event:
                 getContentResolver().delete(EventEntry.EVENT_CONTENT_URI, null, null);
-                mAdapter.notifyDataSetChanged();
+                getLoaderManager().restartLoader(LOADER_ID, null, this);
                 return true;
         }
         return false;
