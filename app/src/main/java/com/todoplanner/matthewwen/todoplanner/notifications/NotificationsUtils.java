@@ -63,11 +63,6 @@ public class NotificationsUtils {
         }
 
         manager.notify(CALENDAR_NOTIFICATION, notify.build());
-        if (CALENDAR_NOTIFICATION == 2099){
-            CALENDAR_NOTIFICATION = 2000;
-        }else {
-            CALENDAR_NOTIFICATION++;
-        }
    }
 
     public static void displayReminderNotification(Context context, String taskName, String reminder){

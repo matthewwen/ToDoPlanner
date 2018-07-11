@@ -65,8 +65,6 @@ public class AlarmEventStartReminderReceiver extends BroadcastReceiver{
 
         cursor.close();
 
-        Log.v(TAG, "Notification should be displayed now!");
-
         NotificationsUtils.displayCalendarNotification(context, title, range, "");
     }
 }

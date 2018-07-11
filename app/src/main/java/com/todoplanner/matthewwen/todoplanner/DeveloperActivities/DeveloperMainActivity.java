@@ -294,15 +294,15 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
 
         //Event 1
         long startingValue1 =  new Date().getTime() + TimeUnit.MINUTES.toMillis(1);
-        long endValue1 = startingValue1 + TimeUnit.MINUTES.toMillis(1);
+        long endValue1 = startingValue1 + TimeUnit.HOURS.toMillis(1);
         //Event 2
-        long endValue2 = endValue1 + TimeUnit.MINUTES.toMillis(1);
+        long endValue2 = endValue1 + TimeUnit.HOURS.toMillis(3);
         //Event 3
-        long endValue3 = endValue2 + TimeUnit.MINUTES.toMillis(1);
+        long endValue3 = endValue2 + TimeUnit.HOURS.toMillis(2);
         //Event 4
-        long endValue4 = endValue3 + TimeUnit.MINUTES.toMillis(1);
+        long endValue4 = endValue3 + TimeUnit.HOURS.toMillis(1);
         //Event 5
-        long endValue5 = endValue4 + TimeUnit.MINUTES.toMillis(1);
+        long endValue5 = endValue4 + TimeUnit.HOURS.toMillis(2);
 
         //Creating all the values
         createEvent("Event 1", startingValue1, endValue1);
