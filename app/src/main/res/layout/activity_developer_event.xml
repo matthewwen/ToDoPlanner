@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".developerActivities.DeveloperEventActivity">
+    tools:context=".developerActivities.developerDisplayDatabase.DeveloperEventActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/developer_event_rv"

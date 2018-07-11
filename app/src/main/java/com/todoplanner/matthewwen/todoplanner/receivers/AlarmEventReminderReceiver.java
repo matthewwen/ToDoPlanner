@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 
-public class AlarmEventReminderReciever extends BroadcastReceiver {
+public class AlarmEventReminderReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {

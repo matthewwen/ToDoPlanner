@@ -1,7 +1,6 @@
-package com.todoplanner.matthewwen.todoplanner.developerActivities;
+package com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase;
 
 import android.app.LoaderManager;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.todoplanner.matthewwen.todoplanner.R;
-import com.todoplanner.matthewwen.todoplanner.adapters.DeveloperNoteAdapter;
+import com.todoplanner.matthewwen.todoplanner.adapters.adapters.DeveloperNoteAdapter;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.loaders.NoteLoader;
 import com.todoplanner.matthewwen.todoplanner.objects.Note;

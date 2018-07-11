@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TaskEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.NoteEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
+import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 public class DataDbHelper extends SQLiteOpenHelper {
 
@@ -48,7 +49,9 @@ public class DataDbHelper extends SQLiteOpenHelper {
                 EventEntry.COLUMN_EVENT_START + " LONG NOT NULL, " +
                 EventEntry.COLUMN_EVENT_END + " LONG NOT NULL, " +
                 EventEntry.COLUMN_EVENT_NOTE + " TEXT, " +
-                EventEntry.COLUMN_EVENT_TASK_ID + " INTEGER NOT NULL);";
+                EventEntry.COLUMN_EVENT_TASK_ID + " INTEGER NOT NULL, " +
+                EventEntry.COLUMN_EVENT_IN_PROGRESS + " INTEGER);";
+
         //execute into the database
         sqLiteDatabase.execSQL(EVENT_CREATE_TABLE);
     }

@@ -1,4 +1,4 @@
-package com.todoplanner.matthewwen.todoplanner.adapters;
+package com.todoplanner.matthewwen.todoplanner.adapters.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -41,6 +41,7 @@ public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAd
         holder.startTv.setText("Start: " + new Date(event.getEventStart()).toString());
         holder.endTv.setText("End: " + new Date(event.getEventEnd()).toString());
         holder.taskIDTv.setText("Task ID: " + Integer.toString(event.getTaskId()));
+        holder.inProgTv.setText("In Progress ID: " + Integer.toString(event.getInProgress()));
     }
 
     @Override
@@ -65,6 +66,7 @@ public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAd
         TextView startTv;
         TextView endTv;
         TextView taskIDTv;
+        TextView inProgTv;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -73,6 +75,7 @@ public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAd
             startTv = itemView.findViewById(R.id.developer_event_start_tv);
             endTv = itemView.findViewById(R.id.developer_event_end_tv);
             taskIDTv = itemView.findViewById(R.id.developer_event_task_id);
+            inProgTv = itemView.findViewById(R.id.developer_event_in_progress);
         }
     }
 }

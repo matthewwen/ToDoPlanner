@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".developerActivities.DeveloperNoteActivity">
+    tools:context=".developerActivities.developerDisplayDatabase.DeveloperNoteActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/developer_note_rv"

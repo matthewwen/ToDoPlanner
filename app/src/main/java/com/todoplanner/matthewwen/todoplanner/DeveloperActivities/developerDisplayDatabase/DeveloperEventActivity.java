@@ -1,4 +1,4 @@
-package com.todoplanner.matthewwen.todoplanner.developerActivities;
+package com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase;
 
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -12,7 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.todoplanner.matthewwen.todoplanner.R;
-import com.todoplanner.matthewwen.todoplanner.adapters.DeveloperEventAdapter;
+import com.todoplanner.matthewwen.todoplanner.adapters.adapters.DeveloperEventAdapter;
 import com.todoplanner.matthewwen.todoplanner.loaders.EventLoader;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
@@ -87,6 +87,7 @@ public class DeveloperEventActivity extends AppCompatActivity implements
         values.put(EventEntry.COLUMN_EVENT_END, end);
         values.put(EventEntry.COLUMN_EVENT_NOTE, NOTE);
         values.put(EventEntry.COLUMN_EVENT_TASK_ID, TASK_ID);
+        values.put(EventEntry.COLUMN_EVENT_IN_PROGRESS, 1);
 
         getContentResolver().insert(EventEntry.EVENT_CONTENT_URI, values);
 

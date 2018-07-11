@@ -29,12 +29,12 @@
             android:name=".developerActivities.DeveloperMainActivity"
             android:label="@string/developer_view" />
         <activity
-            android:name=".developerActivities.DeveloperTaskActivity"
+            android:name=".developerActivities.developerDisplayDatabase.DeveloperTaskActivity"
             android:label="@string/developer_task_list" />
         <activity
-            android:name=".developerActivities.DeveloperNoteActivity"
+            android:name=".developerActivities.developerDisplayDatabase.DeveloperNoteActivity"
             android:label="@string/developer_notes_list" />
-        <activity android:name=".developerActivities.DeveloperEventActivity"
+        <activity android:name=".developerActivities.developerDisplayDatabase.DeveloperEventActivity"
             android:label="@string/developer_event_list"/>
 
         <service android:name=".sync.UpdateDelayedEventJobService"
@@ -48,7 +48,9 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".receivers.AlarmEventReminderReciever"/>
+        <receiver android:name=".receivers.AlarmEventReminderReceiver"/>
+        <receiver android:name=".receivers.events.AlarmEventStartReminderReceiver"/>
+        <receiver android:name=".receivers.events.AlarmEventEndReminderReceiver"/>
 
     </application>
 

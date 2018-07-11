@@ -1,23 +1,19 @@
-package com.todoplanner.matthewwen.todoplanner.developerActivities;
+package com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase;
 
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Loader;
-import android.content.UriMatcher;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.todoplanner.matthewwen.todoplanner.adapters.DeveloperTaskAdapter;
+import com.todoplanner.matthewwen.todoplanner.adapters.adapters.DeveloperTaskAdapter;
 import com.todoplanner.matthewwen.todoplanner.loaders.TaskLoader;
 import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
-import com.todoplanner.matthewwen.todoplanner.data.DataDbHelper;
 import com.todoplanner.matthewwen.todoplanner.objects.Task;
 
 import java.util.ArrayList;

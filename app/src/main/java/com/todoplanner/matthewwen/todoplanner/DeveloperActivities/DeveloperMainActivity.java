@@ -6,9 +6,12 @@ import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
+import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,21 +21,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.firebase.jobdispatcher.Constraint;
-import com.firebase.jobdispatcher.Driver;
-import com.firebase.jobdispatcher.FirebaseJobDispatcher;
-import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.firebase.jobdispatcher.Job;
-import com.firebase.jobdispatcher.Lifetime;
-import com.firebase.jobdispatcher.Trigger;
 import com.todoplanner.matthewwen.todoplanner.R;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.PreferenceUtils;
-import com.todoplanner.matthewwen.todoplanner.notifications.NotificationPendingIntent;
+import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.DeveloperEventActivity;
+import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.DeveloperNoteActivity;
+import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.DeveloperTaskActivity;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
-import com.todoplanner.matthewwen.todoplanner.receivers.AlarmEventReminderReciever;
-import com.todoplanner.matthewwen.todoplanner.sync.EventJobService;
+import com.todoplanner.matthewwen.todoplanner.objects.Event;
+import com.todoplanner.matthewwen.todoplanner.receivers.AlarmEventReminderReceiver;
+import com.todoplanner.matthewwen.todoplanner.receivers.events.AlarmEventStartReminderReceiver;
 import com.todoplanner.matthewwen.todoplanner.sync.UpdateDelayedEventJobService;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -45,11 +47,15 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
     private Button mEventButton;
     private Button mReminderButton;
 
-    //ID and Tag for Recievers
+    //ID and Tag for Receivers
     private static final int DEVELOPER_REMINDER_EVENT_SERVICE = 2;
+    private static final int DEVELOPER_REMINDER_EVENT_START = 3;
+    private static final int DEVELOOPER_REMINDER_EVENT_END = 5;
 
     //Pending Intent act as ID.
     private static PendingIntent pendingIntentReminderNotification;
+    private static PendingIntent pendingIntentStartEvent;
+    private static PendingIntent pendingIntentEndEvent;
 
     //ID and Tag for Job Services
     private static final int DEVELOPER_JOB_SERVICE_TEST = 1;
@@ -103,10 +109,8 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
             createReminderAlarmService();
         }else {
             mReminderButton.setText(REMINDER_EVENT_JOB_SERVICE_OFF);
-            cancelEventJobService();
+            cancelReminderAlarmService();
         }
-
-
     }
 
     @Override
@@ -205,7 +209,7 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
         assert manager != null;
         if (pendingIntentReminderNotification != null) manager.cancel(pendingIntentReminderNotification);
-        Intent intent = new Intent(this, AlarmEventReminderReciever.class);
+        Intent intent = new Intent(this, AlarmEventReminderReceiver.class);
         pendingIntentReminderNotification = PendingIntent.getBroadcast(this, DEVELOPER_REMINDER_EVENT_SERVICE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         manager.setRepeating(AlarmManager.RTC_WAKEUP,
                 new Date().getTime() + TimeUnit.MINUTES.toMillis(1),
@@ -245,5 +249,114 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
                 cancelReminderAlarmService();
             }
         }
+    }
+
+    public void developerScenarioDelayingEvent(View view) {
+        //Turn off all services
+        PreferenceUtils.setEventDeveloperJobService(this, false);
+        PreferenceUtils.setReminderDeveloperJobService(this, false);
+
+        //Delete all Events
+        getContentResolver().delete(DataContract.EventEntry.EVENT_CONTENT_URI,
+                null, null);
+
+        //Add content values inside of calendar
+        //Event 1
+        long startingValue1 =  new Date().getTime() + TimeUnit.MINUTES.toMillis(2);
+        long endValue1 = startingValue1 + TimeUnit.MINUTES.toMillis(3);
+        //Event 2
+        long endValue2 = endValue1 + TimeUnit.MINUTES.toMillis(6);
+        //Event 3
+        long endValue3 = endValue2 + TimeUnit.MINUTES.toMillis(7);
+        //Event 4
+        long endValue4 = endValue3 + TimeUnit.MINUTES.toMillis(2);
+        //Event 5
+        long endValue5 = endValue4 + TimeUnit.MINUTES.toMillis(3);
+
+        //Creating all the values
+        createEvent("Event 1", startingValue1, endValue1);
+        createEvent("Event 2", endValue1, endValue2);
+        createEvent("Event 3", endValue2, endValue3);
+        createEvent("Event 4", endValue3, endValue4);
+        createEvent("Event 5", endValue4, endValue5);
+
+    }
+
+    public void developerScenarioCalendarEvent(View view) {
+        Log.v(TAG, "Event Created");
+        //Turn off all services
+        PreferenceUtils.setEventDeveloperJobService(this, false);
+        PreferenceUtils.setReminderDeveloperJobService(this, false);
+
+        //Delete all Events
+        getContentResolver().delete(DataContract.EventEntry.EVENT_CONTENT_URI,
+                null, null);
+
+        //Event 1
+        long startingValue1 =  new Date().getTime() + TimeUnit.MINUTES.toMillis(1);
+        long endValue1 = startingValue1 + TimeUnit.MINUTES.toMillis(1);
+        //Event 2
+        long endValue2 = endValue1 + TimeUnit.MINUTES.toMillis(1);
+        //Event 3
+        long endValue3 = endValue2 + TimeUnit.MINUTES.toMillis(1);
+        //Event 4
+        long endValue4 = endValue3 + TimeUnit.MINUTES.toMillis(1);
+        //Event 5
+        long endValue5 = endValue4 + TimeUnit.MINUTES.toMillis(1);
+
+        //Creating all the values
+        createEvent("Event 1", startingValue1, endValue1);
+        createEvent("Event 2", endValue1, endValue2);
+        createEvent("Event 3", endValue2, endValue3);
+        createEvent("Event 4", endValue3, endValue4);
+        createEvent("Event 5", endValue4, endValue5);
+
+        //Getting the cursor
+        Cursor cursor = getContentResolver().query(EventEntry.EVENT_CONTENT_URI,
+                EventEntry.PROJECTION_DATE,
+                EventEntry.COLUMN_EVENT_START + " > ?",
+                new String[]{Long.toString(new Date().getTime())},
+                EventEntry.COLUMN_EVENT_START);
+        assert cursor != null;
+
+        //getting all the events
+        cursor.moveToPosition(-1);
+        ArrayList<Uri> allUri = new ArrayList<>();
+        ArrayList<Long> allStartTimes = new ArrayList<>();
+        ArrayList<Long> allEndTimes = new ArrayList<>();
+        int idIndex = cursor.getColumnIndex(EventEntry._ID);
+        int startIndex = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_START);
+        int endIndex = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_END);
+        while (cursor.moveToNext()){
+            allStartTimes.add(cursor.getLong(startIndex));
+            allEndTimes.add(cursor.getLong(endIndex));
+            allUri.add(ContentUris.withAppendedId(EventEntry.EVENT_CONTENT_URI, cursor.getInt(idIndex)));
+        }
+
+        //Setting up all the alarms
+        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        for (int i = 0; i < allUri.size(); i++){
+            Intent intent = new Intent(this, AlarmEventStartReminderReceiver.class);
+            intent.setAction(allUri.get(i).toString());
+            pendingIntentStartEvent = PendingIntent.getBroadcast(this, DEVELOPER_REMINDER_EVENT_START, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            assert manager != null;
+            manager.set(AlarmManager.RTC_WAKEUP, allStartTimes.get(i), pendingIntentStartEvent);
+        }
+
+
+        cursor.close();
+
+    }
+
+    private void createEvent(String name, long startValue, long endValue){
+        ContentValues values = new ContentValues();
+        values.put(EventEntry.COLUMN_EVENT_NAME, name);
+        values.put(EventEntry.COLUMN_EVENT_START, startValue);
+        values.put(EventEntry.COLUMN_EVENT_END, endValue);
+        values.put(EventEntry.COLUMN_EVENT_NOTE, "THE FLOOR IS LAVA ~ SAID TROY AND ABED");
+        values.put(EventEntry.COLUMN_EVENT_TASK_ID, -1);
+        values.put(EventEntry.COLUMN_EVENT_IN_PROGRESS, EventEntry.EVENT_NOT_IN_PROGRESS);
+
+        getContentResolver().insert(EventEntry.EVENT_CONTENT_URI, values);
     }
 }

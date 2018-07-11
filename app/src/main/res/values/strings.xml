@@ -29,10 +29,13 @@
     <string name="developer_reminder_calender">Calendar Reminder Test</string>
     <string name="developer_reminder_weather">Weather Reminder Test</string>
     <string name="developer_reminder_turn_in">Turn In Assignment</string>
+    <string name="developer_scenario_calender_event">Scenario Number 1 Automated Completed</string>
+    <string name="developer_scenario_delaying_event">Scenario Number 2 Delaying Task Automatically</string>
     <!-- Headings and Labels for each section -->
     <string name="developer_heading_notification">Notifications</string>
     <string name="developer_heading_job_services">Job Services</string>
     <string name="developer_heading_database">Databases</string>
+    <string name="developer_heading_scenario">Scenarios</string>
     <!-- Menu Options -->
     <string name="developer_menu_add_task">Add Dummy Task</string>
     <string name="developer_menu_add_note">Add Dummy Note</string>

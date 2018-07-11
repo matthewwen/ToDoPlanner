@@ -1,6 +1,5 @@
 package com.todoplanner.matthewwen.todoplanner.data;
 
-import android.annotation.SuppressLint;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -16,8 +15,14 @@ import android.util.Log;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TaskEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.NoteEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
+import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
+import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
+import java.util.Date;
 import java.util.Objects;
+
+import static com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry.COLUMN_EVENT_START;
+import static com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry.PROJECTION_INPROGRESS;
 
 public class DataProvider extends ContentProvider {
 
@@ -38,6 +43,7 @@ public class DataProvider extends ContentProvider {
 
     //from the table 'userEvent
     private static final int TABLE_EVENT = 300;
+    private static final int TABLE_EVENT_ID = 301;
 
     private static UriMatcher buildUriMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -50,6 +56,7 @@ public class DataProvider extends ContentProvider {
 
         //This is for the events
         uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + EventEntry.TABLE_NAME, TABLE_EVENT);
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + EventEntry.TABLE_NAME +"/#", TABLE_EVENT_ID);
 
         return uriMatcher;
     }
@@ -70,6 +77,11 @@ public class DataProvider extends ContentProvider {
             case TABLE_TODO: return queryTask(uri, columns, selection, selectionArgs, orderBy);
             case TABLE_NOTE: return queryNotes(uri, columns, selection, selectionArgs, orderBy);
             case TABLE_EVENT: return queryEvent(uri, columns, selection, selectionArgs, orderBy);
+            case TABLE_EVENT_ID: {
+                selection = EventEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return queryEvent(uri, columns, selection, selectionArgs, orderBy);
+            }
             default:
                 Log.e(TAG, "Url does not work: " + uri.toString());
                 return null;
@@ -97,6 +109,7 @@ public class DataProvider extends ContentProvider {
         Cursor cursor = sqLiteDatabase.query(EventEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
         ContentResolver resolver = Objects.requireNonNull(getContext()).getContentResolver();
         if (resolver == null) return null;
+        Log.v(TAG, "How many events: " + cursor.getCount());
         cursor.setNotificationUri(resolver, uri);
         return cursor;
     }
@@ -139,8 +152,55 @@ public class DataProvider extends ContentProvider {
         return ContentUris.withAppendedId(uri, id);
     }
 
-    private Uri eventInsert(Uri uri, ContentValues contentValues){
+    private Uri eventInsert(Uri uri, @Nullable ContentValues contentValues){
+        if (contentValues == null) return uri;
+
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase reader = mDbHelper.getReadableDatabase();
+
+        //getting the cursor
+        Cursor cursor = reader.rawQuery("SELECT * FROM " + EventEntry.TABLE_NAME +
+                " WHERE " + EventEntry.COLUMN_EVENT_END + " > " + contentValues.getAsLong(COLUMN_EVENT_START), null);
+        cursor.setNotificationUri(Objects.requireNonNull(getContext()).getContentResolver(), uri);
+
+        //index columns and rows
+        int eventStartIndex = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_START);
+        int eventEndIndex = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_END);
+
+        //getting the user start and end time
+        Long newStartEvent = contentValues.getAsLong(EventEntry.COLUMN_EVENT_START);
+        Long newEndEvent = contentValues.getAsLong(EventEntry.COLUMN_EVENT_END);
+
+        //checking each event the cursor caught
+        cursor.moveToPosition(-1);
+        while (cursor.moveToNext()){
+            Long eventStart = cursor.getLong(eventStartIndex);
+            Long eventEnd = cursor.getLong(eventEndIndex);
+            if ((newStartEvent > eventStart && newStartEvent < eventEnd) ||
+                    (newEndEvent > eventStart && newEndEvent < eventEnd)){
+                Log.v(TAG, "Error adding event. It will be overlapping another event");
+                cursor.close();
+                return uri;
+            }
+
+        }
+        cursor.close();
+
+        Cursor cursor1 = reader.rawQuery("SELECT * FROM " + EventEntry.TABLE_NAME +
+                " WHERE " + EventEntry.COLUMN_EVENT_IN_PROGRESS + " = " + EventEntry.EVENT_IN_PROGRESS, null);
+        cursor1.setNotificationUri(getContext().getContentResolver(), uri);
+        
+        int inProgressValues = EventEntry.EVENT_NOT_IN_PROGRESS;
+        cursor1.moveToPosition(-1);
+        if (cursor.getCount() > 0){
+            Long current = new Date().getTime(); 
+            if (newStartEvent <= current && newEndEvent >= current){
+                inProgressValues = EventEntry.EVENT_IN_PROGRESS; 
+            }
+            cursor1.close(); 
+        }
+        
+        contentValues.put(EventEntry.COLUMN_EVENT_IN_PROGRESS, inProgressValues);
 
         long id = db.insert(EventEntry.TABLE_NAME, null, contentValues);
 

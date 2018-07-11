@@ -20,7 +20,7 @@ public class PreferenceUtils {
     /**
      * This is for the Job service that adds a event to your database.
      */
-    synchronized private static void setEventDeveloperJobService(Context context, Boolean doIt){
+    synchronized public static void setEventDeveloperJobService(Context context, Boolean doIt){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(KEY_DEVELOPER_JOB_SERVICE, doIt);
@@ -40,7 +40,7 @@ public class PreferenceUtils {
     /**
      * This is for the reminder to show up
      */
-    synchronized private static void setReminderDeveloperJobService(Context context, Boolean doIt){
+    synchronized public static void setReminderDeveloperJobService(Context context, Boolean doIt){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(KEY_DEVELOPER_EVENT_REMINDER, doIt);
