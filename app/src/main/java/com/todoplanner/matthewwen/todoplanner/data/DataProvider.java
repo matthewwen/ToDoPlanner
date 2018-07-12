@@ -1,5 +1,6 @@
 package com.todoplanner.matthewwen.todoplanner.data;
 
+import android.app.IntentService;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -15,14 +16,11 @@ import android.util.Log;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TaskEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.NoteEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
-import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
-import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.Date;
 import java.util.Objects;
 
 import static com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry.COLUMN_EVENT_START;
-import static com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry.PROJECTION_INPROGRESS;
 
 public class DataProvider extends ContentProvider {
 
@@ -109,7 +107,6 @@ public class DataProvider extends ContentProvider {
         Cursor cursor = sqLiteDatabase.query(EventEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
         ContentResolver resolver = Objects.requireNonNull(getContext()).getContentResolver();
         if (resolver == null) return null;
-        Log.v(TAG, "How many events: " + cursor.getCount());
         cursor.setNotificationUri(resolver, uri);
         return cursor;
     }
@@ -192,7 +189,7 @@ public class DataProvider extends ContentProvider {
         
         int inProgressValues = EventEntry.EVENT_NOT_IN_PROGRESS;
         cursor1.moveToPosition(-1);
-        if (cursor.getCount() > 0){
+        if (cursor1.getCount() == 0){
             Long current = new Date().getTime(); 
             if (newStartEvent <= current && newEndEvent >= current){
                 inProgressValues = EventEntry.EVENT_IN_PROGRESS; 
@@ -237,7 +234,22 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
+        int id = sUriMatcher.match(uri);
+        Log.v(TAG, "Update uri: " + uri.toString());
+        switch (id){
+            case TABLE_EVENT_ID:
+                s = EventEntry._ID + " =?";
+                strings = new String[]{Long.toString(ContentUris.parseId(uri))};
+                return updateEvent(uri, contentValues, s, strings);
+        }
         return 0;
+    }
+
+    public int updateEvent(Uri uri, ContentValues contentValues, String selection, String[] selectoinArgs){
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        int number = db.update(EventEntry.TABLE_NAME, contentValues, selection, selectoinArgs);
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
+        return number;
     }
 
 }

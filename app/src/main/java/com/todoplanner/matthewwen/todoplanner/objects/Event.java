@@ -9,11 +9,12 @@ public class Event implements Story {
     private long eventStart;
     private long eventEnd;
     private int taskId;
+    private String note;
     private int inProgress;
 
-    public Event(int id, String eventName, long eventStart, long eventEnd, int taskId, int inProgress){
+    public Event(int id, String eventName, long eventStart, long eventEnd, int taskId, String note, int inProgress){
         this.id = id; this.eventName = eventName; this.eventStart = eventStart; this.eventEnd = eventEnd; this.taskId = taskId;
-        this.inProgress = inProgress;
+        this.inProgress = inProgress; this.note = note;
     }
 
     @Override
@@ -44,5 +45,9 @@ public class Event implements Story {
 
     public int getInProgress(){
         return inProgress;
+    }
+
+    public String getNote() {
+        return note;
     }
 }

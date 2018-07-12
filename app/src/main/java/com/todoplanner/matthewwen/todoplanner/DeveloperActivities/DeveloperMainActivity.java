@@ -28,9 +28,8 @@ import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDispl
 import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.DeveloperNoteActivity;
 import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.DeveloperTaskActivity;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
-import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import com.todoplanner.matthewwen.todoplanner.receivers.AlarmEventReminderReceiver;
-import com.todoplanner.matthewwen.todoplanner.receivers.events.AlarmEventStartReminderReceiver;
+import com.todoplanner.matthewwen.todoplanner.receivers.events.AlarmEventCalendarReminderReceiver;
 import com.todoplanner.matthewwen.todoplanner.sync.UpdateDelayedEventJobService;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
 
@@ -50,7 +49,7 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
     //ID and Tag for Receivers
     private static final int DEVELOPER_REMINDER_EVENT_SERVICE = 2;
     private static final int DEVELOPER_REMINDER_EVENT_START = 3;
-    private static final int DEVELOOPER_REMINDER_EVENT_END = 5;
+    private static final int DEVELOPER_REMINDER_EVENT_END = 5;
 
     //Pending Intent act as ID.
     private static PendingIntent pendingIntentReminderNotification;
@@ -146,9 +145,11 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     public void developerReminderCalendar(View view) {
         NotificationsUtils.displayCalendarNotification(this,
+                null,
                 "Wang meets Wen at Purdon't",
                 "1pm to 5pm",
-                "516 Northwestern Ave, West Lafayette, IN 47906");
+                "516 Northwestern Ave, West Lafayette, IN 47906",
+                NotificationsUtils.EVENT_REMINDER_START);
 
     }
 
@@ -294,15 +295,15 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
 
         //Event 1
         long startingValue1 =  new Date().getTime() + TimeUnit.MINUTES.toMillis(1);
-        long endValue1 = startingValue1 + TimeUnit.HOURS.toMillis(1);
+        long endValue1 = startingValue1 + TimeUnit.MINUTES.toMillis(1);
         //Event 2
-        long endValue2 = endValue1 + TimeUnit.HOURS.toMillis(3);
+        long endValue2 = endValue1 + TimeUnit.MINUTES.toMillis(1);
         //Event 3
-        long endValue3 = endValue2 + TimeUnit.HOURS.toMillis(2);
+        long endValue3 = endValue2 + TimeUnit.MINUTES.toMillis(1);
         //Event 4
-        long endValue4 = endValue3 + TimeUnit.HOURS.toMillis(1);
+        long endValue4 = endValue3 + TimeUnit.MINUTES.toMillis(1);
         //Event 5
-        long endValue5 = endValue4 + TimeUnit.HOURS.toMillis(2);
+        long endValue5 = endValue4 + TimeUnit.MINUTES.toMillis(1);
 
         //Creating all the values
         createEvent("Event 1", startingValue1, endValue1);
@@ -333,19 +334,40 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
             allUri.add(ContentUris.withAppendedId(EventEntry.EVENT_CONTENT_URI, cursor.getInt(idIndex)));
         }
 
+        //get rid of the start times that overlap the end times
+        for (int i = 1; i < allStartTimes.size(); i++){
+            if (NotificationsUtils.compareTime(allStartTimes.get(i), allEndTimes.get(i-1))) {
+                allStartTimes.set(i, null);
+            }
+        }
+
         //Setting up all the alarms
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
         for (int i = 0; i < allUri.size(); i++){
-            Intent intent = new Intent(this, AlarmEventStartReminderReceiver.class);
-            intent.setAction(allUri.get(i).toString());
-            pendingIntentStartEvent = PendingIntent.getBroadcast(this, DEVELOPER_REMINDER_EVENT_START, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            //Make intents
+            Intent intentStart = new Intent(this, AlarmEventCalendarReminderReceiver.class);
+            Intent intentEnd = new Intent(this, AlarmEventCalendarReminderReceiver.class);
+            //set uri as the action
+            intentStart.setAction(allUri.get(i).toString());
+            intentEnd.setAction(allUri.get(i).toString());
+            //putting in the type.
+            intentStart.putExtra(getString(R.string.notification_event_start_stop_key),
+                    NotificationsUtils.EVENT_REMINDER_START);
+            intentEnd.putExtra(getString(R.string.notification_event_start_stop_key),
+                    NotificationsUtils.EVENT_REMINDER_END);
+            //Creating pending
             assert manager != null;
-            manager.set(AlarmManager.RTC_WAKEUP, allStartTimes.get(i), pendingIntentStartEvent);
+            pendingIntentStartEvent = PendingIntent.getBroadcast(this,
+                    DEVELOPER_REMINDER_EVENT_START, intentStart, PendingIntent.FLAG_UPDATE_CURRENT);
+            pendingIntentEndEvent = PendingIntent.getBroadcast(this,
+                    DEVELOPER_REMINDER_EVENT_END, intentEnd, PendingIntent.FLAG_UPDATE_CURRENT);
+            //Add it to the alarm service
+            if (allStartTimes.get(i) != null) {
+                manager.set(AlarmManager.RTC_WAKEUP, allStartTimes.get(i), pendingIntentStartEvent);
+            }
+            manager.set(AlarmManager.RTC_WAKEUP, allEndTimes.get(i), pendingIntentEndEvent);
         }
-
-
         cursor.close();
-
     }
 
     private void createEvent(String name, long startValue, long endValue){
@@ -355,7 +377,6 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
         values.put(EventEntry.COLUMN_EVENT_END, endValue);
         values.put(EventEntry.COLUMN_EVENT_NOTE, "THE FLOOR IS LAVA ~ SAID TROY AND ABED");
         values.put(EventEntry.COLUMN_EVENT_TASK_ID, -1);
-        values.put(EventEntry.COLUMN_EVENT_IN_PROGRESS, EventEntry.EVENT_NOT_IN_PROGRESS);
 
         getContentResolver().insert(EventEntry.EVENT_CONTENT_URI, values);
     }

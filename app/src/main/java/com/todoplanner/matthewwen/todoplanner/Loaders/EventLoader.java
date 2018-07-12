@@ -35,6 +35,7 @@ public class EventLoader extends AsyncTaskLoader<ArrayList<Event>> {
         int startIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_START);
         int endIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_END);
         int taskIdIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_TASK_ID);
+        int noteIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_NOTE);
         int inProgIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_IN_PROGRESS);
 
         while (cursor.moveToNext()){
@@ -43,9 +44,10 @@ public class EventLoader extends AsyncTaskLoader<ArrayList<Event>> {
             long start = cursor.getLong(startIndex);
             long end = cursor.getLong(endIndex);
             int taskId = cursor.getInt(taskIdIndex);
+            String note = cursor.getString(noteIndex);
             int inProg = cursor.getInt(inProgIndex);
 
-            Event temp = new Event(id, name, start, end, taskId, inProg);
+            Event temp = new Event(id, name, start, end, taskId, note, inProg);
             allEvents.add(temp);
         }
 

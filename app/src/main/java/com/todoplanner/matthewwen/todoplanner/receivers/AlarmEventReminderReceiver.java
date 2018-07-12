@@ -10,6 +10,12 @@ public class AlarmEventReminderReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        NotificationsUtils.displayCalendarNotification(context, "Math Class", "1pm-5pm", "Home");
+        NotificationsUtils.displayCalendarNotification(context,
+                null,
+                "Math Class",
+                "1pm-5pm",
+                "Home",
+                NotificationsUtils.EVENT_REMINDER_START);
+
     }
 }

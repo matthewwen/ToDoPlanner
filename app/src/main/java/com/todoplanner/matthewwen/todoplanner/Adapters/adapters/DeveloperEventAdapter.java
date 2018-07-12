@@ -41,6 +41,7 @@ public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAd
         holder.startTv.setText("Start: " + new Date(event.getEventStart()).toString());
         holder.endTv.setText("End: " + new Date(event.getEventEnd()).toString());
         holder.taskIDTv.setText("Task ID: " + Integer.toString(event.getTaskId()));
+        holder.noteTv.setText("Note: " + event.getNote());
         holder.inProgTv.setText("In Progress ID: " + Integer.toString(event.getInProgress()));
     }
 
@@ -66,6 +67,7 @@ public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAd
         TextView startTv;
         TextView endTv;
         TextView taskIDTv;
+        TextView noteTv;
         TextView inProgTv;
 
         ViewHolder(View itemView) {
@@ -74,7 +76,8 @@ public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAd
             nameTv = itemView.findViewById(R.id.developer_event_name_tv);
             startTv = itemView.findViewById(R.id.developer_event_start_tv);
             endTv = itemView.findViewById(R.id.developer_event_end_tv);
-            taskIDTv = itemView.findViewById(R.id.developer_event_task_id);
+            taskIDTv = itemView.findViewById(R.id.developer_event_task_id_tv);
+            noteTv = itemView.findViewById(R.id.developer_event_note_tv);
             inProgTv = itemView.findViewById(R.id.developer_event_in_progress);
         }
     }

@@ -92,8 +92,7 @@ public class DataContract {
             COLUMN_EVENT_END,
             COLUMN_EVENT_IN_PROGRESS};
 
-        public static final String[] PROJECTION_INPROGRESS = {_ID,
+        public static final String[] PROJECTION_IN_PROGRESS = {_ID,
             COLUMN_EVENT_IN_PROGRESS};
-
     }
 }

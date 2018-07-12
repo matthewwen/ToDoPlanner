@@ -1,33 +1,43 @@
 package com.todoplanner.matthewwen.todoplanner.receivers.events;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.util.Log;
 
+import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
+import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.notifications.NotificationPendingIntent;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class AlarmEventStartReminderReceiver extends BroadcastReceiver{
+public class AlarmEventCalendarReminderReceiver extends BroadcastReceiver{
 
+    //This is for displaying the range
     private static final SimpleDateFormat GET_ADVANCE_FORMAT = new SimpleDateFormat("h:mm", Locale.ENGLISH);
     private static final SimpleDateFormat GET_SIMPLE_FORMAT = new SimpleDateFormat("h", Locale.ENGLISH);
     private static final SimpleDateFormat GET_MINUTE = new SimpleDateFormat("m", Locale.ENGLISH);
     private static final SimpleDateFormat GET_AM_PM = new SimpleDateFormat("a", Locale.ENGLISH);
 
-    private static final String TAG = AlarmEventStartReminderReceiver.class.getSimpleName();
+    private static final String TAG = AlarmEventCalendarReminderReceiver.class.getSimpleName();
+
+    //This is a reference to Simple format for comparing times
+    public static final SimpleDateFormat GET_COMPARE_FORMAT = new SimpleDateFormat("h:mm a", Locale.ENGLISH);
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //Get the Uri
+        //Get the Uri and the type
         String action = intent.getAction();
         Uri uri = Uri.parse(action);
+        String type = intent.getStringExtra(context.getString(R.string.notification_event_start_stop_key));
 
         //Get the Cursor
         Cursor cursor = context.getContentResolver().query(uri,
@@ -38,7 +48,6 @@ public class AlarmEventStartReminderReceiver extends BroadcastReceiver{
         assert cursor != null;
         cursor.moveToPosition(-1);
         cursor.moveToNext();
-        Log.v(TAG, "I Am Here");
 
         //get all the values
         int titleIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_NAME);
@@ -65,6 +74,15 @@ public class AlarmEventStartReminderReceiver extends BroadcastReceiver{
 
         cursor.close();
 
-        NotificationsUtils.displayCalendarNotification(context, title, range, "");
+        //If notification on start, make it in progress
+        if (type.equals(NotificationsUtils.EVENT_REMINDER_START)){
+            DataMethods.noneInProgress(context);
+            ContentValues values = DataMethods.getContentValues(context, uri);
+            values.put(DataContract.EventEntry.COLUMN_EVENT_IN_PROGRESS,
+                    DataContract.EventEntry.EVENT_IN_PROGRESS);
+            context.getContentResolver().update(uri, values, null, null);
+        }
+
+        NotificationsUtils.displayCalendarNotification(context, uri, title, range, "", type);
     }
 }

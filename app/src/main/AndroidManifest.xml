@@ -49,8 +49,10 @@
         </service>
 
         <receiver android:name=".receivers.AlarmEventReminderReceiver"/>
-        <receiver android:name=".receivers.events.AlarmEventStartReminderReceiver"/>
-        <receiver android:name=".receivers.events.AlarmEventEndReminderReceiver"/>
+        <receiver android:name=".receivers.events.AlarmEventCalendarReminderReceiver"/>
+
+        <service android:name=".service.NextEventIntentService"
+            android:exported="true"/>
 
     </application>
 

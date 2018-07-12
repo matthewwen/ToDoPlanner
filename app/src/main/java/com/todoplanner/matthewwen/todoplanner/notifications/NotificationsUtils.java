@@ -3,17 +3,19 @@ package com.todoplanner.matthewwen.todoplanner.notifications;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.R;
+import com.todoplanner.matthewwen.todoplanner.receivers.events.AlarmEventCalendarReminderReceiver;
+
+import java.util.Date;
 
 import static com.todoplanner.matthewwen.todoplanner.notifications.NotificationPendingIntent.calendarPendingIntent;
 import static com.todoplanner.matthewwen.todoplanner.notifications.NotificationPendingIntent.openReminderPendingIntent;
@@ -21,6 +23,10 @@ import static com.todoplanner.matthewwen.todoplanner.notifications.NotificationP
 public class NotificationsUtils {
 
     private static final String TAG = NotificationsUtils.class.getSimpleName();
+
+    //The different type of notification for Calendar Events
+    public static final String EVENT_REMINDER_START = "Start Event: ";
+    public static final String EVENT_REMINDER_END = "End Event: ";
 
     //The identifications for the Notifications
     private static int CALENDAR_NOTIFICATION = 2000;
@@ -32,10 +38,22 @@ public class NotificationsUtils {
     private static final String REMINDER_NOTIFICATION_CHANNEL = "reminder-notification-channel";
     private static final String WEATHER_NOTIFICATION_CHANNEL = "weather-notification-channel";
 
-    public static void displayCalendarNotification(Context context, String title, String range, String location){
+    //Comparing times from one event to the next
+    public static boolean compareTime(long date1, long date2){
+        return AlarmEventCalendarReminderReceiver.GET_COMPARE_FORMAT.format(new Date(date1))
+                .equals(
+                        AlarmEventCalendarReminderReceiver.GET_COMPARE_FORMAT.format(new Date(date2))
+                );
+    }
+
+
+    public static void displayCalendarNotification(Context context, Uri uri, String title,
+                                                   String range, String location, String typeOfEvent){
+
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE) ;
         assert manager != null;
 
+        //creating notification channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             CharSequence name = context.getString(R.string.notification_channel_calendar_name);
             String description = context.getString(R.string.notification_channel_calendar_description);
@@ -45,24 +63,47 @@ public class NotificationsUtils {
             manager.createNotificationChannel(channel);
         }
 
+        //Building the Notification
         NotificationCompat.Builder notify = new NotificationCompat.Builder(context, CALENDAR_NOTIFICATION_CHANNEL)
-                .setContentTitle("Event: " + title)
+                .setContentTitle(typeOfEvent + title)
                 .setContentText(range)
                 .setAutoCancel(true)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(
-                        range + "\n" + location
-                ))
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setLargeIcon(largeIcon(context))
-                .setContentIntent(calendarPendingIntent(context))
-                .addAction(NotificationAction.openMaps(context));
+                .setContentIntent(calendarPendingIntent(context));
 
+        //Fix the location error
+        if (location.equals("")){
+            notify.setStyle(new NotificationCompat.BigTextStyle().bigText(
+                    range
+            ));
+        }else{
+            notify.setStyle(new NotificationCompat.BigTextStyle().bigText(
+                    range + "\n" + location
+            ));
+            if (typeOfEvent.equals(EVENT_REMINDER_START)){
+                notify.addAction(NotificationAction.openMaps(context));
+            }
+        }
+
+        //If the calendar event is type end. Two actions need to be added
+        if (typeOfEvent.equals(EVENT_REMINDER_END)){
+
+        }
+
+        //for devices with sdk less than oreo
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
             notify.setPriority(Notification.PRIORITY_HIGH);
         }
 
         manager.notify(CALENDAR_NOTIFICATION, notify.build());
+
+        if (CALENDAR_NOTIFICATION == 2099){
+            CALENDAR_NOTIFICATION = 2000;
+        }else {
+            CALENDAR_NOTIFICATION++;
+        }
    }
 
     public static void displayReminderNotification(Context context, String taskName, String reminder){

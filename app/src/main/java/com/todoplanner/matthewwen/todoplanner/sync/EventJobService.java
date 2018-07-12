@@ -26,9 +26,11 @@ public class EventJobService extends JobService {
             @Override
             protected Void doInBackground(Void... voids) {
                 NotificationsUtils.displayCalendarNotification(EventJobService.this,
+                        null,
                         "Event Job Service",
                         "1pm to 5pm",
-                        "Matthew Home");
+                        "Matthew Home",
+                        NotificationsUtils.EVENT_REMINDER_START);
                 Log.v(TAG, "Notification is created");
                 return null;
             }
