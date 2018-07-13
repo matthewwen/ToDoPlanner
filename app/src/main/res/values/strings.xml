@@ -30,7 +30,9 @@
     <!-- Button Title for the developer view -->
     <string name="developer_task_list">Tasks Database</string>
     <string name="developer_notes_list">Notes Database</string>
-    <string name="developer_event_list">Event Database</string>
+    <string name="developer_today_event_list">Today Event Database</string>
+    <string name="developer_pending_event_list">Pending Event Database</string>
+    <string name="developer_past_event_list">Past Event Database</string>
     <string name="developer_reminder_calender">Calendar Reminder Test</string>
     <string name="developer_reminder_weather">Weather Reminder Test</string>
     <string name="developer_reminder_turn_in">Turn In Assignment</string>

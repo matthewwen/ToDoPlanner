@@ -1,5 +1,7 @@
 package com.todoplanner.matthewwen.todoplanner.objects;
 
+import android.net.Uri;
+
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 
 public class Note implements Story{
@@ -34,4 +36,5 @@ public class Note implements Story{
     public String getStoryType() {
         return DataContract.NoteEntry.TABLE_NAME;
     }
+
 }

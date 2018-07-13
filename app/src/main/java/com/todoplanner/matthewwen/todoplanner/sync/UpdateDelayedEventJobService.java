@@ -7,7 +7,6 @@ import android.content.Context;
 
 import android.app.job.JobService;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 
@@ -29,13 +28,13 @@ public class UpdateDelayedEventJobService extends JobService {
         long start = new Date().getTime();
         long end = TimeUnit.MINUTES.toMillis(15) + start;
         ContentValues values = new ContentValues();
-        values.put(DataContract.EventEntry.COLUMN_EVENT_NAME, EVENT_NAME);
-        values.put(DataContract.EventEntry.COLUMN_EVENT_START, start);
-        values.put(DataContract.EventEntry.COLUMN_EVENT_END, end);
-        values.put(DataContract.EventEntry.COLUMN_EVENT_NOTE, NOTE);
-        values.put(DataContract.EventEntry.COLUMN_EVENT_TASK_ID, TASK_ID);
+        values.put(DataContract.TodayEventEntry.COLUMN_EVENT_NAME, EVENT_NAME);
+        values.put(DataContract.TodayEventEntry.COLUMN_EVENT_START, start);
+        values.put(DataContract.TodayEventEntry.COLUMN_EVENT_END, end);
+        values.put(DataContract.TodayEventEntry.COLUMN_EVENT_NOTE, NOTE);
+        values.put(DataContract.TodayEventEntry.COLUMN_EVENT_TASK_ID, TASK_ID);
 
-        context.getContentResolver().insert(DataContract.EventEntry.EVENT_CONTENT_URI, values);
+        context.getContentResolver().insert(DataContract.TodayEventEntry.EVENT_CONTENT_URI, values);
     }
 
 

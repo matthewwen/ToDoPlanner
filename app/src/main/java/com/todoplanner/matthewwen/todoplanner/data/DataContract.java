@@ -9,13 +9,10 @@ public class DataContract {
     public final static String AUTHORITY = "com.todoplanner.matthewwen.todoplanner";
 
     //the uri with the content authority
-    public final static Uri BASE_CONTENT_AUTHORITY = Uri.parse("content://" + AUTHORITY);
+    final static Uri BASE_CONTENT_AUTHORITY = Uri.parse("content://" + AUTHORITY);
 
     //the path to the table
     public static final String PATH_DATA = "userData";
-
-    //this is the full content authority
-    public static String CONTENT_AUTHORITY = AUTHORITY + "/" + PATH_DATA ;
 
     public static final class TaskEntry implements BaseColumns{
 
@@ -57,10 +54,10 @@ public class DataContract {
 
     }
 
-    public static final class EventEntry implements BaseColumns{
+    public static final class TodayEventEntry implements BaseColumns{
 
         //the table name
-        public static final String TABLE_NAME = "userEvents";
+        public static final String TABLE_NAME = "userTodayEvents";
 
         //content uri with the appended path
         public static final Uri EVENT_CONTENT_URI = BASE_CONTENT_AUTHORITY.buildUpon().appendPath(PATH_DATA).appendPath(TABLE_NAME).build();
@@ -72,20 +69,37 @@ public class DataContract {
         public static final String COLUMN_EVENT_NOTE = "eventNote";
         public static final String COLUMN_EVENT_TASK_ID = "eventTask"; //if -1, then it is just an event
         public static final String COLUMN_EVENT_IN_PROGRESS = "eventProgress"; //if 0, then no. If 1, then yes.
+        public static final String COLUMN_EVENT_STATIONARY = "eventStationary"; //if 0, then no. If 1, then yes
 
         //this is for constant values
         public static final int NO_TASK_ID = -1;
         public static final int EVENT_IN_PROGRESS = 1;
         public static final int EVENT_NOT_IN_PROGRESS = 0;
 
+        //this is for stationary vs. not stationary
+        public static final int EVENT_STATIONARY = 1;
+        public static final int EVENT_NOT_STATIONARY = 0;
+
         //the projection
-        public static final String[] PROJECTION = {_ID,
+        public static final String[] PROJECTION = {
+                _ID,
             COLUMN_EVENT_NAME,
             COLUMN_EVENT_START,
             COLUMN_EVENT_END,
-            COLUMN_EVENT_NOTE,
             COLUMN_EVENT_TASK_ID,
-            COLUMN_EVENT_IN_PROGRESS};
+            COLUMN_EVENT_NOTE,
+            COLUMN_EVENT_IN_PROGRESS,
+            COLUMN_EVENT_STATIONARY};
+
+        //All the Index
+        public static final int COLUMN_EVENT_ID_FULL_INDEX = 0;
+        public static final int COLUMN_EVENT_NAME_FULL_INDEX = 1;
+        public static final int COLUMN_EVENT_START_FULL_INDEX = 2;
+        public static final int COLUMN_EVENT_END_FULL_INDEX = 3;
+        public static final int COLUMN_EVENT_TASK_ID_FULL_INDEX = 4;
+        public static final int COLUMN_EVENT_NOTE_FULL_INDEX = 5;
+        public static final int COLUMN_EVENT_IN_PROGRESS_FULL_INDEX = 6;
+        public static final int COLUMN_EVENT_STATIONARY_FULL_INDEX = 7;
 
         public static final String[] PROJECTION_DATE = {_ID,
             COLUMN_EVENT_START,
@@ -94,5 +108,82 @@ public class DataContract {
 
         public static final String[] PROJECTION_IN_PROGRESS = {_ID,
             COLUMN_EVENT_IN_PROGRESS};
+    }
+
+    public static final class PendingEventEntry implements BaseColumns{
+        //the table name
+        public static final String TABLE_NAME = "userPendingEvents";
+
+        //content uri with the appended path
+        public static final Uri EVENT_CONTENT_URI = BASE_CONTENT_AUTHORITY.buildUpon().appendPath(PATH_DATA).appendPath(TABLE_NAME).build();
+
+        //the column names label
+        public static final String COLUMN_EVENT_NAME = "eventName";
+        public static final String COLUMN_EVENT_START = "eventStart";
+        public static final String COLUMN_EVENT_END = "eventEnd";
+        public static final String COLUMN_EVENT_NOTE = "eventNote";
+        public static final String COLUMN_EVENT_TASK_ID = "eventTask"; //if -1, then it is just an event
+        public static final String COLUMN_EVENT_STATIONARY = "eventStationary"; //if 0, then no. If 1, then yes
+
+        //this is for stationary vs. not stationary
+        public static final int EVENT_STATIONARY = 1;
+        public static final int EVENT_NOT_STATIONARY = 0;
+
+        public static final int NO_TASK_ID = -1;
+
+        //the projection
+        public static final String[] PROJECTION = {
+                _ID,
+                COLUMN_EVENT_NAME,
+                COLUMN_EVENT_START,
+                COLUMN_EVENT_END,
+                COLUMN_EVENT_TASK_ID,
+                COLUMN_EVENT_NOTE,
+                COLUMN_EVENT_STATIONARY};
+
+        //All the Index
+        public static final int COLUMN_EVENT_ID_FULL_INDEX = 0;
+        public static final int COLUMN_EVENT_NAME_FULL_INDEX = 1;
+        public static final int COLUMN_EVENT_START_FULL_INDEX = 2;
+        public static final int COLUMN_EVENT_END_FULL_INDEX = 3;
+        public static final int COLUMN_EVENT_TASK_ID_FULL_INDEX = 4;
+        public static final int COLUMN_EVENT_NOTE_FULL_INDEX = 5;
+        public static final int COLUMN_EVENT_STATIONARY_FULL_INDEX = 6;
+    }
+
+    public static final class PastEventEntry implements BaseColumns{
+        //the table name
+        public static final String TABLE_NAME = "userPastEvents";
+
+        //content uri with the appended path
+        public static final Uri EVENT_CONTENT_URI = BASE_CONTENT_AUTHORITY.buildUpon().appendPath(PATH_DATA).appendPath(TABLE_NAME).build();
+
+        //the column names label
+        public static final String COLUMN_EVENT_NAME = "eventName";
+        public static final String COLUMN_EVENT_START = "eventStart";
+        public static final String COLUMN_EVENT_END = "eventEnd";
+        public static final String COLUMN_EVENT_NOTE = "eventNote";
+        public static final String COLUMN_EVENT_TASK_ID = "eventTask"; //if -1, then it is just an event
+
+        public static final int NO_TASK_ID = -1;
+
+        //the projection
+        public static final String[] PROJECTION = {
+                _ID,
+                COLUMN_EVENT_NAME,
+                COLUMN_EVENT_START,
+                COLUMN_EVENT_END,
+                COLUMN_EVENT_TASK_ID,
+                COLUMN_EVENT_NOTE
+        };
+
+        //All the Index
+        public static final int COLUMN_EVENT_ID_FULL_INDEX = 0;
+        public static final int COLUMN_EVENT_NAME_FULL_INDEX = 1;
+        public static final int COLUMN_EVENT_START_FULL_INDEX = 2;
+        public static final int COLUMN_EVENT_END_FULL_INDEX = 3;
+        public static final int COLUMN_EVENT_TASK_ID_FULL_INDEX = 4;
+        public static final int COLUMN_EVENT_NOTE_FULL_INDEX = 5;
+
     }
 }

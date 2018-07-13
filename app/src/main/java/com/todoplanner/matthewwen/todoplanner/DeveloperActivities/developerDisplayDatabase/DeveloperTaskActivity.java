@@ -10,7 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.todoplanner.matthewwen.todoplanner.adapters.adapters.DeveloperTaskAdapter;
+import com.todoplanner.matthewwen.todoplanner.adapter.DeveloperTaskAdapter;
 import com.todoplanner.matthewwen.todoplanner.loaders.TaskLoader;
 import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;

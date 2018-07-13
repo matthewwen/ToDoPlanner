@@ -34,11 +34,25 @@
             android:onClick="showNotesDatabase"/>
 
         <Button
-            android:id="@+id/event_list"
+            android:id="@+id/event_today_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="showEventDatabase"
-            android:text="@string/developer_event_list"/>
+            android:onClick="showTodayEventDatabase"
+            android:text="@string/developer_today_event_list"/>
+
+        <Button
+            android:id="@+id/event_pending_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="showPendingEventDatabase"
+            android:text="@string/developer_pending_event_list"/>
+
+        <Button
+            android:id="@+id/event_past_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="showPastEventDatabase"
+            android:text="@string/developer_past_event_list"/>
 
 
         <!--This is for the notifications -->

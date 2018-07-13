@@ -11,7 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.todoplanner.matthewwen.todoplanner.R;
-import com.todoplanner.matthewwen.todoplanner.adapters.adapters.DeveloperNoteAdapter;
+import com.todoplanner.matthewwen.todoplanner.adapter.DeveloperNoteAdapter;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.loaders.NoteLoader;
 import com.todoplanner.matthewwen.todoplanner.objects.Note;

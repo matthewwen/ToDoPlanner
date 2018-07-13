@@ -1,5 +1,7 @@
 package com.todoplanner.matthewwen.todoplanner.objects;
 
+import android.net.Uri;
+
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 
 import java.text.SimpleDateFormat;
@@ -13,7 +15,6 @@ public class Task implements Story{
     private String taskName;
     private Date date;
     private int parent;
-
 
     //for the developer
     private long dateMil;

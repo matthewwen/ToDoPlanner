@@ -6,13 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.ContactsContract;
-import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
-import com.todoplanner.matthewwen.todoplanner.notifications.NotificationPendingIntent;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 
 import java.text.SimpleDateFormat;
@@ -29,9 +26,6 @@ public class AlarmEventCalendarReminderReceiver extends BroadcastReceiver{
 
     private static final String TAG = AlarmEventCalendarReminderReceiver.class.getSimpleName();
 
-    //This is a reference to Simple format for comparing times
-    public static final SimpleDateFormat GET_COMPARE_FORMAT = new SimpleDateFormat("h:mm a", Locale.ENGLISH);
-
     @Override
     public void onReceive(Context context, Intent intent) {
         //Get the Uri and the type
@@ -41,18 +35,18 @@ public class AlarmEventCalendarReminderReceiver extends BroadcastReceiver{
 
         //Get the Cursor
         Cursor cursor = context.getContentResolver().query(uri,
-                DataContract.EventEntry.PROJECTION,
+                DataContract.TodayEventEntry.PROJECTION,
                 null,
                 null,
-                DataContract.EventEntry.COLUMN_EVENT_START);
+                DataContract.TodayEventEntry.COLUMN_EVENT_START);
         assert cursor != null;
         cursor.moveToPosition(-1);
         cursor.moveToNext();
 
         //get all the values
-        int titleIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_NAME);
-        int longStartIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_START);
-        int longEndIndex = cursor.getColumnIndex(DataContract.EventEntry.COLUMN_EVENT_END);
+        int titleIndex = cursor.getColumnIndex(DataContract.TodayEventEntry.COLUMN_EVENT_NAME);
+        int longStartIndex = cursor.getColumnIndex(DataContract.TodayEventEntry.COLUMN_EVENT_START);
+        int longEndIndex = cursor.getColumnIndex(DataContract.TodayEventEntry.COLUMN_EVENT_END);
 
         String title = cursor.getString(titleIndex);
         long longStart = cursor.getLong(longStartIndex);
@@ -78,8 +72,8 @@ public class AlarmEventCalendarReminderReceiver extends BroadcastReceiver{
         if (type.equals(NotificationsUtils.EVENT_REMINDER_START)){
             DataMethods.noneInProgress(context);
             ContentValues values = DataMethods.getContentValues(context, uri);
-            values.put(DataContract.EventEntry.COLUMN_EVENT_IN_PROGRESS,
-                    DataContract.EventEntry.EVENT_IN_PROGRESS);
+            values.put(DataContract.TodayEventEntry.COLUMN_EVENT_IN_PROGRESS,
+                    DataContract.TodayEventEntry.EVENT_IN_PROGRESS);
             context.getContentResolver().update(uri, values, null, null);
         }
 

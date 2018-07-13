@@ -1,6 +1,5 @@
 package com.todoplanner.matthewwen.todoplanner.data;
 
-import android.app.IntentService;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -15,12 +14,14 @@ import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TaskEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.NoteEntry;
-import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.PendingEventEntry;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.PastEventEntry;
 
 import java.util.Date;
 import java.util.Objects;
 
-import static com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry.COLUMN_EVENT_START;
+import static com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry.COLUMN_EVENT_START;
 
 public class DataProvider extends ContentProvider {
 
@@ -39,9 +40,17 @@ public class DataProvider extends ContentProvider {
     //from the table 'userNotes'
     private static final int TABLE_NOTE = 200;
 
-    //from the table 'userEvent
-    private static final int TABLE_EVENT = 300;
-    private static final int TABLE_EVENT_ID = 301;
+    //from the table 'userTodayEvent'
+    private static final int TABLE_TODAY_EVENT = 300;
+    private static final int TABLE_EVENT_TODAY_ID = 301;
+
+    //from the table 'userPendingEvent'
+    private static final int TABLE_PENDING_EVENT = 302;
+    private static final int TABLE_PENDING_EVENT_ID = 303;
+
+    //from the table 'userPastEvent'
+    private static final int TABLE_PAST_EVENT = 304;
+    private static final int TABLE_PAST_EVENT_ID = 305;
 
     private static UriMatcher buildUriMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -52,9 +61,17 @@ public class DataProvider extends ContentProvider {
         //This is for the notes.
         uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + NoteEntry.TABLE_NAME, TABLE_NOTE);
 
-        //This is for the events
-        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + EventEntry.TABLE_NAME, TABLE_EVENT);
-        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + EventEntry.TABLE_NAME +"/#", TABLE_EVENT_ID);
+        //This is for the Today events
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + TodayEventEntry.TABLE_NAME, TABLE_TODAY_EVENT);
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + TodayEventEntry.TABLE_NAME +"/#", TABLE_EVENT_TODAY_ID);
+
+        //This is for the Past events
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + PastEventEntry.TABLE_NAME, TABLE_PAST_EVENT);
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + PastEventEntry.TABLE_NAME +"/#", TABLE_PAST_EVENT_ID);
+
+        //This is for the Pending events
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + PendingEventEntry.TABLE_NAME, TABLE_PENDING_EVENT);
+        uriMatcher.addURI(DataContract.AUTHORITY, DataContract.PATH_DATA + "/" + PendingEventEntry.TABLE_NAME +"/#", TABLE_PENDING_EVENT_ID);
 
         return uriMatcher;
     }
@@ -74,11 +91,23 @@ public class DataProvider extends ContentProvider {
         switch (id){
             case TABLE_TODO: return queryTask(uri, columns, selection, selectionArgs, orderBy);
             case TABLE_NOTE: return queryNotes(uri, columns, selection, selectionArgs, orderBy);
-            case TABLE_EVENT: return queryEvent(uri, columns, selection, selectionArgs, orderBy);
-            case TABLE_EVENT_ID: {
-                selection = EventEntry._ID + "=?";
+            case TABLE_TODAY_EVENT: return queryTodayEvent(uri, columns, selection, selectionArgs, orderBy);
+            case TABLE_EVENT_TODAY_ID: {
+                selection = TodayEventEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return queryEvent(uri, columns, selection, selectionArgs, orderBy);
+                return queryTodayEvent(uri, columns, selection, selectionArgs, orderBy);
+            }
+            case TABLE_PENDING_EVENT: return queryPendingEvent(uri, columns, selection, selectionArgs, orderBy);
+            case TABLE_PENDING_EVENT_ID: {
+                selection = TodayEventEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return queryPendingEvent(uri, columns, selection, selectionArgs, orderBy);
+            }
+            case TABLE_PAST_EVENT: return queryPastEvent(uri,columns,selection,selectionArgs,orderBy);
+            case TABLE_PAST_EVENT_ID: {
+                selection = TodayEventEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return queryPastEvent(uri, columns, selection, selectionArgs, orderBy);
             }
             default:
                 Log.e(TAG, "Url does not work: " + uri.toString());
@@ -102,12 +131,26 @@ public class DataProvider extends ContentProvider {
         return cursor;
     }
 
-    private Cursor queryEvent(Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy){
+    private Cursor queryTodayEvent(Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy){
         SQLiteDatabase sqLiteDatabase = mDbHelper.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.query(EventEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
+        Cursor cursor = sqLiteDatabase.query(TodayEventEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
         ContentResolver resolver = Objects.requireNonNull(getContext()).getContentResolver();
         if (resolver == null) return null;
         cursor.setNotificationUri(resolver, uri);
+        return cursor;
+    }
+
+    private Cursor queryPastEvent(Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy){
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.query(PastEventEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
+        cursor.setNotificationUri(Objects.requireNonNull(getContext()).getContentResolver(), uri);
+        return cursor;
+    }
+
+    private Cursor queryPendingEvent(Uri uri, String[] projection, String selection, String[] selectionArgs, String orderBy){
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        Cursor cursor = db.query(PendingEventEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, orderBy);
+        cursor.setNotificationUri(Objects.requireNonNull(getContext()).getContentResolver(), uri);
         return cursor;
     }
 
@@ -124,7 +167,8 @@ public class DataProvider extends ContentProvider {
         switch (id){
             case TABLE_TODO: return taskInsert(uri, contentValues);
             case TABLE_NOTE: return noteInsert(uri, contentValues);
-            case TABLE_EVENT: return eventInsert(uri, contentValues);
+            case TABLE_TODAY_EVENT: return eventTodayInsert(uri, contentValues);
+            case TABLE_PAST_EVENT: return eventPastInsert(uri, contentValues);
         }
         return uri;
     }
@@ -149,24 +193,24 @@ public class DataProvider extends ContentProvider {
         return ContentUris.withAppendedId(uri, id);
     }
 
-    private Uri eventInsert(Uri uri, @Nullable ContentValues contentValues){
+    private Uri eventTodayInsert(Uri uri, @Nullable ContentValues contentValues){
         if (contentValues == null) return uri;
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         SQLiteDatabase reader = mDbHelper.getReadableDatabase();
 
         //getting the cursor
-        Cursor cursor = reader.rawQuery("SELECT * FROM " + EventEntry.TABLE_NAME +
-                " WHERE " + EventEntry.COLUMN_EVENT_END + " > " + contentValues.getAsLong(COLUMN_EVENT_START), null);
+        Cursor cursor = reader.rawQuery("SELECT * FROM " + TodayEventEntry.TABLE_NAME +
+                " WHERE " + TodayEventEntry.COLUMN_EVENT_END + " > " + contentValues.getAsLong(COLUMN_EVENT_START), null);
         cursor.setNotificationUri(Objects.requireNonNull(getContext()).getContentResolver(), uri);
 
         //index columns and rows
-        int eventStartIndex = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_START);
-        int eventEndIndex = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_END);
+        int eventStartIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_START);
+        int eventEndIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_END);
 
         //getting the user start and end time
-        Long newStartEvent = contentValues.getAsLong(EventEntry.COLUMN_EVENT_START);
-        Long newEndEvent = contentValues.getAsLong(EventEntry.COLUMN_EVENT_END);
+        Long newStartEvent = contentValues.getAsLong(TodayEventEntry.COLUMN_EVENT_START);
+        Long newEndEvent = contentValues.getAsLong(TodayEventEntry.COLUMN_EVENT_END);
 
         //checking each event the cursor caught
         cursor.moveToPosition(-1);
@@ -183,26 +227,33 @@ public class DataProvider extends ContentProvider {
         }
         cursor.close();
 
-        Cursor cursor1 = reader.rawQuery("SELECT * FROM " + EventEntry.TABLE_NAME +
-                " WHERE " + EventEntry.COLUMN_EVENT_IN_PROGRESS + " = " + EventEntry.EVENT_IN_PROGRESS, null);
+        Cursor cursor1 = reader.rawQuery("SELECT * FROM " + TodayEventEntry.TABLE_NAME +
+                " WHERE " + TodayEventEntry.COLUMN_EVENT_IN_PROGRESS + " = " + TodayEventEntry.EVENT_IN_PROGRESS, null);
         cursor1.setNotificationUri(getContext().getContentResolver(), uri);
-        
-        int inProgressValues = EventEntry.EVENT_NOT_IN_PROGRESS;
+
+        int inProgressValues = TodayEventEntry.EVENT_NOT_IN_PROGRESS;
         cursor1.moveToPosition(-1);
         if (cursor1.getCount() == 0){
-            Long current = new Date().getTime(); 
+            Long current = new Date().getTime();
             if (newStartEvent <= current && newEndEvent >= current){
-                inProgressValues = EventEntry.EVENT_IN_PROGRESS; 
+                inProgressValues = TodayEventEntry.EVENT_IN_PROGRESS;
             }
-            cursor1.close(); 
+            cursor1.close();
         }
-        
-        contentValues.put(EventEntry.COLUMN_EVENT_IN_PROGRESS, inProgressValues);
 
-        long id = db.insert(EventEntry.TABLE_NAME, null, contentValues);
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, inProgressValues);
+
+        long id = db.insert(TodayEventEntry.TABLE_NAME, null, contentValues);
 
         Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
 
+        return ContentUris.withAppendedId(uri, id);
+    }
+
+    private Uri eventPastInsert(Uri uri, ContentValues values){
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        long id = db.insert(PastEventEntry.TABLE_NAME, null, values);
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -212,7 +263,12 @@ public class DataProvider extends ContentProvider {
         switch (id){
             case TABLE_TODO: return deleteTaskAll(uri);
             case TABLE_NOTE: return deleteNoteAll(uri);
-            case TABLE_EVENT: return deleteAllEvent(uri);
+            case TABLE_TODAY_EVENT: return deleteTodayEvent(uri, s, strings);
+            case TABLE_EVENT_TODAY_ID: {
+                s = TodayEventEntry._ID + "=?";
+                strings = new String[] {Long.toString(ContentUris.parseId(uri))};
+                return deleteTodayEvent(uri, s, strings);
+            }
         }
         return 0;
     }
@@ -227,9 +283,9 @@ public class DataProvider extends ContentProvider {
         return mDbHelper.getWritableDatabase().delete(TaskEntry.TABLE_NAME, null, null);
     }
 
-    public int deleteAllEvent(Uri uri){
+    public int deleteTodayEvent(Uri uri, String selection, String[] selectionArgs){
         Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
-        return mDbHelper.getWritableDatabase().delete(EventEntry.TABLE_NAME, null, null);
+        return mDbHelper.getWritableDatabase().delete(TodayEventEntry.TABLE_NAME, selection, selectionArgs);
     }
 
     @Override
@@ -237,17 +293,17 @@ public class DataProvider extends ContentProvider {
         int id = sUriMatcher.match(uri);
         Log.v(TAG, "Update uri: " + uri.toString());
         switch (id){
-            case TABLE_EVENT_ID:
-                s = EventEntry._ID + " =?";
+            case TABLE_EVENT_TODAY_ID:
+                s = TodayEventEntry._ID + " =?";
                 strings = new String[]{Long.toString(ContentUris.parseId(uri))};
                 return updateEvent(uri, contentValues, s, strings);
         }
         return 0;
     }
 
-    public int updateEvent(Uri uri, ContentValues contentValues, String selection, String[] selectoinArgs){
+    public int updateEvent(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs){
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        int number = db.update(EventEntry.TABLE_NAME, contentValues, selection, selectoinArgs);
+        int number = db.update(TodayEventEntry.TABLE_NAME, contentValues, selection, selectionArgs);
         Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
         return number;
     }

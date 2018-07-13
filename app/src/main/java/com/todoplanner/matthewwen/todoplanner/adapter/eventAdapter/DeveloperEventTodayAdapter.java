@@ -1,4 +1,4 @@
-package com.todoplanner.matthewwen.todoplanner.adapters.adapters;
+package com.todoplanner.matthewwen.todoplanner.adapter.eventAdapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,12 +15,12 @@ import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAdapter.ViewHolder> {
+public class DeveloperEventTodayAdapter extends RecyclerView.Adapter<DeveloperEventTodayAdapter.ViewHolder> {
 
     private ArrayList<Event> allEvents;
     private LayoutInflater inflater;
 
-    public DeveloperEventAdapter(Context context, ArrayList<Event> allEvents){
+    public DeveloperEventTodayAdapter(Context context, ArrayList<Event> allEvents){
         this.allEvents = allEvents;
         inflater = LayoutInflater.from(context);
     }
@@ -28,7 +28,7 @@ public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAd
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.recycle_layout_developer_event_item, parent, false);
+        View view = inflater.inflate(R.layout.recycle_layout_developer_event_today_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -72,13 +72,13 @@ public class DeveloperEventAdapter extends RecyclerView.Adapter<DeveloperEventAd
 
         ViewHolder(View itemView) {
             super(itemView);
-            idtv = itemView.findViewById(R.id.developer_event_id_tv);
-            nameTv = itemView.findViewById(R.id.developer_event_name_tv);
-            startTv = itemView.findViewById(R.id.developer_event_start_tv);
-            endTv = itemView.findViewById(R.id.developer_event_end_tv);
-            taskIDTv = itemView.findViewById(R.id.developer_event_task_id_tv);
-            noteTv = itemView.findViewById(R.id.developer_event_note_tv);
-            inProgTv = itemView.findViewById(R.id.developer_event_in_progress);
+            idtv = itemView.findViewById(R.id.developer_event_today_id_tv);
+            nameTv = itemView.findViewById(R.id.developer_event_today_name_tv);
+            startTv = itemView.findViewById(R.id.developer_event_today_start_tv);
+            endTv = itemView.findViewById(R.id.developer_event_today_end_tv);
+            taskIDTv = itemView.findViewById(R.id.developer_event_task_today_id_tv);
+            noteTv = itemView.findViewById(R.id.developer_event_today_note_tv);
+            inProgTv = itemView.findViewById(R.id.developer_event_today_in_progress);
         }
     }
 }

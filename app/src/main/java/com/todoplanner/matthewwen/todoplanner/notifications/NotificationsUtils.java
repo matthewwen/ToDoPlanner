@@ -1,21 +1,31 @@
 package com.todoplanner.matthewwen.todoplanner.notifications;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.R;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract;
+import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.receivers.events.AlarmEventCalendarReminderReceiver;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.todoplanner.matthewwen.todoplanner.notifications.NotificationPendingIntent.calendarPendingIntent;
 import static com.todoplanner.matthewwen.todoplanner.notifications.NotificationPendingIntent.openReminderPendingIntent;
@@ -38,15 +48,26 @@ public class NotificationsUtils {
     private static final String REMINDER_NOTIFICATION_CHANNEL = "reminder-notification-channel";
     private static final String WEATHER_NOTIFICATION_CHANNEL = "weather-notification-channel";
 
+    //The ID identified by pending intents
+    private static PendingIntent pendingIntentStartEvent;
+    private static PendingIntent pendingIntentEndEvent;
+
+    //The ID Tag for receivers
+    private static final int DEVELOPER_REMINDER_EVENT_START = 3;
+    private static final int DEVELOPER_REMINDER_EVENT_END = 5;
+
+    //This is a reference to Simple format for comparing times
+    private static final SimpleDateFormat GET_COMPARE_FORMAT = new SimpleDateFormat("h:mm a", Locale.ENGLISH);
+
     //Comparing times from one event to the next
     public static boolean compareTime(long date1, long date2){
-        return AlarmEventCalendarReminderReceiver.GET_COMPARE_FORMAT.format(new Date(date1))
+        return GET_COMPARE_FORMAT.format(new Date(date1))
                 .equals(
-                        AlarmEventCalendarReminderReceiver.GET_COMPARE_FORMAT.format(new Date(date2))
+                        GET_COMPARE_FORMAT.format(new Date(date2))
                 );
     }
 
-
+    //For the Calendar
     public static void displayCalendarNotification(Context context, Uri uri, String title,
                                                    String range, String location, String typeOfEvent){
 
@@ -89,7 +110,7 @@ public class NotificationsUtils {
 
         //If the calendar event is type end. Two actions need to be added
         if (typeOfEvent.equals(EVENT_REMINDER_END)){
-
+            notify.addAction(NotificationAction.nextEvent(context, uri));
         }
 
         //for devices with sdk less than oreo
@@ -174,16 +195,77 @@ public class NotificationsUtils {
         manager.notify(WEATHER_NOTIFICATION, builder.build());
     }
 
-    /**
-     *
-     * @param context of the activity
-     * @return Bitmap for the notification
-     */
     private static Bitmap largeIcon(Context context){
         Resources res = context.getResources();
 
         return BitmapFactory.decodeResource(res, R.mipmap.ic_launcher_round);
     }
 
+    //Set Up the Next Alarm (and check if next event is stationary)
+    public static void setAlarmNextEvent(Context context){
+        //Getting the cursor
+        Cursor cursor = context.getContentResolver().query(DataContract.TodayEventEntry.EVENT_CONTENT_URI,
+                DataContract.TodayEventEntry.PROJECTION_DATE,
+                DataContract.TodayEventEntry.COLUMN_EVENT_END + " > ?",
+                new String[]{Long.toString(new Date().getTime())},
+                DataContract.TodayEventEntry.COLUMN_EVENT_START);
+        assert cursor != null;
+
+        //get the first event
+        int idIndex = cursor.getColumnIndex(DataContract.TodayEventEntry._ID);
+        int startIndex = cursor.getColumnIndex(DataContract.TodayEventEntry.COLUMN_EVENT_START);
+        int endIndex = cursor.getColumnIndex(DataContract.TodayEventEntry.COLUMN_EVENT_END);
+
+        int id;
+        long start;
+        long end;
+        Uri uri;
+        boolean haveEnd = true;
+
+        if (cursor.moveToPosition(0)){
+            start = cursor.getLong(startIndex);
+            end = cursor.getLong(endIndex);
+            id = cursor.getInt(idIndex);
+            uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, id);
+        }else{
+            Log.v(TAG, "No Event Founded");
+            return;
+        }
+
+        //make sure the next event is not stationary
+        if (cursor.moveToPosition(1)){
+            if (compareTime(end, cursor.getLong(DataContract.TodayEventEntry.COLUMN_EVENT_START_FULL_INDEX))) {
+                haveEnd = !(cursor.getInt(DataContract.TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX)
+                        == DataContract.TodayEventEntry.EVENT_STATIONARY);
+            }
+        }
+
+        //Setting up all the alarms
+        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        assert manager != null;
+        //delete the current alarms set
+        if (pendingIntentStartEvent != null) {manager.cancel(pendingIntentStartEvent);}
+        if (pendingIntentEndEvent != null) {manager.cancel(pendingIntentEndEvent);}
+        //Make intents
+        Intent intentStart = new Intent(context, AlarmEventCalendarReminderReceiver.class);
+        Intent intentEnd = new Intent(context, AlarmEventCalendarReminderReceiver.class);
+        //set uri as the action
+        intentStart.setAction(uri.toString());
+        intentEnd.setAction(uri.toString());
+        //putting in the type.
+        intentStart.putExtra(context.getString(R.string.notification_event_start_stop_key),
+                NotificationsUtils.EVENT_REMINDER_START);
+        intentEnd.putExtra(context.getString(R.string.notification_event_start_stop_key),
+                NotificationsUtils.EVENT_REMINDER_END);
+        //Creating pending
+        pendingIntentStartEvent = PendingIntent.getBroadcast(context,
+                DEVELOPER_REMINDER_EVENT_START, intentStart, PendingIntent.FLAG_UPDATE_CURRENT);
+        pendingIntentEndEvent = PendingIntent.getBroadcast(context,
+                DEVELOPER_REMINDER_EVENT_END, intentEnd, PendingIntent.FLAG_UPDATE_CURRENT);
+        //Add it to the alarm service
+        manager.set(AlarmManager.RTC_WAKEUP, start, pendingIntentStartEvent);
+        if (haveEnd) {manager.set(AlarmManager.RTC_WAKEUP, end, pendingIntentEndEvent);}
+        cursor.close();
+    }
 
 }

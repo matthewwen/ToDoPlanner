@@ -6,12 +6,10 @@ import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,18 +20,18 @@ import android.view.View;
 import android.widget.Button;
 
 import com.todoplanner.matthewwen.todoplanner.R;
-import com.todoplanner.matthewwen.todoplanner.data.DataContract;
+import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.data.PreferenceUtils;
-import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.DeveloperEventActivity;
-import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.DeveloperNoteActivity;
 import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.DeveloperTaskActivity;
+import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPastEventActivity;
+import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPendingEventActivity;
+import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperTodayEventActivity;
+import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.DeveloperNoteActivity;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.receivers.AlarmEventReminderReceiver;
-import com.todoplanner.matthewwen.todoplanner.receivers.events.AlarmEventCalendarReminderReceiver;
 import com.todoplanner.matthewwen.todoplanner.sync.UpdateDelayedEventJobService;
-import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -48,13 +46,10 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     //ID and Tag for Receivers
     private static final int DEVELOPER_REMINDER_EVENT_SERVICE = 2;
-    private static final int DEVELOPER_REMINDER_EVENT_START = 3;
-    private static final int DEVELOPER_REMINDER_EVENT_END = 5;
+
 
     //Pending Intent act as ID.
     private static PendingIntent pendingIntentReminderNotification;
-    private static PendingIntent pendingIntentStartEvent;
-    private static PendingIntent pendingIntentEndEvent;
 
     //ID and Tag for Job Services
     private static final int DEVELOPER_JOB_SERVICE_TEST = 1;
@@ -165,8 +160,8 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
                 "It will be Sunny all day long");
     }
 
-    public void showEventDatabase(View view) {
-        Intent intent = new Intent(this, DeveloperEventActivity.class);
+    public void showTodayEventDatabase(View view) {
+        Intent intent = new Intent(this, DeveloperTodayEventActivity.class);
         startActivity(intent);
     }
 
@@ -258,7 +253,7 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
         PreferenceUtils.setReminderDeveloperJobService(this, false);
 
         //Delete all Events
-        getContentResolver().delete(DataContract.EventEntry.EVENT_CONTENT_URI,
+        getContentResolver().delete(TodayEventEntry.EVENT_CONTENT_URI,
                 null, null);
 
         //Add content values inside of calendar
@@ -275,11 +270,11 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
         long endValue5 = endValue4 + TimeUnit.MINUTES.toMillis(3);
 
         //Creating all the values
-        createEvent("Event 1", startingValue1, endValue1);
-        createEvent("Event 2", endValue1, endValue2);
-        createEvent("Event 3", endValue2, endValue3);
-        createEvent("Event 4", endValue3, endValue4);
-        createEvent("Event 5", endValue4, endValue5);
+        DataMethods.createEvent(this, "Event 1", startingValue1, endValue1);
+        DataMethods.createEvent(this, "Event 2", endValue1, endValue2);
+        DataMethods.createEvent(this,"Event 3", endValue2, endValue3);
+        DataMethods.createEvent(this,"Event 4", endValue3, endValue4);
+        DataMethods.createEvent(this,"Event 5", endValue4, endValue5);
 
     }
 
@@ -290,7 +285,7 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
         PreferenceUtils.setReminderDeveloperJobService(this, false);
 
         //Delete all Events
-        getContentResolver().delete(DataContract.EventEntry.EVENT_CONTENT_URI,
+        getContentResolver().delete(TodayEventEntry.EVENT_CONTENT_URI,
                 null, null);
 
         //Event 1
@@ -306,78 +301,22 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
         long endValue5 = endValue4 + TimeUnit.MINUTES.toMillis(1);
 
         //Creating all the values
-        createEvent("Event 1", startingValue1, endValue1);
-        createEvent("Event 2", endValue1, endValue2);
-        createEvent("Event 3", endValue2, endValue3);
-        createEvent("Event 4", endValue3, endValue4);
-        createEvent("Event 5", endValue4, endValue5);
+        DataMethods.createEvent(this,"Event 1", startingValue1, endValue1);
+        DataMethods.createEvent(this,"Event 2", endValue1, endValue2);
+        DataMethods.createEvent(this,"Event 3", endValue2, endValue3);
+        DataMethods.createEvent(this,"Event 4", endValue3, endValue4);
+        DataMethods.createEvent(this,"Event 5", endValue4, endValue5);
 
-        //Getting the cursor
-        Cursor cursor = getContentResolver().query(EventEntry.EVENT_CONTENT_URI,
-                EventEntry.PROJECTION_DATE,
-                EventEntry.COLUMN_EVENT_START + " > ?",
-                new String[]{Long.toString(new Date().getTime())},
-                EventEntry.COLUMN_EVENT_START);
-        assert cursor != null;
-
-        //getting all the events
-        cursor.moveToPosition(-1);
-        ArrayList<Uri> allUri = new ArrayList<>();
-        ArrayList<Long> allStartTimes = new ArrayList<>();
-        ArrayList<Long> allEndTimes = new ArrayList<>();
-        int idIndex = cursor.getColumnIndex(EventEntry._ID);
-        int startIndex = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_START);
-        int endIndex = cursor.getColumnIndex(EventEntry.COLUMN_EVENT_END);
-        while (cursor.moveToNext()){
-            allStartTimes.add(cursor.getLong(startIndex));
-            allEndTimes.add(cursor.getLong(endIndex));
-            allUri.add(ContentUris.withAppendedId(EventEntry.EVENT_CONTENT_URI, cursor.getInt(idIndex)));
-        }
-
-        //get rid of the start times that overlap the end times
-        for (int i = 1; i < allStartTimes.size(); i++){
-            if (NotificationsUtils.compareTime(allStartTimes.get(i), allEndTimes.get(i-1))) {
-                allStartTimes.set(i, null);
-            }
-        }
-
-        //Setting up all the alarms
-        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        for (int i = 0; i < allUri.size(); i++){
-            //Make intents
-            Intent intentStart = new Intent(this, AlarmEventCalendarReminderReceiver.class);
-            Intent intentEnd = new Intent(this, AlarmEventCalendarReminderReceiver.class);
-            //set uri as the action
-            intentStart.setAction(allUri.get(i).toString());
-            intentEnd.setAction(allUri.get(i).toString());
-            //putting in the type.
-            intentStart.putExtra(getString(R.string.notification_event_start_stop_key),
-                    NotificationsUtils.EVENT_REMINDER_START);
-            intentEnd.putExtra(getString(R.string.notification_event_start_stop_key),
-                    NotificationsUtils.EVENT_REMINDER_END);
-            //Creating pending
-            assert manager != null;
-            pendingIntentStartEvent = PendingIntent.getBroadcast(this,
-                    DEVELOPER_REMINDER_EVENT_START, intentStart, PendingIntent.FLAG_UPDATE_CURRENT);
-            pendingIntentEndEvent = PendingIntent.getBroadcast(this,
-                    DEVELOPER_REMINDER_EVENT_END, intentEnd, PendingIntent.FLAG_UPDATE_CURRENT);
-            //Add it to the alarm service
-            if (allStartTimes.get(i) != null) {
-                manager.set(AlarmManager.RTC_WAKEUP, allStartTimes.get(i), pendingIntentStartEvent);
-            }
-            manager.set(AlarmManager.RTC_WAKEUP, allEndTimes.get(i), pendingIntentEndEvent);
-        }
-        cursor.close();
+        NotificationsUtils.setAlarmNextEvent(this);
     }
 
-    private void createEvent(String name, long startValue, long endValue){
-        ContentValues values = new ContentValues();
-        values.put(EventEntry.COLUMN_EVENT_NAME, name);
-        values.put(EventEntry.COLUMN_EVENT_START, startValue);
-        values.put(EventEntry.COLUMN_EVENT_END, endValue);
-        values.put(EventEntry.COLUMN_EVENT_NOTE, "THE FLOOR IS LAVA ~ SAID TROY AND ABED");
-        values.put(EventEntry.COLUMN_EVENT_TASK_ID, -1);
+    public void showPendingEventDatabase(View view) {
+        Intent intent = new Intent(this, DeveloperPendingEventActivity.class);
+        startActivity(intent);
+    }
 
-        getContentResolver().insert(EventEntry.EVENT_CONTENT_URI, values);
+    public void showPastEventDatabase(View view) {
+        Intent intent = new Intent(this, DeveloperPastEventActivity.class);
+        startActivity(intent);
     }
 }

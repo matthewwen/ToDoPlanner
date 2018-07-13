@@ -6,8 +6,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TaskEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.NoteEntry;
-import com.todoplanner.matthewwen.todoplanner.data.DataContract.EventEntry;
-import com.todoplanner.matthewwen.todoplanner.objects.Event;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.PendingEventEntry;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract.PastEventEntry;
 
 public class DataDbHelper extends SQLiteOpenHelper {
 
@@ -42,18 +43,44 @@ public class DataDbHelper extends SQLiteOpenHelper {
         //execute into the database
         sqLiteDatabase.execSQL(NOTE_CREATE_TABLE);
 
-        //create the event table in a string
-        final String EVENT_CREATE_TABLE = "CREATE TABLE " + EventEntry.TABLE_NAME + " (" +
-                EventEntry._ID + " INTEGER PRIMARY KEY, " +
-                EventEntry.COLUMN_EVENT_NAME + " TEXT, " +
-                EventEntry.COLUMN_EVENT_START + " LONG NOT NULL, " +
-                EventEntry.COLUMN_EVENT_END + " LONG NOT NULL, " +
-                EventEntry.COLUMN_EVENT_NOTE + " TEXT, " +
-                EventEntry.COLUMN_EVENT_TASK_ID + " INTEGER NOT NULL, " +
-                EventEntry.COLUMN_EVENT_IN_PROGRESS + " INTEGER);";
+        //create the today event table in a string
+        final String TODAY_EVENT_CREATE_TABLE = "CREATE TABLE " + TodayEventEntry.TABLE_NAME + " (" +
+                TodayEventEntry._ID + " INTEGER PRIMARY KEY, " +
+                TodayEventEntry.COLUMN_EVENT_NAME + " TEXT, " +
+                TodayEventEntry.COLUMN_EVENT_START + " LONG NOT NULL, " +
+                TodayEventEntry.COLUMN_EVENT_END + " LONG NOT NULL, " +
+                TodayEventEntry.COLUMN_EVENT_NOTE + " TEXT, " +
+                TodayEventEntry.COLUMN_EVENT_TASK_ID + " INTEGER NOT NULL, " +
+                TodayEventEntry.COLUMN_EVENT_IN_PROGRESS + " INTEGER, " +
+                TodayEventEntry.COLUMN_EVENT_STATIONARY + " INTEGER);";
 
         //execute into the database
-        sqLiteDatabase.execSQL(EVENT_CREATE_TABLE);
+        sqLiteDatabase.execSQL(TODAY_EVENT_CREATE_TABLE);
+
+        //create the pending event table in a string
+        final String PENDING_EVENT_CREATE_TABLE = "CREATE TABLE " + PendingEventEntry.TABLE_NAME + " (" +
+                PendingEventEntry._ID + " INTEGER PRIMARY KEY, " +
+                PendingEventEntry.COLUMN_EVENT_NAME + " TEXT, " +
+                PendingEventEntry.COLUMN_EVENT_START + " LONG NOT NULL, " +
+                PendingEventEntry.COLUMN_EVENT_END + " LONG NOT NULL, " +
+                PendingEventEntry.COLUMN_EVENT_NOTE + " TEXT, " +
+                PendingEventEntry.COLUMN_EVENT_TASK_ID + " INTEGER NOT NULL, " +
+                PendingEventEntry.COLUMN_EVENT_STATIONARY + " INTEGER);";
+
+        //execute into the database
+        sqLiteDatabase.execSQL(PENDING_EVENT_CREATE_TABLE);
+
+        //create the past event table in a string
+        final String PAST_EVENT_CREATE_TABLE = "CREATE TABLE " + PastEventEntry.TABLE_NAME + " (" +
+                PastEventEntry._ID + " INTEGER PRIMARY KEY, " +
+                PastEventEntry.COLUMN_EVENT_NAME + " TEXT, " +
+                PastEventEntry.COLUMN_EVENT_START + " LONG NOT NULL, " +
+                PastEventEntry.COLUMN_EVENT_END + " LONG NOT NULL, " +
+                PastEventEntry.COLUMN_EVENT_NOTE + " TEXT, " +
+                PastEventEntry.COLUMN_EVENT_TASK_ID + " INTEGER NOT NULL);";
+
+        //execute into the database
+        sqLiteDatabase.execSQL(PAST_EVENT_CREATE_TABLE);
     }
 
     //Delete current table on then rebuild.
@@ -61,6 +88,10 @@ public class DataDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TaskEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + NoteEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TodayEventEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PastEventEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PendingEventEntry.TABLE_NAME);
+
         onCreate(sqLiteDatabase);
     }
 }

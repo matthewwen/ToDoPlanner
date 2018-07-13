@@ -1,5 +1,7 @@
 package com.todoplanner.matthewwen.todoplanner.objects;
 
+import android.net.Uri;
+
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 
 public class Event implements Story {
@@ -11,10 +13,23 @@ public class Event implements Story {
     private int taskId;
     private String note;
     private int inProgress;
+    private int staticInt;
 
-    public Event(int id, String eventName, long eventStart, long eventEnd, int taskId, String note, int inProgress){
+    //This is for the today view
+    public Event(int id, String eventName, long eventStart, long eventEnd, int taskId, String note, int inProgress, int staticInt){
         this.id = id; this.eventName = eventName; this.eventStart = eventStart; this.eventEnd = eventEnd; this.taskId = taskId;
-        this.inProgress = inProgress; this.note = note;
+        this.inProgress = inProgress; this.note = note; this.staticInt = staticInt;
+    }
+
+    //This is for pending
+    public Event(int id, String eventName, long eventStart, long eventEnd, String note, int taskId,  int staticInt){
+        this.id = id; this.eventName = eventName; this.eventStart = eventStart; this.eventEnd = eventEnd; this.note = note;
+        this.taskId = taskId; this.staticInt = staticInt;
+    }
+
+    //This is for past
+    public Event(int id, String name, long start, long end, String note, int taskId){
+        this.id = id; this.eventName = name; this.eventStart = start; this.eventEnd = end; this.note = note; this.taskId = taskId;
     }
 
     @Override
@@ -24,7 +39,7 @@ public class Event implements Story {
 
     @Override
     public String getStoryType() {
-        return DataContract.EventEntry.TABLE_NAME;
+        return DataContract.TodayEventEntry.TABLE_NAME;
     }
 
     public String getEventName() {
@@ -49,5 +64,17 @@ public class Event implements Story {
 
     public String getNote() {
         return note;
+    }
+
+    public int getStaticInt(){
+        return staticInt;
+    }
+
+    public void setEventStart(long eventStart){
+        this.eventStart = eventStart;
+    }
+
+    public void setEventEnd(long eventEnd){
+        this.eventEnd = eventEnd;
     }
 }

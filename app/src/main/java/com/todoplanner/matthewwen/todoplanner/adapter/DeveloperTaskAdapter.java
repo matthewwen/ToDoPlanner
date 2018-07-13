@@ -1,4 +1,4 @@
-package com.todoplanner.matthewwen.todoplanner.adapters.adapters;
+package com.todoplanner.matthewwen.todoplanner.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
