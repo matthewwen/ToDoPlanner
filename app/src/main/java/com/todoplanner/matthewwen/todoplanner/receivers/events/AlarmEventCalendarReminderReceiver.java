@@ -12,9 +12,7 @@ import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class AlarmEventCalendarReminderReceiver extends BroadcastReceiver{
 
@@ -57,7 +55,7 @@ public class AlarmEventCalendarReminderReceiver extends BroadcastReceiver{
         //If notification on start, make it in progress
         if (type.equals(NotificationsUtils.EVENT_REMINDER_START)){
             DataMethods.noneInProgress(context);
-            ContentValues values = DataMethods.getContentValues(context, uri);
+            ContentValues values = DataMethods.getTodayEventContentValues(context, uri);
             values.put(DataContract.TodayEventEntry.COLUMN_EVENT_IN_PROGRESS,
                     DataContract.TodayEventEntry.EVENT_IN_PROGRESS);
             context.getContentResolver().update(uri, values, null, null);

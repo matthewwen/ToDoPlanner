@@ -4,6 +4,9 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!-- Common Actions -->
+    <string name="common_action_finished">Finished</string>
+
     <!-- Notification Channels for devices with sdk greater than or equal to O -->
     <string name="notification_channel_calendar_name">Calendar Notification Channel</string>
     <string name="notification_channel_calendar_description">Calendar Events</string>

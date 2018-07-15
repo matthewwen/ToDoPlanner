@@ -58,6 +58,8 @@ public class DeveloperTodayEventActivity extends AppCompatActivity implements
         recyclerView.setAdapter(mAdapter);
 
         getLoaderManager().initLoader(LOADER_ID, null, this);
+
+
     }
 
     @Override

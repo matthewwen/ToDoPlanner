@@ -81,7 +81,7 @@ public class DeveloperEventPendingAdapter extends
             endTv = itemView.findViewById(R.id.developer_event_pending_end_tv);
             taskIDTv = itemView.findViewById(R.id.developer_event_task_pending_id_tv);
             noteTv = itemView.findViewById(R.id.developer_event_pending_note_tv);
-            stationTv = itemView.findViewById(R.id.developer_event_pending_stationary);
+            stationTv = itemView.findViewById(R.id.developer_event_today_item_stationary);
         }
     }
 }

@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.PendingEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
@@ -15,7 +14,6 @@ import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +44,7 @@ public class DataMethods {
                     == TodayEventEntry.EVENT_IN_PROGRESS){
                    int id = cursor.getInt(idIndex);
                    Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, id);
-                   ContentValues values = getContentValues(context, uri);
+                   ContentValues values = getTodayEventContentValues(context, uri);
                   values.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, TodayEventEntry.EVENT_NOT_IN_PROGRESS);
                   context.getContentResolver().update(uri, values, null, null);
             }
@@ -56,7 +54,7 @@ public class DataMethods {
     }
 
     //get all the content values for a particular uri
-    public static ContentValues getContentValues(Context context, Uri uri){
+    public static ContentValues getTodayEventContentValues(Context context, Uri uri){
         Cursor cursor = context.getContentResolver().query(uri,
                 TodayEventEntry.PROJECTION,
                 null,
@@ -83,8 +81,9 @@ public class DataMethods {
     }
 
     //move back everything so everything is updated (Uri is current uri)
-    public static void updateData(Context context, Uri uri, ArrayList<Event> allEvents){
-        if (moveEverythingBack(context, uri, allEvents)){
+    public static void updateData(Context context, Uri uri, ArrayList<Event> allEvents,
+        boolean showNotificaiton){
+        if (moveEverythingBack(context, uri, allEvents, showNotificaiton)){
             Log.v(TAG, "Moving Everything back was a success");
         }else {
             Log.v(TAG, "Moving Everything back was not a success");
@@ -92,7 +91,8 @@ public class DataMethods {
     }
 
     //Move all the events a certain point (Uri is the just completed event)
-    private static boolean moveEverythingBack(final Context context, final Uri uri, ArrayList<Event> allEvents){
+    private static boolean moveEverythingBack(final Context context, final Uri uri, ArrayList<Event> allEvents,
+                                              boolean showNotification){
         //Getting Everything set up
         if (allEvents == null || allEvents.size() == 0){
             return false;
@@ -130,7 +130,8 @@ public class DataMethods {
         if (allEvents.size() == 0) return false;
         Event nextEvent = allEvents.remove(0);
         if (nextEvent.getEventStart() <= Calendar.getInstance().getTime().getTime()) {
-            NotificationsUtils.displayCalendarNotificationStart(context, nextEvent);
+            if (showNotification)
+                NotificationsUtils.displayCalendarNotificationStart(context, nextEvent);
             nextEvent.setInProgress();
             if (allEvents.size() == 0 || !allEvents.get(0).isStatic()){
                 Log.v(TAG, "Created the next alarm service Ending");
@@ -219,7 +220,7 @@ public class DataMethods {
 
     //get how long the next alarm is (Uri is the current uri)
     public static long differenceOfNextEvent(Context context, Uri uri){
-        ContentValues old = getContentValues(context, uri);
+        ContentValues old = getTodayEventContentValues(context, uri);
         long endTime = old.getAsLong(TodayEventEntry.COLUMN_EVENT_END);
         Cursor cursor = context.getContentResolver().query(TodayEventEntry.EVENT_CONTENT_URI,
                 new String[]{TodayEventEntry._ID, TodayEventEntry.COLUMN_EVENT_START, TodayEventEntry.COLUMN_EVENT_END},
@@ -268,7 +269,7 @@ public class DataMethods {
 
     //create past event (Last Thing that happens before starting the next event)
     public static void changeToPastEvent(Context context, Uri oldUri) {
-        ContentValues oldValues = getContentValues(context, oldUri);
+        ContentValues oldValues = getTodayEventContentValues(context, oldUri);
         context.getContentResolver().delete(oldUri, null, null);
         ContentValues values = new ContentValues();
         values.put(PastEventEntry.COLUMN_EVENT_NAME, oldValues.getAsString(TodayEventEntry.COLUMN_EVENT_NAME));
@@ -279,6 +280,21 @@ public class DataMethods {
         context.getContentResolver().insert(PastEventEntry.EVENT_CONTENT_URI, values);
     }
 
-
+    //Get the Event based off of uri
+    public static Event getTodayEvent(Context context, Uri uri){
+        Cursor cursor = context.getContentResolver().query(uri, TodayEventEntry.PROJECTION, null, null, null);
+        assert cursor != null;
+        cursor.moveToPosition(0);
+        int id = cursor.getInt(TodayEventEntry.COLUMN_EVENT_ID_FULL_INDEX);
+        String name = cursor.getString(TodayEventEntry.COLUMN_EVENT_NAME_FULL_INDEX);
+        long start = cursor.getLong(TodayEventEntry.COLUMN_EVENT_START_FULL_INDEX);
+        long end = cursor.getLong(TodayEventEntry.COLUMN_EVENT_END_FULL_INDEX);
+        int taskId = cursor.getInt(TodayEventEntry.COLUMN_EVENT_TASK_ID_FULL_INDEX);
+        String note = cursor.getString(TodayEventEntry.COLUMN_EVENT_NOTE_FULL_INDEX);
+        int inProg = cursor.getInt(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS_FULL_INDEX);
+        int station = cursor.getInt(TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX);
+        cursor.close();
+        return new Event(id, name, start, end, taskId, note, inProg, station);
+    }
 }
 

@@ -38,7 +38,7 @@ public class NextEventIntentService extends IntentService{
                     Calendar.getInstance().getTimeInMillis(),
                     DataMethods.getEndTime(this, uri)
             ))){
-                DataMethods.updateData(this, uri, allEvents); // it should already set the next alarm
+                DataMethods.updateData(this, uri, allEvents, true); // it should already set the next alarm
             }else{
                 Log.v(TAG, "Everything is perfect. Just show notification and started end service");
                 NotificationsUtils.displayCalendarNotificationStart(this, allEvents.get(1));
@@ -49,10 +49,6 @@ public class NextEventIntentService extends IntentService{
             DataMethods.changeToPastEvent(NextEventIntentService.this, uri);
             NotificationsUtils.setAlarmNextEvent(this);
         }
-
-
-
-
 
 
     }
