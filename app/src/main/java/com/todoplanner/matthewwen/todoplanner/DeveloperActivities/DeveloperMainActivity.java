@@ -32,6 +32,7 @@ import com.todoplanner.matthewwen.todoplanner.receivers.AlarmEventReminderReceiv
 import com.todoplanner.matthewwen.todoplanner.sync.UpdateDelayedEventJobService;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -288,24 +289,16 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
         getContentResolver().delete(TodayEventEntry.EVENT_CONTENT_URI,
                 null, null);
 
-        //Event 1
-        long startingValue1 =  new Date().getTime() + TimeUnit.MINUTES.toMillis(1);
-        long endValue1 = startingValue1 + TimeUnit.MINUTES.toMillis(1);
-        //Event 2
-        long endValue2 = endValue1 + TimeUnit.MINUTES.toMillis(1);
-        //Event 3
-        long endValue3 = endValue2 + TimeUnit.MINUTES.toMillis(1);
-        //Event 4
-        long endValue4 = endValue3 + TimeUnit.MINUTES.toMillis(1);
-        //Event 5
-        long endValue5 = endValue4 + TimeUnit.MINUTES.toMillis(1);
+        ArrayList<Long> allTimes = new ArrayList<>();
+        long startingValue1 =  new Date().getTime();
+        for (int i = 0; i < 21; i++){
+            startingValue1 +=  TimeUnit.MINUTES.toMillis(1);
+            allTimes.add(startingValue1);
+        }
 
-        //Creating all the values
-        DataMethods.createEvent(this,"Event 1", startingValue1, endValue1);
-        DataMethods.createEvent(this,"Event 2", endValue1, endValue2);
-        DataMethods.createEvent(this,"Event 3", endValue2, endValue3);
-        DataMethods.createEvent(this,"Event 4", endValue3, endValue4);
-        DataMethods.createEvent(this,"Event 5", endValue4, endValue5);
+        for (int i = 1; i <= 20; i++){
+            DataMethods.createEvent(this,"Event " + i, allTimes.get(i-1), allTimes.get(i));
+        }
 
         NotificationsUtils.setAlarmNextEvent(this);
     }

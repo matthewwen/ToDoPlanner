@@ -58,8 +58,16 @@ public class Event implements Story {
         return taskId;
     }
 
-    public int getInProgress(){
+    public int getTheProgress(){
         return inProgress;
+    }
+
+    public boolean getInProgress(){
+        return inProgress == DataContract.TodayEventEntry.EVENT_IN_PROGRESS;
+    }
+
+    public boolean isStatic(){
+        return staticInt == DataContract.TodayEventEntry.EVENT_STATIONARY;
     }
 
     public String getNote() {
@@ -76,5 +84,9 @@ public class Event implements Story {
 
     public void setEventEnd(long eventEnd){
         this.eventEnd = eventEnd;
+    }
+
+    public void setInProgress(){
+        inProgress = DataContract.TodayEventEntry.EVENT_IN_PROGRESS;
     }
 }

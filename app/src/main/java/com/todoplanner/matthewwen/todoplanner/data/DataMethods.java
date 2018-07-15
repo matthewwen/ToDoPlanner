@@ -5,13 +5,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.PendingEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.PastEventEntry;
+import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import java.util.concurrent.TimeUnit;
@@ -80,8 +83,8 @@ public class DataMethods {
     }
 
     //move back everything so everything is updated (Uri is current uri)
-    public static void updateData(Context context, Uri uri){
-        if (moveEverythingBack(context, uri)){
+    public static void updateData(Context context, Uri uri, ArrayList<Event> allEvents){
+        if (moveEverythingBack(context, uri, allEvents)){
             Log.v(TAG, "Moving Everything back was a success");
         }else {
             Log.v(TAG, "Moving Everything back was not a success");
@@ -89,13 +92,14 @@ public class DataMethods {
     }
 
     //Move all the events a certain point (Uri is the just completed event)
-    private static boolean moveEverythingBack(Context context, Uri uri){
+    private static boolean moveEverythingBack(final Context context, final Uri uri, ArrayList<Event> allEvents){
         //Getting Everything set up
-        ContentValues oldEvent = getContentValues(context, uri);
-        long oldEndValue = oldEvent.getAsLong(TodayEventEntry.COLUMN_EVENT_END);
-        long difference = new Date().getTime() - oldEndValue + TimeUnit.SECONDS.toMillis(1);
-        ArrayList<Event> allEvents = getAllTodayEvents(context);
-        allEvents.remove(0); //first one is useless.
+        if (allEvents == null || allEvents.size() == 0){
+            return false;
+        }
+        Event finished  = allEvents.remove(0); //first one is useless.
+        long oldEndValue = finished.getEventEnd();
+        long difference = Calendar.getInstance().getTime().getTime() - oldEndValue;
         long ending = oldEndValue;
         //Updating to see what would happen. If return false, then there is an error.
         boolean conti = true;
@@ -110,15 +114,40 @@ public class DataMethods {
                     allEvents.remove(i);
                 }
             }else {
-                temp.setEventStart(temp.getEventStart() + difference);
-                ending = temp.getEventEnd() + difference;
-                temp.setEventEnd(temp.getEventEnd() + difference);
+                if (temp.getEventStart() < ending + difference) {
+                    temp.setEventStart(temp.getEventStart() + difference);
+                    ending = temp.getEventEnd() + difference;
+                    temp.setEventEnd(temp.getEventEnd() + difference);
+                }else {
+                    conti = false;
+                    while (allEvents.size() > i){
+                        allEvents.remove(i);
+                    }
+                }
             }
         }
         //If no error, apply to the database.
+        if (allEvents.size() == 0) return false;
+        Event nextEvent = allEvents.remove(0);
+        if (nextEvent.getEventStart() <= Calendar.getInstance().getTime().getTime()) {
+            NotificationsUtils.displayCalendarNotificationStart(context, nextEvent);
+            nextEvent.setInProgress();
+            if (allEvents.size() == 0 || !allEvents.get(0).isStatic()){
+                Log.v(TAG, "Created the next alarm service Ending");
+                NotificationsUtils.setAlarmNextEventEnd(context, nextEvent);
+            }else {
+                Log.v(TAG, "We though it was static");
+            }
+        }
+
+        updateEventInDatabase(context, nextEvent);
+
+        changeToPastEvent(context, uri);
+
         for (Event temp: allEvents){
             updateEventInDatabase(context, temp);
         }
+
         return true;
     }
 
@@ -131,7 +160,7 @@ public class DataMethods {
         values.put(TodayEventEntry.COLUMN_EVENT_END, event.getEventEnd());
         values.put(TodayEventEntry.COLUMN_EVENT_NOTE, event.getNote());
         values.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, event.getTaskId());
-        values.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, event.getInProgress());
+        values.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, event.getTheProgress());
         values.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, event.getStaticInt());
         context.getContentResolver().update(uri, values, null, null);
     }
@@ -215,7 +244,7 @@ public class DataMethods {
     //adding an event
     public static void createEvent(Context context, String name, long startValue, long endValue){
         ContentValues values = new ContentValues();
-        long limit = new Date().getTime() + TWELVE_HOURS;
+        long limit = Calendar.getInstance().getTime().getTime() + TWELVE_HOURS;
 
         if (startValue > limit){
             values.put(PendingEventEntry.COLUMN_EVENT_NAME, name);
@@ -244,7 +273,7 @@ public class DataMethods {
         ContentValues values = new ContentValues();
         values.put(PastEventEntry.COLUMN_EVENT_NAME, oldValues.getAsString(TodayEventEntry.COLUMN_EVENT_NAME));
         values.put(PastEventEntry.COLUMN_EVENT_START, oldValues.getAsLong(TodayEventEntry.COLUMN_EVENT_START));
-        values.put(PastEventEntry.COLUMN_EVENT_END, new Date().getTime()); //When this method ends is the proper end time.
+        values.put(PastEventEntry.COLUMN_EVENT_END, Calendar.getInstance().getTime().getTime()); //When this method ends is the proper end time.
         values.put(PastEventEntry.COLUMN_EVENT_NOTE, oldValues.getAsString(TodayEventEntry.COLUMN_EVENT_NOTE));
         values.put(PastEventEntry.COLUMN_EVENT_TASK_ID, oldValues.getAsString(TodayEventEntry.COLUMN_EVENT_TASK_ID));
         context.getContentResolver().insert(PastEventEntry.EVENT_CONTENT_URI, values);

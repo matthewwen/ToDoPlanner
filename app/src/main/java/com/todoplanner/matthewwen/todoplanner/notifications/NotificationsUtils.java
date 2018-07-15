@@ -21,9 +21,11 @@ import android.util.Log;
 import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import com.todoplanner.matthewwen.todoplanner.receivers.events.AlarmEventCalendarReminderReceiver;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -58,6 +60,12 @@ public class NotificationsUtils {
 
     //This is a reference to Simple format for comparing times
     private static final SimpleDateFormat GET_COMPARE_FORMAT = new SimpleDateFormat("h:mm a", Locale.ENGLISH);
+
+    //This is for displaying the range
+    private static final SimpleDateFormat GET_ADVANCE_FORMAT = new SimpleDateFormat("h:mm", Locale.ENGLISH);
+    private static final SimpleDateFormat GET_SIMPLE_FORMAT = new SimpleDateFormat("h", Locale.ENGLISH);
+    private static final SimpleDateFormat GET_MINUTE = new SimpleDateFormat("m", Locale.ENGLISH);
+    private static final SimpleDateFormat GET_AM_PM = new SimpleDateFormat("a", Locale.ENGLISH);
 
     //Comparing times from one event to the next
     public static boolean compareTime(long date1, long date2){
@@ -119,13 +127,22 @@ public class NotificationsUtils {
         }
 
         manager.notify(CALENDAR_NOTIFICATION, notify.build());
-
-        if (CALENDAR_NOTIFICATION == 2099){
-            CALENDAR_NOTIFICATION = 2000;
-        }else {
-            CALENDAR_NOTIFICATION++;
-        }
    }
+
+   //For the Calendar with different parameter
+    public static void displayCalendarNotificationStart(Context context, Event event){
+        Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, event.getID());
+        String title = event.getEventName();
+        String range = displayRange(new Date(event.getEventStart()), new Date(event.getEventEnd()));
+        String location = "";
+        displayCalendarNotification(context,
+                uri,
+                title,
+                range,
+                location,
+                EVENT_REMINDER_START);
+    }
+
 
     public static void displayReminderNotification(Context context, String taskName, String reminder){
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -203,11 +220,16 @@ public class NotificationsUtils {
 
     //Set Up the Next Alarm (and check if next event is stationary)
     public static void setAlarmNextEvent(Context context){
+        //Cancel Notification (dismiss)
+        NotificationManager notifyMangager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        assert notifyMangager != null;
+        notifyMangager.cancel(CALENDAR_NOTIFICATION);
+
         //Getting the cursor
         Cursor cursor = context.getContentResolver().query(DataContract.TodayEventEntry.EVENT_CONTENT_URI,
                 DataContract.TodayEventEntry.PROJECTION_DATE,
                 DataContract.TodayEventEntry.COLUMN_EVENT_END + " > ?",
-                new String[]{Long.toString(new Date().getTime())},
+                new String[]{Long.toString(Calendar.getInstance().getTime().getTime())},
                 DataContract.TodayEventEntry.COLUMN_EVENT_START);
         assert cursor != null;
 
@@ -240,6 +262,11 @@ public class NotificationsUtils {
             }
         }
 
+        //Make sure the start does not happen before
+        if (start < Calendar.getInstance().getTime().getTime()){
+            start = Calendar.getInstance().getTime().getTime() + 2000;
+        }
+
         //Setting up all the alarms
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         assert manager != null;
@@ -266,6 +293,40 @@ public class NotificationsUtils {
         manager.set(AlarmManager.RTC_WAKEUP, start, pendingIntentStartEvent);
         if (haveEnd) {manager.set(AlarmManager.RTC_WAKEUP, end, pendingIntentEndEvent);}
         cursor.close();
+    }
+
+    //Set Up the End Alarm. The Event is the current event you try to end
+    public static void setAlarmNextEventEnd(Context context, Event theEvent){
+        //Get alarm service
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        //Cancel Bother
+        assert alarmManager != null;
+        if (pendingIntentStartEvent != null) {alarmManager.cancel(pendingIntentStartEvent);}
+        if (pendingIntentEndEvent != null) {alarmManager.cancel(pendingIntentEndEvent);}
+        Intent intentEnd = new Intent(context, AlarmEventCalendarReminderReceiver.class);
+        Uri theUri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, theEvent.getID());
+        intentEnd.setAction(theUri.toString());
+        intentEnd.putExtra(context.getString(R.string.notification_event_start_stop_key),
+                NotificationsUtils.EVENT_REMINDER_END);
+        pendingIntentEndEvent = PendingIntent.getBroadcast(context,
+                DEVELOPER_REMINDER_EVENT_END, intentEnd, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, theEvent.getEventEnd(), pendingIntentEndEvent);
+    }
+
+    public static String displayRange(Date dateStart, Date dateEnd){
+        String range = "";
+        if (GET_MINUTE.format(dateStart).equals("0") &&
+                GET_MINUTE.format(dateEnd).equals("0")){
+            range = GET_SIMPLE_FORMAT.format(dateStart) +
+                    " - " + GET_SIMPLE_FORMAT.format(dateEnd) + " " +
+                    GET_AM_PM.format(dateEnd);
+        }else {
+            range = GET_ADVANCE_FORMAT.format(dateStart) +
+                    " - " + GET_ADVANCE_FORMAT.format(dateEnd) + " " +
+                    GET_AM_PM.format(dateEnd);
+        }
+
+        return range;
     }
 
 }

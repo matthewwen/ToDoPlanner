@@ -29,12 +29,15 @@
         <activity
             android:name=".developerActivities.DeveloperMainActivity"
             android:label="@string/developer_view" />
+
         <activity
             android:name=".developerActivities.developerDisplayDatabase.DeveloperTaskActivity"
             android:label="@string/developer_task_list" />
+
         <activity
             android:name=".developerActivities.developerDisplayDatabase.DeveloperNoteActivity"
             android:label="@string/developer_notes_list" />
+
         <activity
             android:name=".developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperTodayEventActivity"
             android:label="@string/developer_today_event_list" />
@@ -43,6 +46,7 @@
             android:name=".sync.UpdateDelayedEventJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <service
             android:name=".sync.EventJobService"
             android:exported="false">
@@ -52,14 +56,23 @@
         </service>
 
         <receiver android:name=".receivers.AlarmEventReminderReceiver" />
+
         <receiver android:name=".receivers.events.AlarmEventCalendarReminderReceiver" />
 
         <service
             android:name=".service.NextEventIntentService"
             android:exported="true" />
 
-        <activity android:name=".developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPastEventActivity" />
-        <activity android:name=".developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPendingEventActivity"></activity>
+        <!-- This is developer view past events -->
+        <activity
+            android:name=".developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPastEventActivity"
+            android:label="@string/developer_past_event_list"/>
+
+        <!-- This is developer view pending events -->
+        <activity
+            android:name=".developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPendingEventActivity"
+            android:label="@string/developer_pending_event_list"/>
+
     </application>
 
 </manifest>

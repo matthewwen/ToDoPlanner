@@ -18,11 +18,7 @@ import java.util.Locale;
 
 public class AlarmEventCalendarReminderReceiver extends BroadcastReceiver{
 
-    //This is for displaying the range
-    private static final SimpleDateFormat GET_ADVANCE_FORMAT = new SimpleDateFormat("h:mm", Locale.ENGLISH);
-    private static final SimpleDateFormat GET_SIMPLE_FORMAT = new SimpleDateFormat("h", Locale.ENGLISH);
-    private static final SimpleDateFormat GET_MINUTE = new SimpleDateFormat("m", Locale.ENGLISH);
-    private static final SimpleDateFormat GET_AM_PM = new SimpleDateFormat("a", Locale.ENGLISH);
+
 
     private static final String TAG = AlarmEventCalendarReminderReceiver.class.getSimpleName();
 
@@ -54,17 +50,7 @@ public class AlarmEventCalendarReminderReceiver extends BroadcastReceiver{
         Date dateStart = new Date(longStart);
         Date dateEnd = new Date(longEnd);
 
-        String range = "";
-        if (GET_MINUTE.format(dateStart).equals("0") &&
-                GET_MINUTE.format(dateEnd).equals("0")){
-            range = GET_SIMPLE_FORMAT.format(dateStart) +
-                    " - " + GET_SIMPLE_FORMAT.format(dateEnd) + " " +
-                    GET_AM_PM.format(dateEnd);
-        }else {
-            range = GET_ADVANCE_FORMAT.format(dateStart) +
-                    " - " + GET_ADVANCE_FORMAT.format(dateEnd) + " " +
-                    GET_AM_PM.format(dateEnd);
-        }
+        String range = NotificationsUtils.displayRange(dateStart, dateEnd);
 
         cursor.close();
 
@@ -79,4 +65,6 @@ public class AlarmEventCalendarReminderReceiver extends BroadcastReceiver{
 
         NotificationsUtils.displayCalendarNotification(context, uri, title, range, "", type);
     }
+
+
 }

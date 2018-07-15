@@ -42,7 +42,8 @@ public class DeveloperEventTodayAdapter extends RecyclerView.Adapter<DeveloperEv
         holder.endTv.setText("End: " + new Date(event.getEventEnd()).toString());
         holder.taskIDTv.setText("Task ID: " + Integer.toString(event.getTaskId()));
         holder.noteTv.setText("Note: " + event.getNote());
-        holder.inProgTv.setText("In Progress ID: " + Integer.toString(event.getInProgress()));
+        holder.inProgTv.setText("In Progress ID: " + Integer.toString(event.getTheProgress()));
+        holder.stationTv.setText("Stationary: " + Integer.toString(event.getStaticInt()));
     }
 
     @Override
@@ -69,6 +70,7 @@ public class DeveloperEventTodayAdapter extends RecyclerView.Adapter<DeveloperEv
         TextView taskIDTv;
         TextView noteTv;
         TextView inProgTv;
+        TextView stationTv;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -79,6 +81,7 @@ public class DeveloperEventTodayAdapter extends RecyclerView.Adapter<DeveloperEv
             taskIDTv = itemView.findViewById(R.id.developer_event_task_today_id_tv);
             noteTv = itemView.findViewById(R.id.developer_event_today_note_tv);
             inProgTv = itemView.findViewById(R.id.developer_event_today_in_progress);
+            stationTv = itemView.findViewById(R.id.developer_event_pending_stationary);
         }
     }
 }
