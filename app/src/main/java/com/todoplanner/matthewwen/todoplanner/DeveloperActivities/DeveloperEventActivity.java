@@ -2,7 +2,6 @@ package com.todoplanner.matthewwen.todoplanner.developerActivities;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.UriMatcher;
 import android.net.Uri;
@@ -19,7 +18,6 @@ import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
-import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperTodayEventActivity;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
@@ -133,25 +131,45 @@ public class DeveloperEventActivity extends AppCompatActivity {
                                 Calendar.getInstance().getTimeInMillis(),
                                 end
                         ))){
-                            DataMethods.updateData(DeveloperEventActivity.this, uri, allEvents, false);
+                            DataMethods.updateDataDelay(DeveloperEventActivity.this, uri, allEvents, false);
                         }else{
                             NotificationsUtils.setAlarmNextEventEnd(DeveloperEventActivity.this, allEvents.get(1));
+                            allEvents.get(1).setInProgress();
+                            DataMethods.updateTodayEvent(DeveloperEventActivity.this, allEvents.get(1));
                             DataMethods.changeToPastEvent(DeveloperEventActivity.this, uri); allEvents.remove(0);
                         }
                         goToNext = true;
                     }else {
-                        DataMethods.changeToPastEvent(DeveloperEventActivity.this, uri);
-                        NotificationsUtils.setAlarmNextEvent(DeveloperEventActivity.this);
-                        goToNext = false;
+                        //if the next event is not stationary
+                        if (allEvents.size() > 1 && allEvents.get(1).isStatic()) {
+                            DataMethods.changeToPastEvent(DeveloperEventActivity.this, uri);
+                            NotificationsUtils.setAlarmNextEvent(DeveloperEventActivity.this);
+                            goToNext = false;
+                        }else {
+                            if (DataMethods.moveEverythingForward(DeveloperEventActivity.this,
+                                    uri, allEvents, false)){ //automatically delete the finished event
+                                Log.v(TAG, "Method successfully moved forward");
+                                allEvents.get(0).setInProgress();
+                                DataMethods.updateTodayEvent(DeveloperEventActivity.this, allEvents.get(0));
+                                NotificationsUtils.setAlarmNextEventEnd(DeveloperEventActivity.this,
+                                        allEvents.get(0));
+                            }else{
+                                Log.v(TAG, "Method needed to spread everything out");
+                            }
+                            goToNext = true;
+                        }
                     }
 
                     //next event or close activity
                     if (goToNext){
                         Uri uri1Next = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, allEvents.get(0).getID());
                         Log.v(TAG, "The Next Event should pop up: " + uri1Next.toString());
+                        Intent nextActivity = new Intent(DeveloperEventActivity.this, DeveloperEventActivity.class);
+                        nextActivity.setAction(uri1Next.toString());
+                        startActivity(nextActivity);
                     }else {
                         Log.v(TAG, "The Activity should close");
-                        onBackPressed();
+                        DeveloperEventActivity.super.onBackPressed();
                     }
                 }
             });

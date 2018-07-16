@@ -53,6 +53,11 @@ public class DataMethods {
         cursor.close();
     }
 
+    private static long roundNearestMinute(long time){
+        long remainder = time % TimeUnit.MINUTES.toMillis(1);
+        return time - remainder;
+    }
+
     //get all the content values for a particular uri
     public static ContentValues getTodayEventContentValues(Context context, Uri uri){
         Cursor cursor = context.getContentResolver().query(uri,
@@ -81,8 +86,8 @@ public class DataMethods {
     }
 
     //move back everything so everything is updated (Uri is current uri)
-    public static void updateData(Context context, Uri uri, ArrayList<Event> allEvents,
-        boolean showNotification){
+    public static void updateDataDelay(Context context, Uri uri, ArrayList<Event> allEvents,
+                                       boolean showNotification){
         if (moveEverythingBack(context, uri, allEvents, showNotification)){
             Log.v(TAG, "Moving Everything back was a success");
         }else {
@@ -99,7 +104,8 @@ public class DataMethods {
         }
         Event finished  = allEvents.remove(0); //first one is useless.
         long oldEndValue = finished.getEventEnd();
-        long difference = Calendar.getInstance().getTime().getTime() - oldEndValue;
+        long current = roundNearestMinute(Calendar.getInstance().getTimeInMillis());
+        long difference = current - oldEndValue;
         long ending = oldEndValue;
         //Updating to see what would happen. If return false, then there is an error.
         boolean conti = true;
@@ -146,6 +152,43 @@ public class DataMethods {
         changeToPastEvent(context, uri);
 
         for (Event temp: allEvents){
+            updateEventInDatabase(context, temp);
+        }
+
+        return true;
+    }
+
+    //move all the events a certain point forward
+    public static boolean moveEverythingForward(Context context, Uri uri, ArrayList<Event> allEvents,
+                                                boolean showNotification){
+        if (allEvents == null || allEvents.size() < 2){
+            return false;
+        }
+
+        long current = roundNearestMinute(Calendar.getInstance().getTimeInMillis());
+        long oldEnd = allEvents.remove(0).getEventEnd();
+        long difference = oldEnd - current;
+
+        for (int i = 0; i < allEvents.size(); i++){
+            Event temp = allEvents.get(i);
+            if (temp.isStatic()){
+                while (allEvents.size() > i){
+                    allEvents.remove(i);
+                }
+                return false;
+            }else {
+                temp.setEventStart(temp.getEventStart()- difference);
+                temp.setEventEnd(temp.getEventEnd() - difference);
+            }
+        }
+
+        if (showNotification){
+            NotificationsUtils.displayCalendarNotificationStart(context, allEvents.get(1));
+        }
+
+        changeToPastEvent(context, uri);
+
+        for(Event temp: allEvents){
             updateEventInDatabase(context, temp);
         }
 
@@ -246,6 +289,8 @@ public class DataMethods {
     public static void createEvent(Context context, String name, long startValue, long endValue){
         ContentValues values = new ContentValues();
         long limit = Calendar.getInstance().getTime().getTime() + TWELVE_HOURS;
+        startValue = roundNearestMinute(startValue);
+        endValue = roundNearestMinute(endValue);
 
         if (startValue > limit){
             values.put(PendingEventEntry.COLUMN_EVENT_NAME, name);
@@ -274,7 +319,7 @@ public class DataMethods {
         ContentValues values = new ContentValues();
         values.put(PastEventEntry.COLUMN_EVENT_NAME, oldValues.getAsString(TodayEventEntry.COLUMN_EVENT_NAME));
         values.put(PastEventEntry.COLUMN_EVENT_START, oldValues.getAsLong(TodayEventEntry.COLUMN_EVENT_START));
-        values.put(PastEventEntry.COLUMN_EVENT_END, Calendar.getInstance().getTime().getTime()); //When this method ends is the proper end time.
+        values.put(PastEventEntry.COLUMN_EVENT_END, roundNearestMinute(Calendar.getInstance().getTimeInMillis())); //When this method ends is the proper end time.
         values.put(PastEventEntry.COLUMN_EVENT_NOTE, oldValues.getAsString(TodayEventEntry.COLUMN_EVENT_NOTE));
         values.put(PastEventEntry.COLUMN_EVENT_TASK_ID, oldValues.getAsString(TodayEventEntry.COLUMN_EVENT_TASK_ID));
         context.getContentResolver().insert(PastEventEntry.EVENT_CONTENT_URI, values);

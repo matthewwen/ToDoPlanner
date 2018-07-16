@@ -292,7 +292,7 @@ implements SharedPreferences.OnSharedPreferenceChangeListener{
         ArrayList<Long> allTimes = new ArrayList<>();
         long startingValue1 =  new Date().getTime();
         for (int i = 0; i < 21; i++){
-            startingValue1 +=  TimeUnit.MINUTES.toMillis(1);
+            startingValue1 +=  TimeUnit.MINUTES.toMillis(2);
             allTimes.add(startingValue1);
         }
 
