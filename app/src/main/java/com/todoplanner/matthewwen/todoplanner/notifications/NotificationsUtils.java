@@ -100,7 +100,7 @@ public class NotificationsUtils {
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setLargeIcon(largeIcon(context))
-                .setContentIntent(calendarPendingIntent(context));
+                .setContentIntent(calendarPendingIntent(context, uri));
 
         //Fix the location error
         if (location.equals("")){
@@ -142,7 +142,6 @@ public class NotificationsUtils {
                 location,
                 EVENT_REMINDER_START);
     }
-
 
     public static void displayReminderNotification(Context context, String taskName, String reminder){
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

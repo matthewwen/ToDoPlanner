@@ -82,8 +82,8 @@ public class DataMethods {
 
     //move back everything so everything is updated (Uri is current uri)
     public static void updateData(Context context, Uri uri, ArrayList<Event> allEvents,
-        boolean showNotificaiton){
-        if (moveEverythingBack(context, uri, allEvents, showNotificaiton)){
+        boolean showNotification){
+        if (moveEverythingBack(context, uri, allEvents, showNotification)){
             Log.v(TAG, "Moving Everything back was a success");
         }else {
             Log.v(TAG, "Moving Everything back was not a success");
@@ -295,6 +295,20 @@ public class DataMethods {
         int station = cursor.getInt(TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX);
         cursor.close();
         return new Event(id, name, start, end, taskId, note, inProg, station);
+    }
+
+    //Make the event in progress
+    public static void updateTodayEvent(Context context, Event event){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_NAME, event.getEventName());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_START, event.getEventStart());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_END, event.getEventEnd());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_NOTE, event.getNote());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, event.getTaskId());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, event.getTheProgress());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, event.getStaticInt());
+        Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, event.getID());
+        context.getContentResolver().update(uri, contentValues, null, null);
     }
 }
 

@@ -6,9 +6,11 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.UriMatcher;
 import android.net.Uri;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,6 +19,7 @@ import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperTodayEventActivity;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
@@ -69,6 +72,10 @@ public class DeveloperEventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_developer_event);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(true);
 
         idtv = findViewById(R.id.developer_event_id);
         nameTv = findViewById(R.id.developer_event_name);
@@ -144,6 +151,7 @@ public class DeveloperEventActivity extends AppCompatActivity {
                         Log.v(TAG, "The Next Event should pop up: " + uri1Next.toString());
                     }else {
                         Log.v(TAG, "The Activity should close");
+                        onBackPressed();
                     }
                 }
             });
@@ -152,5 +160,14 @@ public class DeveloperEventActivity extends AppCompatActivity {
         }else {
             next.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int theMenuId = item.getItemId();
+        switch (theMenuId){
+            case android.R.id.home: super.onBackPressed(); return true;
+        }
+        return false;
     }
 }

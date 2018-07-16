@@ -42,8 +42,11 @@ public class NextEventIntentService extends IntentService{
             }else{
                 Log.v(TAG, "Everything is perfect. Just show notification and started end service");
                 NotificationsUtils.displayCalendarNotificationStart(this, allEvents.get(1));
+                allEvents.get(1).setInProgress();
+                DataMethods.updateTodayEvent(this, allEvents.get(1));
                 NotificationsUtils.setAlarmNextEventEnd(this, allEvents.get(1));
                 DataMethods.changeToPastEvent(this, uri);
+
             }
         }else {
             DataMethods.changeToPastEvent(NextEventIntentService.this, uri);
