@@ -89,4 +89,10 @@ public class Event implements Story {
     public void setInProgress(){
         inProgress = DataContract.TodayEventEntry.EVENT_IN_PROGRESS;
     }
+
+    public void setNotInProgress(){inProgress = DataContract.TodayEventEntry.EVENT_NOT_IN_PROGRESS;}
+
+    public long getRange(){
+        return eventEnd - eventStart;
+    }
 }

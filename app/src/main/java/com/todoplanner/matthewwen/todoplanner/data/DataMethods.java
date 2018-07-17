@@ -26,187 +26,31 @@ public class DataMethods {
 
     //reset everything until all the events are not in progress
     public static void noneInProgress(Context context){
-        //Get the cursor for all the events
-        Cursor cursor = context.getContentResolver().query(TodayEventEntry.EVENT_CONTENT_URI,
-                TodayEventEntry.PROJECTION,
-                null,
-                null,
-                TodayEventEntry.COLUMN_EVENT_START);
-        assert cursor != null;
-
-        int idIndex = cursor.getColumnIndex(TodayEventEntry._ID);
-        int inProgIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS);
-
-        cursor.moveToPosition(-1);
-
-        while (cursor.moveToNext()){
-            if (cursor.getInt(inProgIndex)
-                    == TodayEventEntry.EVENT_IN_PROGRESS){
-                   int id = cursor.getInt(idIndex);
-                   Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, id);
-                   ContentValues values = getTodayEventContentValues(context, uri);
-                  values.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, TodayEventEntry.EVENT_NOT_IN_PROGRESS);
-                  context.getContentResolver().update(uri, values, null, null);
-            }
+        ArrayList<Event> allTodayEvents = getAllTodayEvents(context);
+        for (int i = 0; i < allTodayEvents.size(); i++){
+            allTodayEvents.get(i).setNotInProgress();
+            updateTodayEvent(context, allTodayEvents.get(i));
         }
-
-        cursor.close();
     }
 
-    private static long roundNearestMinute(long time){
+    //This Rounds the time to the nearest minute
+    public static long roundNearestMinute(long time){
         long remainder = time % TimeUnit.MINUTES.toMillis(1);
         return time - remainder;
     }
 
-    //get all the content values for a particular uri
-    public static ContentValues getTodayEventContentValues(Context context, Uri uri){
-        Cursor cursor = context.getContentResolver().query(uri,
-                TodayEventEntry.PROJECTION,
-                null,
-                null,
-                null);
-
-        assert cursor != null;
-        int nameIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_NAME);
-        int startIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_START);
-        int endIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_END);
-        int noteIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_NOTE);
-        int taskIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_TASK_ID);
-
-        cursor.moveToPosition(0);
+    //Make the event in progress
+    public static void updateTodayEvent(Context context, Event event){
         ContentValues contentValues = new ContentValues();
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_NAME, cursor.getString(nameIndex));
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_START, cursor.getLong(startIndex));
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_END, cursor.getLong(endIndex));
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_NOTE, cursor.getString(noteIndex));
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, cursor.getInt(taskIndex));
-        cursor.close();
-
-        return contentValues;
-    }
-
-    //move back everything so everything is updated (Uri is current uri)
-    public static void updateDataDelay(Context context, Uri uri, ArrayList<Event> allEvents,
-                                       boolean showNotification){
-        if (moveEverythingBack(context, uri, allEvents, showNotification)){
-            Log.v(TAG, "Moving Everything back was a success");
-        }else {
-            Log.v(TAG, "Moving Everything back was not a success");
-        }
-    }
-
-    //Move all the events a certain point (Uri is the just completed event)
-    private static boolean moveEverythingBack(final Context context, final Uri uri, ArrayList<Event> allEvents,
-                                              boolean showNotification){
-        //Getting Everything set up
-        if (allEvents == null || allEvents.size() == 0){
-            return false;
-        }
-        Event finished  = allEvents.remove(0); //first one is useless.
-        long oldEndValue = finished.getEventEnd();
-        long current = roundNearestMinute(Calendar.getInstance().getTimeInMillis());
-        long difference = current - oldEndValue;
-        long ending = oldEndValue;
-        //Updating to see what would happen. If return false, then there is an error.
-        boolean conti = true;
-        for (int i = 0; i < allEvents.size() && conti; i++){
-            Event temp = allEvents.get(i);
-            if (temp.getStaticInt() == TodayEventEntry.EVENT_STATIONARY){
-                if (ending > temp.getEventStart()){
-                    return false;
-                }
-                conti = false;
-                while (allEvents.size() > i){
-                    allEvents.remove(i);
-                }
-            }else {
-                if (temp.getEventStart() < ending + difference) {
-                    temp.setEventStart(temp.getEventStart() + difference);
-                    ending = temp.getEventEnd() + difference;
-                    temp.setEventEnd(temp.getEventEnd() + difference);
-                }else {
-                    conti = false;
-                    while (allEvents.size() > i){
-                        allEvents.remove(i);
-                    }
-                }
-            }
-        }
-        //If no error, apply to the database.
-        if (allEvents.size() == 0) return false;
-        Event nextEvent = allEvents.remove(0);
-        if (nextEvent.getEventStart() <= Calendar.getInstance().getTime().getTime()) {
-            if (showNotification)
-                NotificationsUtils.displayCalendarNotificationStart(context, nextEvent);
-            nextEvent.setInProgress();
-            if (allEvents.size() == 0 || !allEvents.get(0).isStatic()){
-                Log.v(TAG, "Created the next alarm service Ending");
-                NotificationsUtils.setAlarmNextEventEnd(context, nextEvent);
-            }else {
-                Log.v(TAG, "We though it was static");
-            }
-        }
-
-        updateEventInDatabase(context, nextEvent);
-
-        changeToPastEvent(context, uri);
-
-        for (Event temp: allEvents){
-            updateEventInDatabase(context, temp);
-        }
-
-        return true;
-    }
-
-    //move all the events a certain point forward
-    public static boolean moveEverythingForward(Context context, Uri uri, ArrayList<Event> allEvents,
-                                                boolean showNotification){
-        if (allEvents == null || allEvents.size() < 2){
-            return false;
-        }
-
-        long current = roundNearestMinute(Calendar.getInstance().getTimeInMillis());
-        long oldEnd = allEvents.remove(0).getEventEnd();
-        long difference = oldEnd - current;
-
-        for (int i = 0; i < allEvents.size(); i++){
-            Event temp = allEvents.get(i);
-            if (temp.isStatic()){
-                while (allEvents.size() > i){
-                    allEvents.remove(i);
-                }
-                return false;
-            }else {
-                temp.setEventStart(temp.getEventStart()- difference);
-                temp.setEventEnd(temp.getEventEnd() - difference);
-            }
-        }
-
-        if (showNotification){
-            NotificationsUtils.displayCalendarNotificationStart(context, allEvents.get(1));
-        }
-
-        changeToPastEvent(context, uri);
-
-        for(Event temp: allEvents){
-            updateEventInDatabase(context, temp);
-        }
-
-        return true;
-    }
-
-    //Updating an event into the database.
-    private static void updateEventInDatabase(Context context, Event event){
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_NAME, event.getEventName());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_START, event.getEventStart());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_END, event.getEventEnd());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_NOTE, event.getNote());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, event.getTaskId());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, event.getTheProgress());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, event.getStaticInt());
         Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, event.getID());
-        ContentValues values = new ContentValues();
-        values.put(TodayEventEntry.COLUMN_EVENT_NAME, event.getEventName());
-        values.put(TodayEventEntry.COLUMN_EVENT_START, event.getEventStart());
-        values.put(TodayEventEntry.COLUMN_EVENT_END, event.getEventEnd());
-        values.put(TodayEventEntry.COLUMN_EVENT_NOTE, event.getNote());
-        values.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, event.getTaskId());
-        values.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, event.getTheProgress());
-        values.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, event.getStaticInt());
-        context.getContentResolver().update(uri, values, null, null);
+        context.getContentResolver().update(uri, contentValues, null, null);
     }
 
     //Get all the events
@@ -261,32 +105,9 @@ public class DataMethods {
         return value;
     }
 
-    //get how long the next alarm is (Uri is the current uri)
-    public static long differenceOfNextEvent(Context context, Uri uri){
-        ContentValues old = getTodayEventContentValues(context, uri);
-        long endTime = old.getAsLong(TodayEventEntry.COLUMN_EVENT_END);
-        Cursor cursor = context.getContentResolver().query(TodayEventEntry.EVENT_CONTENT_URI,
-                new String[]{TodayEventEntry._ID, TodayEventEntry.COLUMN_EVENT_START, TodayEventEntry.COLUMN_EVENT_END},
-                TodayEventEntry.COLUMN_EVENT_START + ">=?",
-                new String[]{Long.toString(endTime)},
-                TodayEventEntry.COLUMN_EVENT_START);
-        assert cursor != null;
-        long diff;
-        if (cursor.moveToPosition(0)){
-            diff = cursor.getLong(cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_END)) -
-                    cursor.getLong(cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_START));
-        }else {
-            Log.v(TAG, "Error getting difference or it does not exist");
-            diff = TimeUnit.MINUTES.toMillis(6);
-        }
-
-        cursor.close();
-
-        return diff;
-    }
-
     //adding an event
-    public static void createEvent(Context context, String name, long startValue, long endValue){
+    public static void createEvent(Context context, String name,
+                                   long startValue, long endValue){
         ContentValues values = new ContentValues();
         long limit = Calendar.getInstance().getTime().getTime() + TWELVE_HOURS;
         startValue = roundNearestMinute(startValue);
@@ -342,18 +163,33 @@ public class DataMethods {
         return new Event(id, name, start, end, taskId, note, inProg, station);
     }
 
-    //Make the event in progress
-    public static void updateTodayEvent(Context context, Event event){
+    //get all the content values for a particular uri
+    public static ContentValues getTodayEventContentValues(Context context, Uri uri){
+        Cursor cursor = context.getContentResolver().query(uri,
+                TodayEventEntry.PROJECTION,
+                null,
+                null,
+                null);
+
+        assert cursor != null;
+        int nameIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_NAME);
+        int startIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_START);
+        int endIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_END);
+        int noteIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_NOTE);
+        int taskIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_TASK_ID);
+
+        cursor.moveToPosition(0);
         ContentValues contentValues = new ContentValues();
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_NAME, event.getEventName());
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_START, event.getEventStart());
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_END, event.getEventEnd());
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_NOTE, event.getNote());
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, event.getTaskId());
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, event.getTheProgress());
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, event.getStaticInt());
-        Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, event.getID());
-        context.getContentResolver().update(uri, contentValues, null, null);
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_NAME, cursor.getString(nameIndex));
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_START, cursor.getLong(startIndex));
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_END, cursor.getLong(endIndex));
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_NOTE, cursor.getString(noteIndex));
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, cursor.getInt(taskIndex));
+        cursor.close();
+
+        return contentValues;
     }
+
+
 }
 

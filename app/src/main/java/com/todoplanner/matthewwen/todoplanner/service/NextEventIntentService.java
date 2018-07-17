@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.NotificationBehavior;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
@@ -25,28 +26,7 @@ public class NextEventIntentService extends IntentService{
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         assert intent != null;
-        final Uri uri = Uri.parse(intent.getAction());
-        ArrayList<Event> allEvents = DataMethods.getAllTodayEvents(this); //First one is the finished one, Second one is the next event.
-
-        if (allEvents.size() > 1 && allEvents.get(1).getEventStart() < Calendar.getInstance().getTimeInMillis()){
-            if (!(NotificationsUtils.compareTime(
-                    Calendar.getInstance().getTimeInMillis(),
-                    DataMethods.getEndTime(this, uri)
-            ))){
-                DataMethods.updateDataDelay(this, uri, allEvents, true); // it should already set the next alarm
-            }else{
-                Log.v(TAG, "Everything is perfect. Just show notification and started end service");
-                NotificationsUtils.displayCalendarNotificationStart(this, allEvents.get(1));
-                allEvents.get(1).setInProgress();
-                DataMethods.updateTodayEvent(this, allEvents.get(1));
-                NotificationsUtils.setAlarmNextEventEnd(this, allEvents.get(1));
-                DataMethods.changeToPastEvent(this, uri);
-
-            }
-        }else {
-            DataMethods.changeToPastEvent(NextEventIntentService.this, uri);
-            NotificationsUtils.setAlarmNextEvent(this);
-        }
+        NotificationBehavior.setUpNextEvent(intent, this);
 
 
     }

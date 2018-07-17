@@ -41,7 +41,7 @@ public class NotificationsUtils {
     public static final String EVENT_REMINDER_END = "End Event: ";
 
     //The identifications for the Notifications
-    private static int CALENDAR_NOTIFICATION = 2000;
+    public static int CALENDAR_NOTIFICATION = 2000;
     private static int REMINDER_NOTIFICATION = 2100;
     private static int WEATHER_NOTIFICATION = 2200;
 
