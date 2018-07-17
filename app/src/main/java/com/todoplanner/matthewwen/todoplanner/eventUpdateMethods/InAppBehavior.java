@@ -185,6 +185,7 @@ public class InAppBehavior {
         //Change to past events
         Uri oldUri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());
         DataMethods.changeToPastEvent(context, oldUri);
+        //Adding change to the database
         EventChangeBehavior.moveEverythingForward(context, allEvents, true);
     }
 

@@ -35,6 +35,8 @@ public class EventChangeBehavior {
             NotificationsUtils.displayCalendarNotificationStart(context, nextEvent);
         }
 
+        NotificationsUtils.setAlarmNextEventEnd(context, allEvents.get(0));
+
         for (Event temp: allEvents){
             DataMethods.updateTodayEvent(context, temp);
         }
@@ -55,6 +57,8 @@ public class EventChangeBehavior {
         if (showNotification){
             NotificationsUtils.displayCalendarNotificationStart(context, allEvents.get(0));
         }
+
+        NotificationsUtils.setAlarmNextEventEnd(context, allEvents.get(0));
 
         for(Event temp: allEvents){
             DataMethods.updateTodayEvent(context, temp);
