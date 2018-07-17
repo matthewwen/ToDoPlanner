@@ -1,17 +1,9 @@
 package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 
-import android.app.NotificationManager;
-import android.content.ContentUris;
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
-
-import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
-import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -27,7 +19,7 @@ public class InAppBehavior {
     private static final int CREATE_NEXT_ALARM_SERVICE = 5;
 
     public static void userPressedFinished(Context context){
-        ArrayList<Event> allEvents = getEvents(context);  //First one is the finished one, Second one is the next event.
+        ArrayList<Event> allEvents = CommonBehavior.getEvents(context);  //First one is the finished one, Second one is the next event.
         if (allEvents == null){
             Log.v(TAG, "All Events are null");
             return;
@@ -37,11 +29,11 @@ public class InAppBehavior {
         int type = getType(finished, allEvents);
         Log.v(TAG, "This is the Type: "+ type);
         switch (type){
-            case CHANGE_NOTHING: changeNothing(context, allEvents.get(0), finished);
+            case CHANGE_NOTHING: CommonBehavior.changeNothing(context, allEvents.get(0), finished);
                 break;
-            case DELAY_EVERY_EVENT: delayEveryEvent(context, allEvents, finished);
+            case DELAY_EVERY_EVENT: CommonBehavior.delayEveryEvent(context, allEvents, finished);
                 break;
-            case FORWARD_EVERY_EVENT: forwardEveryEvent(context, allEvents, finished);
+            case FORWARD_EVERY_EVENT: CommonBehavior.forwardEveryEvent(context, allEvents, finished);
                 break;
             case PROPORTION_DELAY:
                 break;
@@ -50,26 +42,6 @@ public class InAppBehavior {
             case CREATE_NEXT_ALARM_SERVICE:
                 break;
         }
-    }
-
-    private static ArrayList<Event> getEvents(Context context){
-        ArrayList<Event> allEvents = DataMethods.getAllTodayEvents(context);
-        boolean foundStatic = false; int position = -1;
-        for (int i = 1; i < allEvents.size() && !foundStatic; i++){
-            if (allEvents.get(i).isStatic()){
-                foundStatic = true;
-                position = i;
-            }
-        }
-        if (position != -1) {
-            while (allEvents.size() > position + 1) {
-                allEvents.remove(position + 1);
-            }
-        }
-        if (allEvents.size() <= 1){
-            return null;
-        }
-        return allEvents;
     }
 
     private static int getType(Event finished, ArrayList<Event> upComingEvents){
@@ -131,7 +103,7 @@ public class InAppBehavior {
                 return PROPORTION_DELAY;
             }else {
                 long difference = currentTime - endTime;
-                long addedDifference = ((arraySize - 1) * difference) - getAmountBufferTime(upComingEvents);
+                long addedDifference = ((arraySize - 1) * difference) - CommonBehavior.getAmountBufferTime(upComingEvents);
                 if (secondToLast + addedDifference > startOfStatic){
                     return PROPORTION_DELAY;
                 }else {
@@ -143,61 +115,5 @@ public class InAppBehavior {
         }
     }
 
-    private static void cancelAnyCurrentNotification(Context context){
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        assert manager != null;
-        manager.cancel(NotificationsUtils.CALENDAR_NOTIFICATION);
 
-    }
-
-    private static void changeNothing(Context context, Event nextEvent, Event finished){
-        cancelAnyCurrentNotification(context);
-        NotificationsUtils.setAlarmNextEventEnd(context, nextEvent);
-        nextEvent.setInProgress();
-        DataMethods.updateTodayEvent(context, nextEvent);
-        Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());
-        DataMethods.changeToPastEvent(context, uri);
-    }
-
-    private static void delayEveryEvent(Context context, ArrayList<Event> allEvents, Event finished){
-        cancelAnyCurrentNotification(context);
-
-        //Put the event in the Past
-        Uri oldEventUri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI,
-                finished.getID());
-        DataMethods.changeToPastEvent(context, oldEventUri);
-
-        //Setting the next one to be in progress.
-        Event nextEvent = allEvents.get(0);
-        nextEvent.setInProgress();
-        DataMethods.updateTodayEvent(context, allEvents.get(0));
-
-        //Adding Change into database.
-        EventChangeBehavior.moveEverythingBack(context, allEvents, true);
-    }
-
-    private static void forwardEveryEvent(Context context, ArrayList<Event> allEvents, Event finished){
-        cancelAnyCurrentNotification(context);
-        //Set the Event in Progress
-        Event nextEvent = allEvents.get(0);
-        nextEvent.setInProgress();
-        DataMethods.updateTodayEvent(context, nextEvent);
-        //Change to past events
-        Uri oldUri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());
-        DataMethods.changeToPastEvent(context, oldUri);
-        //Adding change to the database
-        EventChangeBehavior.moveEverythingForward(context, allEvents, true);
-    }
-
-    private static long getDifference(Event eventOne, Event eventTwo){
-        return eventOne.getEventEnd() - eventTwo.getEventStart();
-    }
-
-    private static long getAmountBufferTime(ArrayList<Event> allEvents){
-        long sum = 0;
-        for (int i = 0; i < allEvents.size() - 1; i++){
-            sum += getDifference(allEvents.get(i), allEvents.get(i+1));
-        }
-        return sum;
-    }
 }

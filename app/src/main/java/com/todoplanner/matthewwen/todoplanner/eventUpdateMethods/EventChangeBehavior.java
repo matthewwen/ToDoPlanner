@@ -49,9 +49,11 @@ public class EventChangeBehavior {
         for (int i = 0; i < allEvents.size(); i++){
             Event temp = allEvents.get(i);
             long range = temp.getRange();
-            temp.setEventStart(runOff);
-            temp.setEventEnd(runOff + range);
-            runOff += range;
+            if (runOff > temp.getEventStart()) {
+                temp.setEventStart(runOff);
+                temp.setEventEnd(runOff + range);
+                runOff += range;
+            }
         }
 
         if (showNotification){

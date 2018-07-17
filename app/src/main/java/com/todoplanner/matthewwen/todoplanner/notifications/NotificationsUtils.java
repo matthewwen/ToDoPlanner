@@ -25,6 +25,7 @@ import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import com.todoplanner.matthewwen.todoplanner.receivers.events.AlarmEventCalendarReminderReceiver;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -327,5 +328,37 @@ public class NotificationsUtils {
 
         return range;
     }
+
+    public static void setAlarmNextEvent(Context context, Event event, boolean nextStatic){
+        Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI,
+                event.getID());
+        //Setting up all the alarms
+        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        assert manager != null;
+        //delete the current alarms set
+        if (pendingIntentStartEvent != null) {manager.cancel(pendingIntentStartEvent);}
+        if (pendingIntentEndEvent != null) {manager.cancel(pendingIntentEndEvent);}
+        //Make intents
+        Intent intentStart = new Intent(context, AlarmEventCalendarReminderReceiver.class);
+        Intent intentEnd = new Intent(context, AlarmEventCalendarReminderReceiver.class);
+        //set uri as the action
+        intentStart.setAction(uri.toString());
+        intentEnd.setAction(uri.toString());
+        //putting in the type.
+        intentStart.putExtra(context.getString(R.string.notification_event_start_stop_key),
+                NotificationsUtils.EVENT_REMINDER_START);
+        intentEnd.putExtra(context.getString(R.string.notification_event_start_stop_key),
+                NotificationsUtils.EVENT_REMINDER_END);
+        //Creating pending
+        pendingIntentStartEvent = PendingIntent.getBroadcast(context,
+                DEVELOPER_REMINDER_EVENT_START, intentStart, PendingIntent.FLAG_UPDATE_CURRENT);
+        pendingIntentEndEvent = PendingIntent.getBroadcast(context,
+                DEVELOPER_REMINDER_EVENT_END, intentEnd, PendingIntent.FLAG_UPDATE_CURRENT);
+        //Add it to the alarm service
+        manager.set(AlarmManager.RTC_WAKEUP, event.getEventStart(), pendingIntentStartEvent);
+        if (!nextStatic) {manager.set(AlarmManager.RTC_WAKEUP, event.getEventEnd(), pendingIntentEndEvent);}
+    }
+
+
 
 }
