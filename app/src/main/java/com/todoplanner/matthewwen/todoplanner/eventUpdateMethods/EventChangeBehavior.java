@@ -1,9 +1,7 @@
 package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 
 import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
-
+import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
@@ -14,7 +12,7 @@ import java.util.Calendar;
 public class EventChangeBehavior {
 
 
-    private static final String TAG = EventChangeBehavior.class.getSimpleName();
+    //private static final String TAG = EventChangeBehavior.class.getSimpleName();
 
     //Move all the events a certain point (Uri is the just completed event)
     public static void moveEverythingBack(Context context, ArrayList<Event> allEvents,
@@ -32,10 +30,10 @@ public class EventChangeBehavior {
 
         Event nextEvent = allEvents.get(0);
         if (showNotification){
-            NotificationsUtils.displayCalendarNotificationStart(context, nextEvent);
+            NotificationsUtils.displayCalendarNotification(context, nextEvent, NotificationsUtils.EVENT_REMINDER_START );
         }
 
-        NotificationsUtils.setAlarmNextEventEnd(context, allEvents.get(0));
+        AlarmServiceMethods.setAlarmNextEventEnd(context, allEvents.get(0));
 
         for (Event temp: allEvents){
             DataMethods.updateTodayEvent(context, temp);
@@ -57,10 +55,10 @@ public class EventChangeBehavior {
         }
 
         if (showNotification){
-            NotificationsUtils.displayCalendarNotificationStart(context, allEvents.get(0));
+            NotificationsUtils.displayCalendarNotification(context, allEvents.get(0), NotificationsUtils.EVENT_REMINDER_START);
         }
 
-        NotificationsUtils.setAlarmNextEventEnd(context, allEvents.get(0));
+        AlarmServiceMethods.setAlarmNextEventEnd(context, allEvents.get(0));
 
         for(Event temp: allEvents){
             DataMethods.updateTodayEvent(context, temp);

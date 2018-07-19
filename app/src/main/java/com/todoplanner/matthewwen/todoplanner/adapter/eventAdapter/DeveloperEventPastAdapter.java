@@ -10,10 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.todoplanner.matthewwen.todoplanner.R;
-import com.todoplanner.matthewwen.todoplanner.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPastEventActivity;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 

@@ -2,6 +2,7 @@ package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
@@ -37,6 +38,9 @@ public class NotificationBehavior {
             case CREATE_NEXT_ALARM_SERVICE: CommonBehavior.setNextAlarmService(context, allEvents);
                 break;
         }
+
+        Uri uri = Uri.parse(intent.getAction());
+        DataMethods.changeToPastEvent(context, uri);
     }
 
     private static int getType(Event finished, ArrayList<Event> upComingEvents){

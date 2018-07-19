@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
-import com.todoplanner.matthewwen.todoplanner.developerActivities.DeveloperEventActivity;
+import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperEventActivity;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;

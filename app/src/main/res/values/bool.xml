@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Share Preference default values -->
-    <bool name="developer_default_job_service">false</bool>
-    <bool name="developer_default_event_reminder">false</bool>
 
 </resources>

@@ -21,53 +21,45 @@
             </intent-filter>
         </activity>
 
+        <!-- Content Provider for Database -->
         <provider
             android:name=".data.DataProvider"
             android:authorities="com.todoplanner.matthewwen.todoplanner"
             android:exported="false" />
 
+        <!-- All the Developer Activities -->
         <activity
-            android:name=".developerActivities.DeveloperMainActivity"
+            android:name=".developer.developerActivities.DeveloperMainActivity"
             android:label="@string/developer_view" />
         <activity
-            android:name=".developerActivities.developerDisplayDatabase.DeveloperTaskActivity"
+            android:name=".developer.developerActivities.developerDisplayDatabase.DeveloperTaskActivity"
             android:label="@string/developer_task_list" />
         <activity
-            android:name=".developerActivities.developerDisplayDatabase.DeveloperNoteActivity"
+            android:name=".developer.developerActivities.developerDisplayDatabase.DeveloperNoteActivity"
             android:label="@string/developer_notes_list" />
         <activity
-            android:name=".developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperTodayEventActivity"
+            android:name=".developer.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperTodayEventActivity"
             android:label="@string/developer_today_event_list" />
 
-        <service
-            android:name=".sync.UpdateDelayedEventJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".sync.EventJobService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispater.ACTION_EXECUTE" />
-            </intent-filter>
-        </service>
+        <!-- FOR SERVICE: android:permission="android.permission.BIND_JOB_SERVICE" /> -->
 
-        <receiver android:name=".receivers.AlarmEventReminderReceiver" />
-        <receiver android:name=".receivers.events.AlarmEventCalendarReminderReceiver" />
 
-        <service
-            android:name=".service.NextEventIntentService"
-            android:exported="true" />
+        <!-- Alarm Service Receivers -->
+        <receiver android:name=".alarmService.CalendarReminderReceiver" />
+
+        <service android:name=".service.NextEventIntentService" />
 
         <!-- This is developer view past events -->
         <activity
-            android:name=".developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPastEventActivity"
+            android:name=".developer.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPastEventActivity"
             android:label="@string/developer_past_event_list" />
 
         <!-- This is developer view pending events -->
         <activity
-            android:name=".developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPendingEventActivity"
+            android:name=".developer.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPendingEventActivity"
             android:label="@string/developer_pending_event_list" />
-        <activity android:name=".developerActivities.DeveloperEventActivity"></activity>
+        <activity android:name=".developer.developerActivities.DeveloperEventActivity" />
+        <activity android:name=".developer.developerActivities.DeveloperEventCreateActivity" />
     </application>
 
 </manifest>

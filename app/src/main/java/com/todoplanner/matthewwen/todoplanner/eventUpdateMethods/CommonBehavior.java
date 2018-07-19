@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
 
+import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
@@ -49,10 +50,10 @@ public class CommonBehavior {
 
     public static void changeNothing(Context context, Event nextEvent, Event finished){
         cancelAnyCurrentNotification(context);
-        NotificationsUtils.displayCalendarNotificationStart(context, nextEvent);
+        NotificationsUtils.displayCalendarNotification(context, nextEvent,  NotificationsUtils.EVENT_REMINDER_START);
         Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());
         DataMethods.changeToPastEvent(context, uri);
-        NotificationsUtils.setAlarmNextEventEnd(context, nextEvent);
+        AlarmServiceMethods.setAlarmNextEventEnd(context, nextEvent);
         nextEvent.setInProgress();
         DataMethods.updateTodayEvent(context, nextEvent);
     }
@@ -120,7 +121,7 @@ public class CommonBehavior {
         value = nextIsStatic && theyLineUp;
 
 
-        NotificationsUtils.setAlarmNextEvent(context, nextEvent, value);
+        AlarmServiceMethods.setAlarmNextEvent(context, nextEvent, value);
 
     }
 }

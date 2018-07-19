@@ -17,7 +17,6 @@ import java.util.Calendar;
 public class NextEventIntentService extends IntentService{
 
     private static final String name = NextEventIntentService.class.getSimpleName();
-    private static final String TAG = name;
 
     public NextEventIntentService() {
         super(name);
@@ -26,8 +25,6 @@ public class NextEventIntentService extends IntentService{
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         assert intent != null;
-        NotificationBehavior.setUpNextEvent(intent, this);
-
-
+        NotificationBehavior.setUpNextEvent(intent,this);
     }
 }

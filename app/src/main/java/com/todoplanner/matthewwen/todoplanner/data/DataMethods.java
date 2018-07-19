@@ -6,6 +6,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+
+import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.PendingEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.PastEventEntry;
@@ -85,29 +87,9 @@ public class DataMethods {
         return allEvents;
     }
 
-    //get the ending time of an event using the uri
-    public static long getEndTime(Context context, Uri uri){
-        Cursor cursor = context.getContentResolver().query(uri,
-                new String[]{TodayEventEntry._ID, TodayEventEntry.COLUMN_EVENT_END},
-                null,
-                null,
-                null);
-        assert cursor != null;
-
-        long value;
-        if (cursor.moveToPosition(0)){
-            value = cursor.getLong(cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_END));
-        }else {
-            Log.v(TAG, "There was an error");
-            value = Long.parseLong("0");
-        }
-        cursor.close();
-        return value;
-    }
-
     //adding an event
-    public static void createEvent(Context context, String name,
-                                   long startValue, long endValue){
+    public static void createEvent(Context context, String name, String note,
+                                   long startValue, long endValue, int staticType){
         ContentValues values = new ContentValues();
         long limit = Calendar.getInstance().getTime().getTime() + TWELVE_HOURS;
         startValue = roundNearestMinute(startValue);
@@ -117,9 +99,9 @@ public class DataMethods {
             values.put(PendingEventEntry.COLUMN_EVENT_NAME, name);
             values.put(PendingEventEntry.COLUMN_EVENT_START, startValue);
             values.put(PendingEventEntry.COLUMN_EVENT_END, endValue);
-            values.put(PendingEventEntry.COLUMN_EVENT_NOTE, "THE FLOOR IS LAVA ~ SAID TROY AND ABED");
+            values.put(PendingEventEntry.COLUMN_EVENT_NOTE, note);
             values.put(PendingEventEntry.COLUMN_EVENT_TASK_ID, PendingEventEntry.NO_TASK_ID);
-            values.put(PendingEventEntry.COLUMN_EVENT_STATIONARY, PendingEventEntry.COLUMN_EVENT_STATIONARY);
+            values.put(PendingEventEntry.COLUMN_EVENT_STATIONARY, staticType);
             context.getContentResolver().insert(PendingEventEntry.EVENT_CONTENT_URI, values);
         }else {
             values.put(TodayEventEntry.COLUMN_EVENT_NAME, name);
@@ -127,9 +109,10 @@ public class DataMethods {
             values.put(TodayEventEntry.COLUMN_EVENT_END, endValue);
             values.put(TodayEventEntry.COLUMN_EVENT_NOTE, "THE FLOOR IS LAVA ~ SAID TROY AND ABED");
             values.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, TodayEventEntry.NO_TASK_ID);
-            values.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, TodayEventEntry.COLUMN_EVENT_STATIONARY);
+            values.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, staticType);
             context.getContentResolver().insert(TodayEventEntry.EVENT_CONTENT_URI, values);
             Log.v(TAG, "Data inserted into the today database");
+            AlarmServiceMethods.setAlarmNextEvent(context);
         }
     }
 

@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.todoplanner.matthewwen.todoplanner.developerActivities.DeveloperMainActivity;
+import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperMainActivity;
 
 //You could just implement LoaderManger.LoaderCallbacks<Cursor>
 public class MainActivity extends AppCompatActivity {

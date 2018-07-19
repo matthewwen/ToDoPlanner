@@ -1,13 +1,12 @@
 package com.todoplanner.matthewwen.todoplanner.notifications;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.todoplanner.matthewwen.todoplanner.developerActivities.DeveloperEventActivity;
-import com.todoplanner.matthewwen.todoplanner.developerActivities.DeveloperMainActivity;
+import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperEventActivity;
+import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperMainActivity;
 import com.todoplanner.matthewwen.todoplanner.service.NextEventIntentService;
 
 public class NotificationPendingIntent {

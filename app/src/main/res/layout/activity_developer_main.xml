@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".developerActivities.DeveloperMainActivity"
+    tools:context=".developer.developerActivities.DeveloperMainActivity"
     android:layout_margin="16dp">
 
     <LinearLayout
@@ -54,47 +54,6 @@
             android:onClick="showPastEventDatabase"
             android:text="@string/developer_past_event_list"/>
 
-
-        <!--This is for the notifications -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/developer_heading_notification"/>
-
-        <Button
-            android:text="@string/developer_reminder_calender"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="developerReminderCalendar"/>
-
-        <Button
-            android:text="@string/developer_reminder_turn_in"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="developerReminderTask"/>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/developer_reminder_weather"
-            android:onClick="developerWeatherUpdate"/>
-
-        <!-- This Test The Job Service on the device -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/developer_heading_job_services"/>
-
-        <Button
-            android:id="@+id/developer_job_service_b"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/developer_reminder_service_b"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <!-- This is for building up scenarios -->
         <TextView
             android:text="@string/developer_heading_scenario"
@@ -108,12 +67,6 @@
             android:layout_height="wrap_content"
             android:onClick="developerScenarioCalendarEvent"/>
 
-        <Button
-            android:id="@+id/developer_scenario_delaying_event_b"
-            android:text="@string/developer_scenario_delaying_event"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="developerScenarioDelayingEvent"/>
 
     </LinearLayout>
 
