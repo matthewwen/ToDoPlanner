@@ -58,8 +58,8 @@
         <activity
             android:name=".developer.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPendingEventActivity"
             android:label="@string/developer_pending_event_list" />
-        <activity android:name=".developer.developerActivities.DeveloperEventActivity" />
-        <activity android:name=".developer.developerActivities.DeveloperEventCreateActivity" />
+        <activity android:name=".developer.developerActivities.developerEvent.DeveloperEventViewActivity" />
+        <activity android:name=".developer.developerActivities.developerEvent.DeveloperEventCreateActivity" />
     </application>
 
 </manifest>

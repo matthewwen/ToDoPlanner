@@ -41,7 +41,7 @@ public class CommonBehavior {
         return allEvents;
     }
 
-    private static void cancelAnyCurrentNotification(Context context){
+    public static void cancelAnyCurrentNotification(Context context){
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         assert manager != null;
         manager.cancel(NotificationsUtils.CALENDAR_NOTIFICATION);

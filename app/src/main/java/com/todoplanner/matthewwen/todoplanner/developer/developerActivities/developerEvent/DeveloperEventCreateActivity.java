@@ -1,4 +1,4 @@
-package com.todoplanner.matthewwen.todoplanner.developer.developerActivities;
+package com.todoplanner.matthewwen.todoplanner.developer.developerActivities.developerEvent;
 
 import android.annotation.SuppressLint;
 import android.app.DialogFragment;
@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class DeveloperEventCreateActivity extends AppCompatActivity
     implements DateDialog.DatePopUp, TimeDialog.TimePopUP {
@@ -124,21 +125,21 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
 
         //set all the values
         if (savedInstanceState == null){
-            savedInstanceState = new Bundle();
             Calendar temp = Calendar.getInstance();
             yearStart = temp.get(Calendar.YEAR);
             monthStart = temp.get(Calendar.MONTH);
             dayOfMonthStart = temp.get(Calendar.DAY_OF_MONTH);
             hourStart = temp.get(Calendar.HOUR_OF_DAY);
             minuteStart = temp.get(Calendar.MINUTE);
-            yearEnd = yearStart;
-            monthEnd = monthStart;
-            dayOfMonthEnd = dayOfMonthStart;
-            hourEnd = hourStart + 1;
-            minuteEnd = minuteStart;
+            Calendar endTemp = Calendar.getInstance();
+            endTemp.setTime(new Date(temp.getTimeInMillis() + TimeUnit.HOURS.toMillis(1)));
+            yearEnd = endTemp.get(Calendar.YEAR);
+            monthEnd = endTemp.get(Calendar.MONTH);
+            dayOfMonthEnd = endTemp.get(Calendar.DAY_OF_MONTH);
+            hourEnd = endTemp.get(Calendar.HOUR_OF_DAY);
+            minuteEnd = endTemp.get(Calendar.MINUTE);
             startDate = getTime(yearStart, monthStart, dayOfMonthStart, hourStart, minuteStart);
             endDate = getTime(yearEnd, monthEnd, dayOfMonthEnd, hourEnd, minuteEnd);
-            onSaveInstanceState(savedInstanceState);
         }else {
             Log.v(TAG, "Restore instance state");
             onRestoreInstanceState(savedInstanceState);

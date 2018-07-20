@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperEventActivity;
+import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.developerEvent.DeveloperEventViewActivity;
 import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperMainActivity;
 import com.todoplanner.matthewwen.todoplanner.service.NextEventIntentService;
 
@@ -18,7 +18,7 @@ public class NotificationPendingIntent {
     private static final int NEXT_EVENT_INTENT_ID = 1003;
 
     static PendingIntent calendarPendingIntent(Context context, Uri uri){
-        Intent intent = new Intent(context, DeveloperEventActivity.class);
+        Intent intent = new Intent(context, DeveloperEventViewActivity.class);
         intent.setAction(uri.toString());
         return PendingIntent.getActivity(context,CALENDAR_PENDING_INTENT_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT );
     }

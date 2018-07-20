@@ -68,7 +68,11 @@ public class DeveloperMainActivity extends AppCompatActivity {
 
     //These are all the scenarios
     public void developerScenarioCalendarEvent(View view) {
-        DeveloperScenarios.developerScenarioOne(this);
+        DeveloperScenarios.developerTwentyEventScenarioOne(this);
+    }
+
+    public void developerScenarioCalendarForwardEvent(View view){
+        DeveloperScenarios.developerFowardConnectedEventSenarioTwo(this);
     }
 
 

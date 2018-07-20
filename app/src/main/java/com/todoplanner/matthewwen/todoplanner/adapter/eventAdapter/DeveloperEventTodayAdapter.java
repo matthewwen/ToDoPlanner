@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
-import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperEventActivity;
+import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.developerEvent.DeveloperEventViewActivity;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class DeveloperEventTodayAdapter extends RecyclerView.Adapter<DeveloperEv
             @Override
             public void onClick(View v) {
                 Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, event.getID());
-                Intent intent = new Intent(context, DeveloperEventActivity.class);
+                Intent intent = new Intent(context, DeveloperEventViewActivity.class);
                 intent.setAction(uri.toString());
                 context.startActivity(intent);
             }
@@ -102,7 +102,7 @@ public class DeveloperEventTodayAdapter extends RecyclerView.Adapter<DeveloperEv
             taskIDTv = itemView.findViewById(R.id.developer_event_task_today_item_id_tv);
             noteTv = itemView.findViewById(R.id.developer_event_today_item_note_tv);
             inProgTv = itemView.findViewById(R.id.developer_event_today_item_in_progress);
-            stationTv = itemView.findViewById(R.id.developer_event_today_item_stationary);
+            stationTv = itemView.findViewById(R.id.developer_event_pending_item_stationary);
         }
     }
 }

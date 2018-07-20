@@ -67,6 +67,12 @@
             android:layout_height="wrap_content"
             android:onClick="developerScenarioCalendarEvent"/>
 
+        <Button
+            android:text="@string/developer_scenario_forward_early"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="developerScenarioCalendarForwardEvent"/>
+
 
     </LinearLayout>
 

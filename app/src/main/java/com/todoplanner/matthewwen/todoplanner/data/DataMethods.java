@@ -91,7 +91,7 @@ public class DataMethods {
     public static void createEvent(Context context, String name, String note,
                                    long startValue, long endValue, int staticType){
         ContentValues values = new ContentValues();
-        long limit = Calendar.getInstance().getTime().getTime() + TWELVE_HOURS;
+        long limit = Calendar.getInstance().getTimeInMillis() + TWELVE_HOURS;
         startValue = roundNearestMinute(startValue);
         endValue = roundNearestMinute(endValue);
 
@@ -134,21 +134,23 @@ public class DataMethods {
     public static Event getTodayEvent(Context context, Uri uri){
         Cursor cursor = context.getContentResolver().query(uri, TodayEventEntry.PROJECTION, null, null, null);
         assert cursor != null;
-        cursor.moveToPosition(0);
-        int id = cursor.getInt(TodayEventEntry.COLUMN_EVENT_ID_FULL_INDEX);
-        String name = cursor.getString(TodayEventEntry.COLUMN_EVENT_NAME_FULL_INDEX);
-        long start = cursor.getLong(TodayEventEntry.COLUMN_EVENT_START_FULL_INDEX);
-        long end = cursor.getLong(TodayEventEntry.COLUMN_EVENT_END_FULL_INDEX);
-        int taskId = cursor.getInt(TodayEventEntry.COLUMN_EVENT_TASK_ID_FULL_INDEX);
-        String note = cursor.getString(TodayEventEntry.COLUMN_EVENT_NOTE_FULL_INDEX);
-        int inProg = cursor.getInt(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS_FULL_INDEX);
-        int station = cursor.getInt(TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX);
-        cursor.close();
-        return new Event(id, name, start, end, taskId, note, inProg, station);
+        if (cursor.moveToPosition(0)){
+            int id = cursor.getInt(TodayEventEntry.COLUMN_EVENT_ID_FULL_INDEX);
+            String name = cursor.getString(TodayEventEntry.COLUMN_EVENT_NAME_FULL_INDEX);
+            long start = cursor.getLong(TodayEventEntry.COLUMN_EVENT_START_FULL_INDEX);
+            long end = cursor.getLong(TodayEventEntry.COLUMN_EVENT_END_FULL_INDEX);
+            int taskId = cursor.getInt(TodayEventEntry.COLUMN_EVENT_TASK_ID_FULL_INDEX);
+            String note = cursor.getString(TodayEventEntry.COLUMN_EVENT_NOTE_FULL_INDEX);
+            int inProg = cursor.getInt(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS_FULL_INDEX);
+            int station = cursor.getInt(TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX);
+            cursor.close();
+            return new Event(id, name, start, end, taskId, note, inProg, station);
+        }
+        return null;
     }
 
     //get all the content values for a particular uri
-    public static ContentValues getTodayEventContentValues(Context context, Uri uri){
+    private static ContentValues getTodayEventContentValues(Context context, Uri uri){
         Cursor cursor = context.getContentResolver().query(uri,
                 TodayEventEntry.PROJECTION,
                 null,

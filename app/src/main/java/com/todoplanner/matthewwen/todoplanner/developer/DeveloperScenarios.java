@@ -11,6 +11,7 @@ import com.todoplanner.matthewwen.todoplanner.data.PreferenceUtils;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +19,7 @@ public class DeveloperScenarios {
 
     private static final String TAG = DeveloperScenarios.class.getSimpleName();
 
-    public static void developerScenarioOne(Context context){
+    public static void developerTwentyEventScenarioOne(Context context){
         Log.v(TAG, "Event Created");
 
         //Delete all Events
@@ -34,6 +35,28 @@ public class DeveloperScenarios {
 
         for (int i = 1; i <= 20; i++){
             DataMethods.createEvent(context,"Event " + i, "Tory and Abed are in Lava",
+                    allTimes.get(i-1), allTimes.get(i), DataContract.TodayEventEntry.EVENT_NOT_STATIONARY);
+        }
+
+        AlarmServiceMethods.setAlarmNextEvent(context);
+    }
+
+    public static void developerFowardConnectedEventSenarioTwo(Context context){
+        Log.v(TAG, "Foward Event Created");
+
+        //Delete all the devents
+        context.getContentResolver().delete(DataContract.TodayEventEntry.EVENT_CONTENT_URI, null, null);
+
+        ArrayList<Long> allTimes = new ArrayList<>();
+        long startValue = DataMethods.roundNearestMinute(
+                Calendar.getInstance().getTimeInMillis() + TimeUnit.MINUTES.toMillis(1));
+        for (int i = 0; i < 21; i++){
+            startValue += TimeUnit.MINUTES.toMillis(5);
+            allTimes.add(startValue);
+        }
+
+        for (int i = 1; i <= 20; i++){
+            DataMethods.createEvent(context,"Event " + i, "Tory and Abed in the Morning",
                     allTimes.get(i-1), allTimes.get(i), DataContract.TodayEventEntry.EVENT_NOT_STATIONARY);
         }
 

@@ -1,6 +1,8 @@
 package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
@@ -12,7 +14,7 @@ import java.util.Calendar;
 public class EventChangeBehavior {
 
 
-    //private static final String TAG = EventChangeBehavior.class.getSimpleName();
+    private static final String TAG = EventChangeBehavior.class.getSimpleName();
 
     //Move all the events a certain point (Uri is the just completed event)
     public static void moveEverythingBack(Context context, ArrayList<Event> allEvents,
@@ -47,7 +49,7 @@ public class EventChangeBehavior {
         for (int i = 0; i < allEvents.size(); i++){
             Event temp = allEvents.get(i);
             long range = temp.getRange();
-            if (runOff > temp.getEventStart()) {
+            if (runOff < temp.getEventStart()) {
                 temp.setEventStart(runOff);
                 temp.setEventEnd(runOff + range);
                 runOff += range;
@@ -59,6 +61,8 @@ public class EventChangeBehavior {
         }
 
         AlarmServiceMethods.setAlarmNextEventEnd(context, allEvents.get(0));
+
+        Log.v(TAG, "All Events are moved forward");
 
         for(Event temp: allEvents){
             DataMethods.updateTodayEvent(context, temp);

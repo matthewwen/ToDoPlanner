@@ -26,6 +26,10 @@ public class CalendarReminderReceiver extends BroadcastReceiver{
         //get the event
         Event event = DataMethods.getTodayEvent(context, uri);
 
+        if (event == null){
+            return;
+        }
+
         //make it in progress
         event.setInProgress();
 

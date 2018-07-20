@@ -15,7 +15,8 @@ import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class DeveloperEventPastAdapter extends RecyclerView.Adapter<DeveloperEventPastAdapter.PastViewHolder> {
+public class DeveloperEventPastAdapter extends
+        RecyclerView.Adapter<DeveloperEventPastAdapter.PastViewHolder> {
 
     LayoutInflater inflater;
     ArrayList<Event> allEvents;

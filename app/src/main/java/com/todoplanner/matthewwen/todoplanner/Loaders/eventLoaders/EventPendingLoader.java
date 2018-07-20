@@ -36,6 +36,7 @@ public class EventPendingLoader extends AsyncTaskLoader<ArrayList<Event>> {
             Event temp = new Event(id,name, start, end, note, taskId, station);
             allEvents.add(temp);
         }
+        cursor.close();
         return allEvents;
     }
 

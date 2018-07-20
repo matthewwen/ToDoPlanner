@@ -169,6 +169,7 @@ public class DataProvider extends ContentProvider {
             case TABLE_NOTE: return noteInsert(uri, contentValues);
             case TABLE_TODAY_EVENT: return eventTodayInsert(uri, contentValues);
             case TABLE_PAST_EVENT: return eventPastInsert(uri, contentValues);
+            case TABLE_PENDING_EVENT: return eventPendingInsert(uri, contentValues);
         }
         return uri;
     }
@@ -190,6 +191,13 @@ public class DataProvider extends ContentProvider {
 
         Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
 
+        return ContentUris.withAppendedId(uri, id);
+    }
+
+    private Uri eventPastInsert(Uri uri, ContentValues values){
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        long id = db.insert(PastEventEntry.TABLE_NAME, null, values);
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -250,11 +258,11 @@ public class DataProvider extends ContentProvider {
         return ContentUris.withAppendedId(uri, id);
     }
 
-    private Uri eventPastInsert(Uri uri, ContentValues values){
+    private Uri eventPendingInsert(Uri uri, ContentValues values){
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        long id = db.insert(PastEventEntry.TABLE_NAME, null, values);
+        long id = db.insert(PendingEventEntry.TABLE_NAME, null, values);
         Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
-        return ContentUris.withAppendedId(uri, id);
+        return ContentUris.withAppendedId(PendingEventEntry.EVENT_CONTENT_URI, id);
     }
 
     @Override
