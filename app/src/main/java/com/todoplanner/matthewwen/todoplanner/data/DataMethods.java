@@ -102,12 +102,13 @@ public class DataMethods {
             values.put(PendingEventEntry.COLUMN_EVENT_NOTE, note);
             values.put(PendingEventEntry.COLUMN_EVENT_TASK_ID, PendingEventEntry.NO_TASK_ID);
             values.put(PendingEventEntry.COLUMN_EVENT_STATIONARY, staticType);
+            Log.v(TAG, "Data inserted into the pending database");
             context.getContentResolver().insert(PendingEventEntry.EVENT_CONTENT_URI, values);
         }else {
             values.put(TodayEventEntry.COLUMN_EVENT_NAME, name);
             values.put(TodayEventEntry.COLUMN_EVENT_START, startValue);
             values.put(TodayEventEntry.COLUMN_EVENT_END, endValue);
-            values.put(TodayEventEntry.COLUMN_EVENT_NOTE, "THE FLOOR IS LAVA ~ SAID TROY AND ABED");
+            values.put(TodayEventEntry.COLUMN_EVENT_NOTE, note);
             values.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, TodayEventEntry.NO_TASK_ID);
             values.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, staticType);
             context.getContentResolver().insert(TodayEventEntry.EVENT_CONTENT_URI, values);

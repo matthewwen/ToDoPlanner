@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,45 +25,58 @@ public class DateDialog extends DialogFragment
 
     private static final String TAG = DateDialog.class.getSimpleName();
 
-    private TextView dateText;
-    private int type;
-    private DatePopUp mainView;
+    //key values
+    private static final String YEAR_KEY = "year_key";
+    private static final String MONTH_KEY = "month_key";
+    private static final String DAY_KEY = "day_key";
+    private static final String TYPE_KEY = "type_key";
 
-    private int hour;
-    private int minute;
-
-    private int year;
-    private int month;
-    private int day;
-
-    public DateDialog(View view, int type, DatePopUp mainView, int year, int month, int day, int hour, int minute){
-        dateText = (TextView) view;
-        this.mainView = mainView;
-        this.type = type;
-        this.hour = hour;
-        this.minute = minute;
-        this.year = year;
-        this.month = month;
-        this.day = day;
+    public static DateDialog newInstance(int type, int year, int month, int day){
+        DateDialog dateDialog = new DateDialog();
+        Bundle args = new Bundle();
+        args.putInt(YEAR_KEY, year);
+        args.putInt(MONTH_KEY, month);
+        args.putInt(DAY_KEY, day);
+        args.putInt(TYPE_KEY, type);
+        dateDialog.setArguments(args);
+        return dateDialog;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        int year = getArguments().getInt(YEAR_KEY);
+        int month = getArguments().getInt(MONTH_KEY);
+        int day = getArguments().getInt(DAY_KEY);
+
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, dayOfMonth);
-        SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH);
-        long time = DataMethods.roundNearestMinute(calendar.getTimeInMillis());
-        String text = format.format(new Date(time));
-        dateText.setText(text);
-        mainView.setDate(type, time);
+        //get values
+        int type = getArguments().getInt(TYPE_KEY);
+
+        //saved instance state
+        Bundle bundle = new Bundle();
+        bundle.putInt(YEAR_KEY, year);
+        bundle.putInt(MONTH_KEY, month);
+        bundle.putInt(DAY_KEY, dayOfMonth);
+        bundle.putInt(TYPE_KEY, type);
+        setArguments(bundle);
+
+
+        DatePopUp popUp = (DatePopUp) getActivity();
+        popUp.setDate(type, year, month, dayOfMonth);
     }
 
+
     public interface DatePopUp{
-        void setDate(int type, long time);
+        void setDate(int type, int year, int month, int dayOfMonth);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        dismiss();
     }
 }

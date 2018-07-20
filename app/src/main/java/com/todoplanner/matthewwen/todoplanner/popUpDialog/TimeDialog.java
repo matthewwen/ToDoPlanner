@@ -19,50 +19,47 @@ import java.util.concurrent.TimeUnit;
 public class TimeDialog extends DialogFragment
     implements TimePickerDialog.OnTimeSetListener{
 
-    private TextView textView;
-    private int type;
-    private TimePopUP popUP;
 
-    private int year;
-    private int month;
-    private int dayOfYear;
-    private int hour;
-    private int minute;
+    //key values
+    private static final String HOUR_KEY = "hour-key";
+    private static final String MINUTE_KEY = "minute-key";
+    private static final String TYPE_KEY = "type-key";
 
-    public TimeDialog(View view, int type, TimePopUP popUP, int year, int month, int dayOfYear,
-                      int hour, int minute){
-        textView = (TextView) view;
-        this.type = type;
-        this.popUP = popUP;
-        this.year = year;
-        this.month = month;
-        this.dayOfYear = dayOfYear;
-        this.hour = hour;
-        this.minute = minute;
+    public static TimeDialog newInstance(int type, int hour, int minute){
+        TimeDialog dialog = new TimeDialog();
+        Bundle bundle = new Bundle();
+        bundle.putInt(HOUR_KEY, hour);
+        bundle.putInt(MINUTE_KEY, minute);
+        bundle.putInt(TYPE_KEY, type);
+        dialog.setArguments(bundle);
+        return dialog;
     }
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        int hour = getArguments().getInt(HOUR_KEY);
+        int minute = getArguments().getInt(MINUTE_KEY);
+
         return new TimePickerDialog(getActivity(), this,
                 hour, minute, false);
     }
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        hour = hourOfDay;
-        this.minute = minute;
-        calendar.set(year, month, dayOfYear, hourOfDay, minute);
-        long time = calendar.getTimeInMillis();
+        int type = getArguments().getInt(TYPE_KEY);
 
-        @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa");
-        String timeText = timeFormat.format(new Date(time));
-        textView.setText(timeText);
-        popUP.setTime(type, time);
+        Bundle bundle = new Bundle();
+        bundle.putInt(HOUR_KEY, hourOfDay);
+        bundle.putInt(MINUTE_KEY, minute);
+        setArguments(bundle);
+
+        TimePopUP popUp = (TimePopUP) getActivity();
+        popUp.setTime(type, hourOfDay, minute);
     }
 
     public interface TimePopUP{
-        void setTime(int type, long time);
+        void setTime(int type, int hour, int minute);
     }
+
 }
