@@ -41,7 +41,7 @@ public class DeveloperScenarios {
         AlarmServiceMethods.setAlarmNextEvent(context);
     }
 
-    public static void developerFowardConnectedEventSenarioTwo(Context context){
+    public static void developerForwardConnectedEventScenarioTwo(Context context){
         Log.v(TAG, "Foward Event Created");
 
         //Delete all the devents
@@ -61,5 +61,24 @@ public class DeveloperScenarios {
         }
 
         AlarmServiceMethods.setAlarmNextEvent(context);
+    }
+
+    public static void developerJobServiceScenario(Context context){
+        //create events 1 hour long and 3 hours apart.
+        ArrayList<Long> timeArray = new ArrayList<>();
+        long current = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
+        current += TimeUnit.HOURS.toMillis(1);
+        for (int i = 0; i < 10; i++){
+            timeArray.add(current);
+            current += TimeUnit.HOURS.toMillis(3);
+        }
+        for (int i = 0; i < timeArray.size(); i++){
+            DataMethods.createEvent(context,
+                    "Event " + i,
+                    "Purdue University",
+                    timeArray.get(i),
+                    timeArray.get(i) + TimeUnit.HOURS.toMillis(1),
+                    DataContract.TodayEventEntry.EVENT_NOT_STATIONARY);
+        }
     }
 }

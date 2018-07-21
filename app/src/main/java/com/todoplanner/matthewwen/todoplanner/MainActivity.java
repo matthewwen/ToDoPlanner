@@ -5,19 +5,21 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperMainActivity;
+import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 
 //You could just implement LoaderManger.LoaderCallbacks<Cursor>
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mTextMessage;
+    private static final String TAG = MainActivity.class.getSimpleName();
+
 
     //use intent filters to determine if the device is connected to wifi or not
-
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -43,6 +45,15 @@ public class MainActivity extends AppCompatActivity {
         //Bottom navigation view
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        //Initial Job Services
+        if (!JobServiceMethods.hasUpdateDatabaseJobService(this)){
+            JobServiceMethods.settingUrgentPendingToToday(this);
+            JobServiceMethods.automatedMoveToTodayJobService(this);
+            Log.v(TAG, "Job Service Created");
+        }else {
+            Log.v(TAG, "Job Service Already Exists");
+        }
     }
 
     @Override

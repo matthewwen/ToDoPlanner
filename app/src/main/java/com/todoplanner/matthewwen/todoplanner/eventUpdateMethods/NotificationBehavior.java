@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
-import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
@@ -22,7 +21,11 @@ public class NotificationBehavior {
     public static final String TAG = NotificationBehavior.class.getSimpleName();
 
     public static void setUpNextEvent(Intent intent, Context context){
-        ArrayList<Event> allEvents = CommonBehavior.getEvents(context);  //First one is the finished one, Second one is the next event.
+        //Cancel Job Service
+        CommonBehavior.cancelJobService(context);
+
+        //First one is the finished one, Second one is the next event.
+        ArrayList<Event> allEvents = CommonBehavior.getEvents(context);
         if (allEvents == null){
             Log.v(TAG, "All Events are null");
             CommonBehavior.cancelAnyCurrentNotification(context);

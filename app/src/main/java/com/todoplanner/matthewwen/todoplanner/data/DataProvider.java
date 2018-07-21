@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -277,6 +278,12 @@ public class DataProvider extends ContentProvider {
                 strings = new String[] {Long.toString(ContentUris.parseId(uri))};
                 return deleteTodayEvent(uri, s, strings);
             }
+            case TABLE_PENDING_EVENT: deleteTablePending(uri, s, strings);
+            case TABLE_PENDING_EVENT_ID: {
+                s = PendingEventEntry._ID + "=?";
+                strings = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                deleteTablePending(uri, s, strings);
+            }
         }
         return 0;
     }
@@ -294,6 +301,15 @@ public class DataProvider extends ContentProvider {
     public int deleteTodayEvent(Uri uri, String selection, String[] selectionArgs){
         Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
         return mDbHelper.getWritableDatabase().delete(TodayEventEntry.TABLE_NAME, selection, selectionArgs);
+    }
+
+    private int deleteTablePending(Uri uri, String selection, String[] selectionArgs){
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        int val = db.delete(PendingEventEntry.TABLE_NAME,
+                selection,
+                selectionArgs);
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
+        return val;
     }
 
     @Override

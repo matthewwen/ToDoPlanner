@@ -4,9 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
@@ -26,16 +28,22 @@ public class CalendarReminderReceiver extends BroadcastReceiver{
         //get the event
         Event event = DataMethods.getTodayEvent(context, uri);
 
-        if (event == null){
+        if (event == null) {
             return;
         }
 
-        //make it in progress
-        event.setInProgress();
+        if (type.equals(NotificationsUtils.EVENT_REMINDER_START)) {
+            //make it in progress
+            event.setInProgress();
 
-        //put it in the database
-        DataMethods.updateTodayEvent(context, event);
+            //put it in the database
+            DataMethods.updateTodayEvent(context, event);
+        }else {
+            Log.v(TAG, "Job Service should be created");
+            JobServiceMethods.automatedDelayEventJobService(context);
+        }
 
+        Log.v(TAG, "Notification is displayed?");
         //display notification
         NotificationsUtils.displayCalendarNotification(context, event, type);
     }

@@ -41,8 +41,11 @@
             android:name=".developer.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperTodayEventActivity"
             android:label="@string/developer_today_event_list" />
 
-        <!-- FOR SERVICE: android:permission="android.permission.BIND_JOB_SERVICE" /> -->
-
+        <!-- Job Services -->
+        <service android:name=".jobServices.jobServiceClass.NotifyMoveEventJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".jobServices.jobServiceClass.UpdateTodayDatabaseJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
 
         <!-- Alarm Service Receivers -->
         <receiver android:name=".alarmService.CalendarReminderReceiver" />

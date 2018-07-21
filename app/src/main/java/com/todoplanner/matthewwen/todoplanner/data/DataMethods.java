@@ -176,6 +176,61 @@ public class DataMethods {
         return contentValues;
     }
 
+    //get all the Pending Events with a start time above a certain time
+    public static ArrayList<Event> getEssentialPendingEvents(Context context, long limit){
+        Cursor cursor = context.getContentResolver().query(PendingEventEntry.EVENT_CONTENT_URI,
+                PendingEventEntry.PROJECTION,
+                PendingEventEntry.COLUMN_EVENT_START +"<?",
+                new String[]{String.valueOf(limit)},
+                PendingEventEntry.COLUMN_EVENT_START);
+        if (cursor == null || cursor.getCount() == 0){
+            return null;
+        }
+        ArrayList<Event> arrayList = new ArrayList<>();
+        cursor.moveToPosition(-1);
+        while (cursor.moveToNext()){
+            int id = cursor.getInt(PendingEventEntry.COLUMN_EVENT_ID_FULL_INDEX);
+            String name = cursor.getString(PendingEventEntry.COLUMN_EVENT_NAME_FULL_INDEX);
+            long start = cursor.getLong(PendingEventEntry.COLUMN_EVENT_START_FULL_INDEX);
+            long end = cursor.getLong(PendingEventEntry.COLUMN_EVENT_END_FULL_INDEX);
+            int taskid = cursor.getInt(PendingEventEntry.COLUMN_EVENT_TASK_ID_FULL_INDEX);
+            String note = cursor.getString(PendingEventEntry.COLUMN_EVENT_NOTE_FULL_INDEX);
+            int station = cursor.getInt(PendingEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX);
+            Event temp = new Event(id, name, start, end, note, taskid, station);
+            arrayList.add(temp);
+        }
+        cursor.close();
+        return arrayList;
+    }
+
+    //delete an event from the pending database
+    public static void deletePendingEvent(Context context, Event event){
+        int id = event.getID();
+        Uri uri = ContentUris.withAppendedId(PendingEventEntry.EVENT_CONTENT_URI, id);
+        context.getContentResolver().delete(uri,
+                null,
+                null);
+    }
+
+    //insert event into Today Event Table
+    public static void insertTodayEvent(Context context, Event event){
+        String name = event.getEventName();
+        long startValue = event.getEventStart();
+        long endValue = event.getEventEnd();
+        String note = event.getNote();
+        int taskId = event.getTaskId();
+        int staticType = event.getStaticInt();
+
+        ContentValues values = new ContentValues();
+        values.put(PendingEventEntry.COLUMN_EVENT_NAME, name);
+        values.put(PendingEventEntry.COLUMN_EVENT_START, startValue);
+        values.put(PendingEventEntry.COLUMN_EVENT_END, endValue);
+        values.put(PendingEventEntry.COLUMN_EVENT_NOTE, note);
+        values.put(PendingEventEntry.COLUMN_EVENT_TASK_ID, taskId);
+        values.put(PendingEventEntry.COLUMN_EVENT_STATIONARY, staticType);
+        context.getContentResolver().insert(PendingEventEntry.EVENT_CONTENT_URI, values);
+    }
+
 
 }
 

@@ -3,6 +3,7 @@ package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 import android.content.Context;
 import android.util.Log;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,6 +20,9 @@ public class InAppBehavior {
     private static final int CREATE_NEXT_ALARM_SERVICE = 5;
 
     public static void userPressedFinished(Context context){
+        //Cancel Job Service
+        JobServiceMethods.cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
+
         ArrayList<Event> allEvents = CommonBehavior.getEvents(context);  //First one is the finished one, Second one is the next event.
         if (allEvents == null){
             Log.v(TAG, "All Events are null");
@@ -103,7 +107,7 @@ public class InAppBehavior {
                 return PROPORTION_DELAY;
             }else {
                 long difference = currentTime - endTime;
-                long addedDifference = ((arraySize - 1) * difference) - CommonBehavior.getAmountBufferTime(upComingEvents);
+                long addedDifference =  difference - CommonBehavior.getAmountBufferTime(upComingEvents);
                 if (secondToLast + addedDifference > startOfStatic){
                     return PROPORTION_DELAY;
                 }else {

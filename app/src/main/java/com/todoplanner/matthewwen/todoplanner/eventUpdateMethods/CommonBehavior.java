@@ -8,6 +8,7 @@ import android.net.Uri;
 import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
@@ -123,5 +124,10 @@ public class CommonBehavior {
 
         AlarmServiceMethods.setAlarmNextEvent(context, nextEvent, value);
 
+    }
+
+    public static void cancelJobService(Context context){
+        //Cancel Job Service
+        JobServiceMethods.cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
     }
 }

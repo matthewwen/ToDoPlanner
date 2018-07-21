@@ -19,6 +19,19 @@ public class EventChangeBehavior {
     //Move all the events a certain point (Uri is the just completed event)
     public static void moveEverythingBack(Context context, ArrayList<Event> allEvents,
                                            boolean showNotification){
+        delayEverything(allEvents);
+
+        Event nextEvent = allEvents.get(0);
+        if (showNotification){
+            NotificationsUtils.displayCalendarNotification(context, nextEvent, NotificationsUtils.EVENT_REMINDER_START );
+        }
+
+        AlarmServiceMethods.setAlarmNextEventEnd(context, allEvents.get(0));
+
+        saveInDatabase(context, allEvents);
+    }
+
+    private static void delayEverything(ArrayList<Event> allEvents){
         long endOff = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
         for (int i = 0; i < allEvents.size(); i++){
             Event temp = allEvents.get(i);
@@ -29,17 +42,18 @@ public class EventChangeBehavior {
                 endOff += range;
             }
         }
+    }
 
-        Event nextEvent = allEvents.get(0);
-        if (showNotification){
-            NotificationsUtils.displayCalendarNotification(context, nextEvent, NotificationsUtils.EVENT_REMINDER_START );
-        }
-
-        AlarmServiceMethods.setAlarmNextEventEnd(context, allEvents.get(0));
-
+    private static void saveInDatabase(Context context, ArrayList<Event> allEvents){
         for (Event temp: allEvents){
             DataMethods.updateTodayEvent(context, temp);
         }
+    }
+
+    public static void moveEverythingBack(Context context, ArrayList<Event> allEvents){
+        delayEverything(allEvents);
+
+        saveInDatabase(context, allEvents);
     }
 
     //move all the events a certain point forward
