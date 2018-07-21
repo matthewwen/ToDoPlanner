@@ -180,7 +180,7 @@ public class DataMethods {
     public static ArrayList<Event> getEssentialPendingEvents(Context context, long limit){
         Cursor cursor = context.getContentResolver().query(PendingEventEntry.EVENT_CONTENT_URI,
                 PendingEventEntry.PROJECTION,
-                PendingEventEntry.COLUMN_EVENT_START +"<?",
+                PendingEventEntry.COLUMN_EVENT_START +"<=?",
                 new String[]{String.valueOf(limit)},
                 PendingEventEntry.COLUMN_EVENT_START);
         if (cursor == null || cursor.getCount() == 0){
@@ -218,17 +218,10 @@ public class DataMethods {
         long startValue = event.getEventStart();
         long endValue = event.getEventEnd();
         String note = event.getNote();
-        int taskId = event.getTaskId();
+        //int taskId = event.getTaskId();
         int staticType = event.getStaticInt();
 
-        ContentValues values = new ContentValues();
-        values.put(PendingEventEntry.COLUMN_EVENT_NAME, name);
-        values.put(PendingEventEntry.COLUMN_EVENT_START, startValue);
-        values.put(PendingEventEntry.COLUMN_EVENT_END, endValue);
-        values.put(PendingEventEntry.COLUMN_EVENT_NOTE, note);
-        values.put(PendingEventEntry.COLUMN_EVENT_TASK_ID, taskId);
-        values.put(PendingEventEntry.COLUMN_EVENT_STATIONARY, staticType);
-        context.getContentResolver().insert(PendingEventEntry.EVENT_CONTENT_URI, values);
+        createEvent(context, name, note, startValue, endValue, staticType);
     }
 
 

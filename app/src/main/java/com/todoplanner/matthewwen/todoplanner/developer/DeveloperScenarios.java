@@ -78,7 +78,7 @@ public class DeveloperScenarios {
                     "Purdue University",
                     timeArray.get(i),
                     timeArray.get(i) + TimeUnit.HOURS.toMillis(1),
-                    DataContract.TodayEventEntry.EVENT_NOT_STATIONARY);
+                    DataContract.TodayEventEntry.EVENT_STATIONARY);
         }
     }
 }

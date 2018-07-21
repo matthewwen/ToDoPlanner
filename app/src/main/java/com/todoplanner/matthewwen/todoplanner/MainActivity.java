@@ -10,8 +10,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperMainActivity;
 import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.jobServices.jobServiceClass.UpdateTodayDatabaseJobService;
+import com.todoplanner.matthewwen.todoplanner.objects.Event;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 //You could just implement LoaderManger.LoaderCallbacks<Cursor>
 public class MainActivity extends AppCompatActivity {
