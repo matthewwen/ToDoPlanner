@@ -78,4 +78,8 @@ public class DeveloperMainActivity extends AppCompatActivity {
     public void developerScenarioJobService(View view) {
         DeveloperScenarios.developerJobServiceScenario(this);
     }
+
+    public void developerScenarioAllStation(View view) {
+        DeveloperScenarios.developerAllStaticScenario(this);
+    }
 }

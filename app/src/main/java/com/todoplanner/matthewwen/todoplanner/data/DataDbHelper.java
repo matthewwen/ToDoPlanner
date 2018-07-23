@@ -52,7 +52,8 @@ public class DataDbHelper extends SQLiteOpenHelper {
                 TodayEventEntry.COLUMN_EVENT_NOTE + " TEXT, " +
                 TodayEventEntry.COLUMN_EVENT_TASK_ID + " INTEGER NOT NULL, " +
                 TodayEventEntry.COLUMN_EVENT_IN_PROGRESS + " INTEGER, " +
-                TodayEventEntry.COLUMN_EVENT_STATIONARY + " INTEGER);";
+                TodayEventEntry.COLUMN_EVENT_STATIONARY + " INTEGER, " +
+                TodayEventEntry.COLUMN_EVENT_ALARM_SET + " INTEGER);";
 
         //execute into the database
         sqLiteDatabase.execSQL(TODAY_EVENT_CREATE_TABLE);

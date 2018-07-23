@@ -70,6 +70,7 @@ public class DataContract {
         public static final String COLUMN_EVENT_TASK_ID = "eventTask"; //if -1, then it is just an event
         public static final String COLUMN_EVENT_IN_PROGRESS = "eventProgress"; //if 0, then no. If 1, then yes.
         public static final String COLUMN_EVENT_STATIONARY = "eventStationary"; //if 0, then no. If 1, then yes
+        public static final String COLUMN_EVENT_ALARM_SET = "eventAlarmSet"; //if 0, then no. If 1, then yes
 
         //this is for constant values
         public static final int NO_TASK_ID = -1;
@@ -80,6 +81,10 @@ public class DataContract {
         public static final int EVENT_STATIONARY = 1;
         public static final int EVENT_NOT_STATIONARY = 0;
 
+        //this is for alarm set vs. alarm not set
+        public static final int ALARM_SET = 1;
+        public static final int ALARM_NOT_SET = 0;
+
         //the projection
         public static final String[] PROJECTION = {
                 _ID,
@@ -89,7 +94,8 @@ public class DataContract {
             COLUMN_EVENT_TASK_ID,
             COLUMN_EVENT_NOTE,
             COLUMN_EVENT_IN_PROGRESS,
-            COLUMN_EVENT_STATIONARY};
+            COLUMN_EVENT_STATIONARY,
+            COLUMN_EVENT_ALARM_SET};
 
         //All the Index
         public static final int COLUMN_EVENT_ID_FULL_INDEX = 0;
@@ -100,6 +106,7 @@ public class DataContract {
         public static final int COLUMN_EVENT_NOTE_FULL_INDEX = 5;
         public static final int COLUMN_EVENT_IN_PROGRESS_FULL_INDEX = 6;
         public static final int COLUMN_EVENT_STATIONARY_FULL_INDEX = 7;
+        public static final int COLUMN_EVENT_ALARM_SET_FULL_INDEX = 8;
 
         public static final String[] PROJECTION_DATE = {_ID,
             COLUMN_EVENT_START,

@@ -26,21 +26,18 @@ public class EventChangeBehavior {
             NotificationsUtils.displayCalendarNotification(context, nextEvent, NotificationsUtils.EVENT_REMINDER_START );
         }
 
-        AlarmServiceMethods.setAlarmNextEventEnd(context, allEvents.get(0));
+        AlarmServiceMethods.setAlarmEventEnd(context, allEvents.get(0));
 
         saveInDatabase(context, allEvents);
     }
 
     private static void delayEverything(ArrayList<Event> allEvents){
-        long endOff = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
+        long difference = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis())
+                - allEvents.get(0).getEventStart();
         for (int i = 0; i < allEvents.size(); i++){
             Event temp = allEvents.get(i);
-            long range = temp.getRange();
-            if (endOff > temp.getEventStart()) {
-                temp.setEventStart(endOff);
-                temp.setEventEnd(endOff + range);
-                endOff += range;
-            }
+            temp.setEventStart(temp.getEventStart() + difference);
+            temp.setEventEnd(temp.getEventEnd() + difference);
         }
     }
 
@@ -74,7 +71,7 @@ public class EventChangeBehavior {
             NotificationsUtils.displayCalendarNotification(context, allEvents.get(0), NotificationsUtils.EVENT_REMINDER_START);
         }
 
-        AlarmServiceMethods.setAlarmNextEventEnd(context, allEvents.get(0));
+        AlarmServiceMethods.setAlarmEventEnd(context, allEvents.get(0));
 
         Log.v(TAG, "All Events are moved forward");
 

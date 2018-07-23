@@ -14,17 +14,18 @@ public class Event implements Story {
     private String note;
     private int inProgress;
     private int staticInt;
+    private int alarmSet;
 
     //This is for the today view
-    public Event(int id, String eventName, long eventStart, long eventEnd, int taskId, String note, int inProgress, int staticInt){
+    public Event(int id, String eventName, long eventStart, long eventEnd, int taskId, String note, int inProgress, int staticInt, int alarmSet){
         this.id = id; this.eventName = eventName; this.eventStart = eventStart; this.eventEnd = eventEnd; this.taskId = taskId;
-        this.inProgress = inProgress; this.note = note; this.staticInt = staticInt;
+        this.inProgress = inProgress; this.note = note; this.staticInt = staticInt; this.alarmSet = alarmSet;
     }
 
     //This is for pending
     public Event(int id, String eventName, long eventStart, long eventEnd, String note, int taskId,  int staticInt){
         this.id = id; this.eventName = eventName; this.eventStart = eventStart; this.eventEnd = eventEnd; this.note = note;
-        this.taskId = taskId; this.staticInt = staticInt;
+        this.taskId = taskId; this.staticInt = staticInt; alarmSet = DataContract.TodayEventEntry.ALARM_NOT_SET;
     }
 
     //This is for past
@@ -94,5 +95,13 @@ public class Event implements Story {
 
     public long getRange(){
         return eventEnd - eventStart;
+    }
+
+    public int getAlarmSet(){
+        return alarmSet;
+    }
+
+    public void setAlarmSet(){
+        alarmSet = DataContract.TodayEventEntry.ALARM_SET;
     }
 }

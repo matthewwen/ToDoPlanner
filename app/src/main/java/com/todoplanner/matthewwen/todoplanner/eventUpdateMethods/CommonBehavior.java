@@ -54,7 +54,7 @@ public class CommonBehavior {
         NotificationsUtils.displayCalendarNotification(context, nextEvent,  NotificationsUtils.EVENT_REMINDER_START);
         Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());
         DataMethods.changeToPastEvent(context, uri);
-        AlarmServiceMethods.setAlarmNextEventEnd(context, nextEvent);
+        AlarmServiceMethods.setAlarmEventEnd(context, nextEvent);
         nextEvent.setInProgress();
         DataMethods.updateTodayEvent(context, nextEvent);
     }
@@ -113,21 +113,36 @@ public class CommonBehavior {
         }
 
         Event nextEvent = allEvents.get(0);
-        Event nextNextEvent = allEvents.get(1);
 
-        boolean value;
-        boolean nextIsStatic = allEvents.get(1).isStatic();
-        boolean theyLineUp = DataMethods.roundNearestMinute(nextEvent.getEventEnd())
-                == DataMethods.roundNearestMinute(nextNextEvent.getEventStart());
-        value = nextIsStatic && theyLineUp;
-
-
-        AlarmServiceMethods.setAlarmNextEvent(context, nextEvent, value);
+        AlarmServiceMethods.setAlarmEventStart(context, nextEvent);
 
     }
 
     public static void cancelJobService(Context context){
         //Cancel Job Service
         JobServiceMethods.cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
+    }
+
+    public static void nnEventNeedEndStatic(Context context, long currentTime, Event nEvent){
+        cancelAnyCurrentNotification(context);
+        if (DataMethods.roundNearestMinute(currentTime) == nEvent.getEventStart()){
+            NotificationsUtils.displayCalendarNotification(context,
+                    nEvent,
+                    NotificationsUtils.EVENT_REMINDER_START);
+        }else {
+            AlarmServiceMethods.setAlarmEventStart(context, nEvent);
+        }
+        AlarmServiceMethods.setAlarmEventStart(context, nEvent);
+    }
+
+    public static void nnEventNoEndStatic(Context context, long currentTime, Event nEvent){
+        cancelAnyCurrentNotification(context);
+        if (DataMethods.roundNearestMinute(currentTime) == nEvent.getEventStart()){
+            NotificationsUtils.displayCalendarNotification(context,
+                    nEvent,
+                    NotificationsUtils.EVENT_REMINDER_START);
+        }else {
+            AlarmServiceMethods.setAlarmEventStart(context, nEvent);
+        }
     }
 }

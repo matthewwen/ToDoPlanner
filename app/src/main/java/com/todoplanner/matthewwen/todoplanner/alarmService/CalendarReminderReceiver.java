@@ -38,6 +38,12 @@ public class CalendarReminderReceiver extends BroadcastReceiver{
 
             //put it in the database
             DataMethods.updateTodayEvent(context, event);
+
+            //making the next alarm service
+            AlarmServiceMethods.setAlarmEventEnd(context, event);
+
+            //cancel all job service
+            JobServiceMethods.cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
         }else {
             Log.v(TAG, "Job Service should be created");
             JobServiceMethods.automatedDelayEventJobService(context);

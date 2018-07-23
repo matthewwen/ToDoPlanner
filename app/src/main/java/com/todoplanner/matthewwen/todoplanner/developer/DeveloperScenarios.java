@@ -7,8 +7,6 @@ import android.util.Log;
 import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
-import com.todoplanner.matthewwen.todoplanner.data.PreferenceUtils;
-import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,7 +36,7 @@ public class DeveloperScenarios {
                     allTimes.get(i-1), allTimes.get(i), DataContract.TodayEventEntry.EVENT_NOT_STATIONARY);
         }
 
-        AlarmServiceMethods.setAlarmNextEvent(context);
+        AlarmServiceMethods.setAlarmEventStart(context);
     }
 
     public static void developerForwardConnectedEventScenarioTwo(Context context){
@@ -60,10 +58,13 @@ public class DeveloperScenarios {
                     allTimes.get(i-1), allTimes.get(i), DataContract.TodayEventEntry.EVENT_NOT_STATIONARY);
         }
 
-        AlarmServiceMethods.setAlarmNextEvent(context);
+        AlarmServiceMethods.setAlarmEventStart(context);
     }
 
     public static void developerJobServiceScenario(Context context){
+        //Delete all the events
+        context.getContentResolver().delete(DataContract.TodayEventEntry.EVENT_CONTENT_URI, null, null);
+
         //create events 1 hour long and 3 hours apart.
         ArrayList<Long> timeArray = new ArrayList<>();
         long current = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
@@ -80,5 +81,25 @@ public class DeveloperScenarios {
                     timeArray.get(i) + TimeUnit.HOURS.toMillis(1),
                     DataContract.TodayEventEntry.EVENT_STATIONARY);
         }
+    }
+
+    public static void developerAllStaticScenario(Context context){
+        //Delete all the events
+        context.getContentResolver().delete(DataContract.TodayEventEntry.EVENT_CONTENT_URI, null, null);
+
+        //events 2 minutes long, 1 minute apart.
+        long start = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis())
+                + TimeUnit.MINUTES.toMillis(1);
+        for (int i = 0; i < 20; i++){
+            DataMethods.createEvent(context,
+                    "Event " + (i+1),
+                    "Purdue University",
+                    start,
+                    start + TimeUnit.MINUTES.toMillis(2),
+                    DataContract.TodayEventEntry.EVENT_STATIONARY);
+            start += TimeUnit.MINUTES.toMillis(3);
+        }
+
+
     }
 }

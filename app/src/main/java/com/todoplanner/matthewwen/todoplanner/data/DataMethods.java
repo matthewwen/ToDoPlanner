@@ -11,7 +11,6 @@ import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.PendingEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.PastEventEntry;
-import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
@@ -51,6 +50,7 @@ public class DataMethods {
         contentValues.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, event.getTaskId());
         contentValues.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, event.getTheProgress());
         contentValues.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, event.getStaticInt());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_ALARM_SET, event.getAlarmSet());
         Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, event.getID());
         context.getContentResolver().update(uri, contentValues, null, null);
     }
@@ -77,8 +77,8 @@ public class DataMethods {
             String note = cursor.getString(DataContract.TodayEventEntry.COLUMN_EVENT_NOTE_FULL_INDEX);
             int inProg = cursor.getInt(DataContract.TodayEventEntry.COLUMN_EVENT_IN_PROGRESS_FULL_INDEX);
             int station = cursor.getInt(DataContract.TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX);
-
-            Event temp = new Event(id, name, start, end, taskId, note, inProg, station);
+            int alarm = cursor.getInt(TodayEventEntry.COLUMN_EVENT_ALARM_SET_FULL_INDEX);
+            Event temp = new Event(id, name, start, end, taskId, note, inProg, station, alarm);
             allEvents.add(temp);
         }
 
@@ -89,7 +89,7 @@ public class DataMethods {
 
     //adding an event
     public static void createEvent(Context context, String name, String note,
-                                   long startValue, long endValue, int staticType){
+                                   long startValue, long endValue, int staticType, int alarmService){
         ContentValues values = new ContentValues();
         long limit = Calendar.getInstance().getTimeInMillis() + TWELVE_HOURS;
         startValue = roundNearestMinute(startValue);
@@ -111,10 +111,17 @@ public class DataMethods {
             values.put(TodayEventEntry.COLUMN_EVENT_NOTE, note);
             values.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, TodayEventEntry.NO_TASK_ID);
             values.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, staticType);
+            values.put(TodayEventEntry.COLUMN_EVENT_ALARM_SET, alarmService);
             context.getContentResolver().insert(TodayEventEntry.EVENT_CONTENT_URI, values);
             Log.v(TAG, "Data inserted into the today database");
-            AlarmServiceMethods.setAlarmNextEvent(context);
+            AlarmServiceMethods.setAlarmEventStart(context);
         }
+    }
+
+    //adding an event
+    public static void createEvent(Context context, String name, String note,
+                                   long startValue, long endValue, int staticType){
+        createEvent(context, name, note, startValue, endValue, staticType, TodayEventEntry.ALARM_NOT_SET);
     }
 
     //create past event (Last Thing that happens before starting the next event)
@@ -143,8 +150,9 @@ public class DataMethods {
             String note = cursor.getString(TodayEventEntry.COLUMN_EVENT_NOTE_FULL_INDEX);
             int inProg = cursor.getInt(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS_FULL_INDEX);
             int station = cursor.getInt(TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX);
+            int alarm = cursor.getInt(TodayEventEntry.COLUMN_EVENT_ALARM_SET_FULL_INDEX);
             cursor.close();
-            return new Event(id, name, start, end, taskId, note, inProg, station);
+            return new Event(id, name, start, end, taskId, note, inProg, station, alarm);
         }
         return null;
     }
@@ -171,6 +179,8 @@ public class DataMethods {
         contentValues.put(TodayEventEntry.COLUMN_EVENT_END, cursor.getLong(endIndex));
         contentValues.put(TodayEventEntry.COLUMN_EVENT_NOTE, cursor.getString(noteIndex));
         contentValues.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, cursor.getInt(taskIndex));
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_ALARM_SET,
+                cursor.getInt(TodayEventEntry.COLUMN_EVENT_ALARM_SET_FULL_INDEX));
         cursor.close();
 
         return contentValues;
@@ -220,10 +230,10 @@ public class DataMethods {
         String note = event.getNote();
         //int taskId = event.getTaskId();
         int staticType = event.getStaticInt();
+        int alarmSet = event.getAlarmSet();
 
-        createEvent(context, name, note, startValue, endValue, staticType);
+        createEvent(context, name, note, startValue, endValue, staticType, alarmSet);
     }
-
 
 }
 

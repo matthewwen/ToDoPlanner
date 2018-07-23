@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
+import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.DelayBehavior;
 import com.todoplanner.matthewwen.todoplanner.jobServices.jobServiceClass.NotifyMoveEventJobService;
@@ -99,6 +100,9 @@ public class JobServiceMethods {
             DataMethods.deletePendingEvent(context, temp);
             DataMethods.insertTodayEvent(context, temp);
         }
+
+        //set next alarm service
+        AlarmServiceMethods.setAlarmEventStart(context);
     }
     //check to see if update database job service exists
     public static boolean hasUpdateDatabaseJobService(Context context){

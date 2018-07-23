@@ -2,6 +2,9 @@ package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
@@ -28,6 +31,15 @@ public class InAppBehavior {
             Log.v(TAG, "All Events are null");
             return;
         }
+
+        Event lastEvent = allEvents.get(allEvents.size() - 1);
+        if (lastEvent.isStatic()){
+            if (lastEvent.getAlarmSet() ==
+                    DataContract.TodayEventEntry.ALARM_NOT_SET){
+                AlarmServiceMethods.setStaticAlarmStartEvent(context, lastEvent);
+            }
+        }
+
         Log.v(TAG, "This the All Events Size: "+ allEvents.size());
         Event finished = allEvents.remove(0);
         int type = getType(finished, allEvents);

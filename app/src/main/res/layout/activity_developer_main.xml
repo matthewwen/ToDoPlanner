@@ -79,6 +79,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <Button
+            android:onClick="developerScenarioAllStation"
+            android:text="@string/developer_scenario_stationary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
 
     </LinearLayout>
 
