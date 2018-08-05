@@ -87,6 +87,20 @@ public class DataMethods {
         return allEvents;
     }
 
+    //get event based off of id
+    public static Event getTodayEvent(ArrayList<Event> allEvents, Uri uri){
+        if (allEvents == null){
+            return null;
+        }
+        int id = (int) ContentUris.parseId(uri);
+        for (int i = 0 ; i < allEvents.size(); i++){
+            if (id == allEvents.get(i).getID()){
+                return allEvents.get(i);
+            }
+        }
+        return null;
+    }
+
     //adding an event
     public static void createEvent(Context context, String name, String note,
                                    long startValue, long endValue, int staticType, int alarmService){
@@ -233,6 +247,27 @@ public class DataMethods {
         int alarmSet = event.getAlarmSet();
 
         createEvent(context, name, note, startValue, endValue, staticType, alarmSet);
+    }
+
+    //move all the events before the upcoming events get moved
+    public static void updateFromNewStatic(Context context, ArrayList<Event> upcomingEvents, int id){
+        ArrayList<Event> deleteEvents = new ArrayList<>();
+        boolean end = false;
+        for (int i = 0; i < upcomingEvents.size() && !end; i++){
+            if (upcomingEvents.get(0).getID() != id){
+                deleteEvents.add(upcomingEvents.remove(i));
+                i--;
+            }else {
+                end = true;
+            }
+        }
+
+        for (int i = 0; i < deleteEvents.size(); i++){
+            int tempID = deleteEvents.get(i).getID();
+            Uri contentUri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, tempID);
+            changeToPastEvent(context, contentUri);
+        }
+
     }
 
 }

@@ -49,7 +49,7 @@ public class NotificationBehavior {
         Event finished = allEvents.remove(0);
         int type = getType(finished, allEvents, currentTime);
         switch (type){
-            case CHANGE_NOTHING_GO_TO_NEXT: CommonBehavior.changeNothing(context, allEvents.get(0), finished);
+            case CHANGE_NOTHING_GO_TO_NEXT: CommonBehavior.changeNothingGoToNext(context, allEvents.get(0), finished);
                 break;
             case DELAY_EVERY_EVENT: CommonBehavior.delayEveryEvent(context, allEvents, finished);
                 break;
@@ -67,7 +67,7 @@ public class NotificationBehavior {
         DataMethods.changeToPastEvent(context, uri);
     }
 
-    private static int getType(Event finished, ArrayList<Event> upComingEvents, long currentTime){
+    public static int getType(Event finished, ArrayList<Event> upComingEvents, long currentTime){
         Event nextEvent = upComingEvents.get(0);
 
         //Checks if the next next event is static

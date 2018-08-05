@@ -40,43 +40,24 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
     private static final String DATE_PICKER_KEY = "DatePicker";
     private static final String TIME_PICKER_KEY = "TimePicker";
 
-    private static final String YEAR_START_KEY = "year-start-key"; private int yearStart;
-    private static final String MONTH_START_KEY = "month-start-key"; private int monthStart;
-    private static final String DAY_OF_MONTH_START_KEY = "day-of-month-start-key"; private int dayOfMonthStart;
-    private static final String HOUR_START_KEY = "hour-start-key" ; private int hourStart;
-    private static final String MINUTE_START_KEY = "minute-start-key"; private int minuteStart;
-
-    private static final String YEAR_END_KEY = "year-end-key"; private int yearEnd;
-    private static final String MONTH_END_KEY = "month-end-key"; private int monthEnd;
-    private static final String DAY_OF_MONTH_END_KEY = "day-of-month-end-key"; private int dayOfMonthEnd;
-    private static final String HOUR_END_KEY = "hour-end-key"; private int hourEnd;
-    private static final String MINUTE_END_KEY = "minute-end-key"; private int minuteEnd;
+    private static final String RANGE_KEY = "range-key"; private long range;
 
     //The Start/End Time
     private static final String START_DATE_LONG = "start-date-long"; private long startDate;
-    private static final String END_DATE_LONG = "end-date-long"; private long endDate;
 
     private TextView startDateTV;
     private TextView endDateTV;
     private TextView endTimeTV;
     private TextView startTimeTV;
 
+    private Calendar startCal;
+    private Calendar endCal;
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(YEAR_START_KEY, yearStart);
-        outState.putInt(MONTH_START_KEY, monthStart);
-        outState.putInt(DAY_OF_MONTH_START_KEY, dayOfMonthStart);
-        outState.putInt(HOUR_START_KEY, hourStart);
-        outState.putInt(MINUTE_START_KEY, minuteStart);
-
-        outState.putInt(YEAR_END_KEY, yearEnd);
-        outState.putInt(MONTH_END_KEY, monthEnd);
-        outState.putInt(DAY_OF_MONTH_END_KEY, dayOfMonthEnd);
-        outState.putInt(HOUR_END_KEY, hourEnd);
-        outState.putInt(MINUTE_END_KEY, minuteEnd);
+        outState.putLong(RANGE_KEY, range);
 
         outState.putLong(START_DATE_LONG, startDate);
-        outState.putLong(END_DATE_LONG, endDate);
 
         super.onSaveInstanceState(outState);
 
@@ -84,20 +65,9 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        yearStart = savedInstanceState.getInt(YEAR_START_KEY);
-        monthStart = savedInstanceState.getInt(MONTH_START_KEY);
-        dayOfMonthStart = savedInstanceState.getInt(DAY_OF_MONTH_START_KEY);
-        hourStart = savedInstanceState.getInt(HOUR_START_KEY);
-        minuteStart = savedInstanceState.getInt(MINUTE_START_KEY);
-
-        yearEnd = savedInstanceState.getInt(YEAR_END_KEY);
-        monthEnd = savedInstanceState.getInt(MONTH_END_KEY);
-        dayOfMonthEnd = savedInstanceState.getInt(DAY_OF_MONTH_END_KEY);
-        hourEnd = savedInstanceState.getInt(HOUR_END_KEY);
-        minuteEnd = savedInstanceState.getInt(MINUTE_END_KEY);
+        range = savedInstanceState.getLong(RANGE_KEY);
 
         startDate = savedInstanceState.getLong(START_DATE_LONG);
-        endDate = savedInstanceState.getLong(END_DATE_LONG);
     }
 
     //initialize date dialog
@@ -123,27 +93,20 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         noteET = findViewById(R.id.developer_create_event_note_et);
         stationS = findViewById(R.id.developer_create_event_stationary_s);
 
-        //set all the values
         if (savedInstanceState == null){
-            Calendar temp = Calendar.getInstance();
-            yearStart = temp.get(Calendar.YEAR);
-            monthStart = temp.get(Calendar.MONTH);
-            dayOfMonthStart = temp.get(Calendar.DAY_OF_MONTH);
-            hourStart = temp.get(Calendar.HOUR_OF_DAY);
-            minuteStart = temp.get(Calendar.MINUTE);
-            Calendar endTemp = Calendar.getInstance();
-            endTemp.setTime(new Date(temp.getTimeInMillis() + TimeUnit.HOURS.toMillis(1)));
-            yearEnd = endTemp.get(Calendar.YEAR);
-            monthEnd = endTemp.get(Calendar.MONTH);
-            dayOfMonthEnd = endTemp.get(Calendar.DAY_OF_MONTH);
-            hourEnd = endTemp.get(Calendar.HOUR_OF_DAY);
-            minuteEnd = endTemp.get(Calendar.MINUTE);
-            startDate = getTime(yearStart, monthStart, dayOfMonthStart, hourStart, minuteStart);
-            endDate = getTime(yearEnd, monthEnd, dayOfMonthEnd, hourEnd, minuteEnd);
+            range = TimeUnit.HOURS.toMillis(1);
+            startDate = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
         }else {
             Log.v(TAG, "Restore instance state");
             onRestoreInstanceState(savedInstanceState);
         }
+
+        //set all the values
+        startCal = Calendar.getInstance();
+        startCal.setTimeInMillis(startDate);
+        long timeEndCal = startCal.getTimeInMillis() + range;
+        endCal = Calendar.getInstance();
+        endCal.setTimeInMillis(timeEndCal);
 
         FloatingActionButton fab = findViewById(R.id.developer_create_event_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -158,6 +121,9 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         startDateTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int yearStart = startCal.get(Calendar.YEAR);
+                int monthStart = startCal.get(Calendar.MONTH);
+                int dayOfMonthStart = startCal.get(Calendar.DAY_OF_MONTH);
                 showDateDialog(START_TIME, yearStart, monthStart, dayOfMonthStart);
             }
         });
@@ -166,6 +132,8 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         startTimeTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int hourStart = startCal.get(Calendar.HOUR_OF_DAY);
+                int minuteStart = startCal.get(Calendar.MINUTE);
                 showTimeDialog(START_TIME, hourStart, minuteStart);
             }
         });
@@ -174,6 +142,9 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         endDateTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int yearEnd = endCal.get(Calendar.YEAR);
+                int monthEnd = endCal.get(Calendar.MONTH);
+                int dayOfMonthEnd = endCal.get(Calendar.DAY_OF_MONTH);
                 showDateDialog(END_TIME, yearEnd, monthEnd, dayOfMonthEnd);
             }
         });
@@ -182,6 +153,8 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         endTimeTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int hourEnd = endCal.get(Calendar.HOUR_OF_DAY);
+                int minuteEnd = endCal.get(Calendar.MINUTE);
                 showTimeDialog(END_TIME, hourEnd, minuteEnd);
             }
         });
@@ -193,10 +166,10 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH);
         startDateTV.setText(dateFormat.format(new Date(startDate)));
-        endDateTV.setText(dateFormat.format(new Date(endDate)));
+        endDateTV.setText(dateFormat.format(new Date(startDate + range)));
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa");
-        endTimeTV.setText(timeFormat.format(new Date(endDate)));
+        endTimeTV.setText(timeFormat.format(new Date(startDate + range)));
         startTimeTV.setText(timeFormat.format(new Date(startDate)));
     }
 
@@ -215,7 +188,7 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
                 name,
                 note,
                 startDate,
-                endDate,
+                startDate + range,
                 staticOrNah);
     }
 
@@ -223,11 +196,18 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
     public void setTime(int type, int hour, int minute) {
         switch (type){
             case START_TIME:
-                hourStart = hour; minuteStart = minute;
-                startDate = getTime(yearStart, monthStart, dayOfMonthStart, hour, minute); break;
+                startDate = getTime(startCal.get(Calendar.YEAR),
+                        startCal.get(Calendar.MONTH),
+                        startCal.get(Calendar.DAY_OF_MONTH),
+                        hour,
+                        minute);
+                startCal.setTimeInMillis(startDate);
+                endCal.setTimeInMillis(startDate + range);
+                break;
             case END_TIME:
-                this.hourEnd = hour; this.minuteEnd = minute;
-                endDate = getTime(yearEnd, monthEnd, dayOfMonthEnd, hourEnd, minute); break;
+                endCal.set(endCal.get(Calendar.YEAR), endCal.get(Calendar.MONTH), endCal.get(Calendar.DAY_OF_MONTH), hour, minute);
+                range = endCal.getTimeInMillis() - startDate;
+                break;
         }
         updateViews();
     }
@@ -236,12 +216,15 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
     public void setDate(int type, int year, int month, int dayOfMonth) {
         switch (type){
             case START_TIME:
-                this.yearStart = year; this.monthStart = month; this.dayOfMonthStart = dayOfMonth;
-                startDate = getTime(year, month, dayOfMonth, hourStart, minuteStart); break;
+                startCal.setTimeInMillis(startDate);
+                startCal.set(year, month, dayOfMonth, startCal.get(Calendar.HOUR_OF_DAY), startCal.get(Calendar.MINUTE));
+                startDate = startCal.getTimeInMillis(); endCal.setTimeInMillis(startDate + range);break;
             case END_TIME:
-                this.yearEnd = year; this.monthEnd = month; this.dayOfMonthEnd = dayOfMonth;
-                endDate = getTime(year, month, dayOfMonth, hourStart, minuteStart); break;
+                endCal.setTimeInMillis(startDate + range);
+                endCal.set(year, month, dayOfMonth, endCal.get(Calendar.HOUR_OF_DAY), endCal.get(Calendar.MINUTE));
+                range = endCal.getTimeInMillis() - startDate; break;
         }
+
         updateViews();
 
     }

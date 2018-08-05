@@ -104,4 +104,8 @@ public class Event implements Story {
     public void setAlarmSet(){
         alarmSet = DataContract.TodayEventEntry.ALARM_SET;
     }
+
+    public boolean isAlarmSet(){
+        return alarmSet == DataContract.TodayEventEntry.ALARM_SET;
+    }
 }

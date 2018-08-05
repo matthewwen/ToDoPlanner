@@ -49,7 +49,7 @@ public class CommonBehavior {
 
     }
 
-    public static void changeNothing(Context context, Event nextEvent, Event finished){
+    public static void changeNothingGoToNext(Context context, Event nextEvent, Event finished){
         cancelAnyCurrentNotification(context);
         NotificationsUtils.displayCalendarNotification(context, nextEvent,  NotificationsUtils.EVENT_REMINDER_START);
         Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());

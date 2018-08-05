@@ -90,9 +90,6 @@ public class AlarmServiceMethods {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         //Cancel Bother
         assert alarmManager != null;
-        if (pendingIntentStartEvent != null) {
-            alarmManager.cancel(pendingIntentStartEvent);
-        }
         if (pendingIntentEndEvent != null) {
             alarmManager.cancel(pendingIntentEndEvent);
         }
@@ -115,9 +112,6 @@ public class AlarmServiceMethods {
         if (pendingIntentStartEvent != null) {
             alarmManager.cancel(pendingIntentStartEvent);
         }
-        if (pendingIntentEndEvent != null) {
-            alarmManager.cancel(pendingIntentEndEvent);
-        }
         Intent intentEnd = new Intent(context, CalendarReminderReceiver.class);
         Uri theUri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, theEvent.getID());
         intentEnd.setAction(theUri.toString());
@@ -134,6 +128,10 @@ public class AlarmServiceMethods {
         //Setting up all the alarms
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         assert manager != null;
+        //cancel alarm service
+        if (pendingIntentStaticStartEvent != null){
+            manager.cancel(pendingIntentStaticStartEvent);
+        }
         Uri staticUri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI,
                 event.getID());
         Intent staticStart = new Intent(context, CalendarReminderReceiver.class);
