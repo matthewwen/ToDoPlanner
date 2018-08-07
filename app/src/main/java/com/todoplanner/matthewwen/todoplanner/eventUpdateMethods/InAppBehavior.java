@@ -3,7 +3,7 @@ package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 import android.content.Context;
 import android.util.Log;
 
-import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
@@ -26,9 +26,8 @@ public class InAppBehavior {
         //Cancel Job Service
         JobServiceMethods.cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
 
-        ArrayList<Event> allEvents = CommonBehavior.getEvents(context);  //First one is the finished one, Second one is the next event.
+        ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);  //First one is the finished one, Second one is the next event.
         if (allEvents == null){
-            Log.v(TAG, "All Events are null");
             return;
         }
 
@@ -36,7 +35,7 @@ public class InAppBehavior {
         if (lastEvent.isStatic()){
             if (lastEvent.getAlarmSet() ==
                     DataContract.TodayEventEntry.ALARM_NOT_SET){
-                AlarmServiceMethods.setStaticAlarmStartEvent(context, lastEvent);
+                SetAlarmServiceMethods.setStaticAlarmService(context, lastEvent);
             }
         }
 

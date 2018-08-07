@@ -187,8 +187,8 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         DataMethods.createEvent(this,
                 name,
                 note,
-                startDate,
-                startDate + range,
+                DataMethods.roundNearestMinute(startDate),
+                DataMethods.roundNearestMinute(startDate + range),
                 staticOrNah);
     }
 

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
@@ -29,7 +29,7 @@ public class NotificationBehavior {
         CommonBehavior.cancelJobService(context);
 
         //First one is the finished one, Second one is the next event.
-        ArrayList<Event> allEvents = CommonBehavior.getEvents(context);
+        ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);
         if (allEvents == null){
             Log.v(TAG, "All Events are null");
             CommonBehavior.cancelAnyCurrentNotification(context);
@@ -40,7 +40,7 @@ public class NotificationBehavior {
         if (lastEvent.isStatic()){
             if (lastEvent.getAlarmSet() ==
                     DataContract.TodayEventEntry.ALARM_NOT_SET){
-                AlarmServiceMethods.setStaticAlarmStartEvent(context, lastEvent);
+                SetAlarmServiceMethods.setStaticAlarmService(context, lastEvent);
             }
         }
 
@@ -63,11 +63,16 @@ public class NotificationBehavior {
                 break;
         }
 
-        Uri uri = Uri.parse(intent.getAction());
-        DataMethods.changeToPastEvent(context, uri);
+        if (type != -1) {
+            Uri uri = Uri.parse(intent.getAction());
+            DataMethods.changeToPastEvent(context, uri);
+        }
     }
 
     public static int getType(Event finished, ArrayList<Event> upComingEvents, long currentTime){
+        if (upComingEvents.size() == 0){
+            return -1;
+        }
         Event nextEvent = upComingEvents.get(0);
 
         //Checks if the next next event is static

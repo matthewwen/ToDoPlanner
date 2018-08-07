@@ -3,7 +3,7 @@ package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 import android.content.Context;
 import android.util.Log;
 
-import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
@@ -26,12 +26,15 @@ public class EventChangeBehavior {
             NotificationsUtils.displayCalendarNotification(context, nextEvent, NotificationsUtils.EVENT_REMINDER_START );
         }
 
-        AlarmServiceMethods.setAlarmEventEnd(context, allEvents.get(0));
+        SetAlarmServiceMethods.setEndAlarmService(context, allEvents.get(0));
 
         saveInDatabase(context, allEvents);
     }
 
     private static void delayEverything(ArrayList<Event> allEvents){
+        if (allEvents.size() == 0){
+            return;
+        }
         long difference = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis())
                 - allEvents.get(0).getEventStart();
         for (int i = 0; i < allEvents.size(); i++){
@@ -71,7 +74,7 @@ public class EventChangeBehavior {
             NotificationsUtils.displayCalendarNotification(context, allEvents.get(0), NotificationsUtils.EVENT_REMINDER_START);
         }
 
-        AlarmServiceMethods.setAlarmEventEnd(context, allEvents.get(0));
+        SetAlarmServiceMethods.setEndAlarmService(context, allEvents.get(0));
 
         Log.v(TAG, "All Events are moved forward");
 

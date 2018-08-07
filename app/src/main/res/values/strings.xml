@@ -28,7 +28,7 @@
     <string name="menu_options_refresh">Refresh</string>
 
     <!-- Key Values for intents -->
-    <string name="notification_event_start_end_event_key">notification-event-start-stop-key</string>
+    <string name="notification_type_setup_key">notification-type-setup-key</string>
 
     <!-- Button Title for the developer view -->
     <string name="developer_task_list">Tasks Database</string>

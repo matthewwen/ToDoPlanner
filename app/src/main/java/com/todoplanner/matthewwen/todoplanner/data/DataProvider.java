@@ -236,22 +236,6 @@ public class DataProvider extends ContentProvider {
         }
         cursor.close();
 
-        Cursor cursor1 = reader.rawQuery("SELECT * FROM " + TodayEventEntry.TABLE_NAME +
-                " WHERE " + TodayEventEntry.COLUMN_EVENT_IN_PROGRESS + " = " + TodayEventEntry.EVENT_IN_PROGRESS, null);
-        cursor1.setNotificationUri(getContext().getContentResolver(), uri);
-
-        int inProgressValues = TodayEventEntry.EVENT_NOT_IN_PROGRESS;
-        cursor1.moveToPosition(-1);
-        if (cursor1.getCount() == 0){
-            Long current = new Date().getTime();
-            if (newStartEvent <= current && newEndEvent >= current){
-                inProgressValues = TodayEventEntry.EVENT_IN_PROGRESS;
-            }
-            cursor1.close();
-        }
-
-        contentValues.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, inProgressValues);
-
         long id = db.insert(TodayEventEntry.TABLE_NAME, null, contentValues);
 
         Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
@@ -315,7 +299,7 @@ public class DataProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         int id = sUriMatcher.match(uri);
-        Log.v(TAG, "Update uri: " + uri.toString());
+        //Log.v(TAG, "Update uri: " + uri.toString());
         switch (id){
             case TABLE_EVENT_TODAY_ID:
                 s = TodayEventEntry._ID + " =?";

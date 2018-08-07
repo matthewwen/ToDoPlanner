@@ -3,11 +3,10 @@ package com.todoplanner.matthewwen.todoplanner.jobServices;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
-import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.DelayBehavior;
 import com.todoplanner.matthewwen.todoplanner.jobServices.jobServiceClass.NotifyMoveEventJobService;
@@ -102,7 +101,7 @@ public class JobServiceMethods {
         }
 
         //set next alarm service
-        AlarmServiceMethods.setAlarmEventStart(context);
+        SetAlarmServiceMethods.setAlarmService(context);
     }
     //check to see if update database job service exists
     public static boolean hasUpdateDatabaseJobService(Context context){

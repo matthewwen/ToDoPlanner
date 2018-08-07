@@ -5,7 +5,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
 
-import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
@@ -15,32 +15,6 @@ import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import java.util.ArrayList;
 
 public class CommonBehavior {
-
-    public static ArrayList<Event> getEvents(Context context){
-        ArrayList<Event> allEvents = DataMethods.getAllTodayEvents(context);
-        boolean foundStatic = false; int position = -1;
-        for (int i = 1; i < allEvents.size() && !foundStatic; i++){
-            if (allEvents.get(i).isStatic()){
-                foundStatic = true;
-                position = i;
-            }
-        }
-        if (position != -1) {
-            while (allEvents.size() > position + 1) {
-                allEvents.remove(position + 1);
-            }
-        }
-        //Delete the finished event if it is the last event throughout the day
-        if (allEvents.size() <= 1){
-            if (allEvents.size() == 1){
-                Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI,
-                        allEvents.get(0).getID());
-                DataMethods.changeToPastEvent(context, uri);
-            }
-            return null;
-        }
-        return allEvents;
-    }
 
     public static void cancelAnyCurrentNotification(Context context){
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -54,7 +28,7 @@ public class CommonBehavior {
         NotificationsUtils.displayCalendarNotification(context, nextEvent,  NotificationsUtils.EVENT_REMINDER_START);
         Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());
         DataMethods.changeToPastEvent(context, uri);
-        AlarmServiceMethods.setAlarmEventEnd(context, nextEvent);
+        SetAlarmServiceMethods.setEndAlarmService(context, nextEvent);
         nextEvent.setInProgress();
         DataMethods.updateTodayEvent(context, nextEvent);
     }
@@ -114,7 +88,7 @@ public class CommonBehavior {
 
         Event nextEvent = allEvents.get(0);
 
-        AlarmServiceMethods.setAlarmEventStart(context, nextEvent);
+        SetAlarmServiceMethods.setStartAlarmService(context, nextEvent);
 
     }
 
@@ -130,9 +104,9 @@ public class CommonBehavior {
                     nEvent,
                     NotificationsUtils.EVENT_REMINDER_START);
         }else {
-            AlarmServiceMethods.setAlarmEventStart(context, nEvent);
+            SetAlarmServiceMethods.setStartAlarmService(context, nEvent);
         }
-        AlarmServiceMethods.setAlarmEventStart(context, nEvent);
+        SetAlarmServiceMethods.setStartAlarmService(context, nEvent);
     }
 
     public static void nnEventNoEndStatic(Context context, long currentTime, Event nEvent){
@@ -142,7 +116,7 @@ public class CommonBehavior {
                     nEvent,
                     NotificationsUtils.EVENT_REMINDER_START);
         }else {
-            AlarmServiceMethods.setAlarmEventStart(context, nEvent);
+            SetAlarmServiceMethods.setStartAlarmService(context, nEvent);
         }
     }
 }

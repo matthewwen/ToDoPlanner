@@ -4,7 +4,7 @@ package com.todoplanner.matthewwen.todoplanner.developer;
 import android.content.Context;
 import android.util.Log;
 
-import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 
@@ -36,13 +36,12 @@ public class DeveloperScenarios {
                     allTimes.get(i-1), allTimes.get(i), DataContract.TodayEventEntry.EVENT_NOT_STATIONARY);
         }
 
-        AlarmServiceMethods.setAlarmEventStart(context);
     }
 
     public static void developerForwardConnectedEventScenarioTwo(Context context){
-        Log.v(TAG, "Foward Event Created");
+        Log.v(TAG, "Forward Event Created");
 
-        //Delete all the devents
+        //Delete all the events
         context.getContentResolver().delete(DataContract.TodayEventEntry.EVENT_CONTENT_URI, null, null);
 
         ArrayList<Long> allTimes = new ArrayList<>();
@@ -58,7 +57,7 @@ public class DeveloperScenarios {
                     allTimes.get(i-1), allTimes.get(i), DataContract.TodayEventEntry.EVENT_NOT_STATIONARY);
         }
 
-        AlarmServiceMethods.setAlarmEventStart(context);
+        SetAlarmServiceMethods.setAlarmService(context);
     }
 
     public static void developerJobServiceScenario(Context context){
@@ -99,7 +98,6 @@ public class DeveloperScenarios {
                     DataContract.TodayEventEntry.EVENT_STATIONARY);
             start += TimeUnit.MINUTES.toMillis(3);
         }
-
 
     }
 }

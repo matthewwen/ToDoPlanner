@@ -7,7 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
-import com.todoplanner.matthewwen.todoplanner.alarmService.AlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.PendingEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.TodayEventEntry;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract.PastEventEntry;
@@ -87,6 +87,26 @@ public class DataMethods {
         return allEvents;
     }
 
+    //get custom array list of only the important array list
+    public static ArrayList<Event> getNecessaryTodayEvents(Context context){
+        ArrayList<Event> allEvents = getAllTodayEvents(context);
+
+        int pos = allEvents.size();
+        boolean found = false;
+        for (int i = 0; i < allEvents.size() && !found; i++){
+            if (!allEvents.get(i).getInProgress() && allEvents.get(i).isStatic()){
+                found = true;
+                pos = i;
+            }
+        }
+
+        while (allEvents.size() > pos + 1){
+            allEvents.remove(pos + 1);
+        }
+
+        return allEvents;
+    }
+
     //get event based off of id
     public static Event getTodayEvent(ArrayList<Event> allEvents, Uri uri){
         if (allEvents == null){
@@ -116,7 +136,6 @@ public class DataMethods {
             values.put(PendingEventEntry.COLUMN_EVENT_NOTE, note);
             values.put(PendingEventEntry.COLUMN_EVENT_TASK_ID, PendingEventEntry.NO_TASK_ID);
             values.put(PendingEventEntry.COLUMN_EVENT_STATIONARY, staticType);
-            Log.v(TAG, "Data inserted into the pending database");
             context.getContentResolver().insert(PendingEventEntry.EVENT_CONTENT_URI, values);
         }else {
             values.put(TodayEventEntry.COLUMN_EVENT_NAME, name);
@@ -126,9 +145,9 @@ public class DataMethods {
             values.put(TodayEventEntry.COLUMN_EVENT_TASK_ID, TodayEventEntry.NO_TASK_ID);
             values.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, staticType);
             values.put(TodayEventEntry.COLUMN_EVENT_ALARM_SET, alarmService);
+            values.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, TodayEventEntry.EVENT_NOT_IN_PROGRESS);
             context.getContentResolver().insert(TodayEventEntry.EVENT_CONTENT_URI, values);
-            Log.v(TAG, "Data inserted into the today database");
-            AlarmServiceMethods.setAlarmEventStart(context);
+            SetAlarmServiceMethods.setAlarmService(context);
         }
     }
 
@@ -267,6 +286,13 @@ public class DataMethods {
             Uri contentUri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, tempID);
             changeToPastEvent(context, contentUri);
         }
+
+    }
+
+    //delete the event
+    public static void deleteTodayEvent(Context context, Event event){
+        Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, event.getID());
+        context.getContentResolver().delete(uri, null, null);
 
     }
 
