@@ -63,10 +63,13 @@ public class NotificationBehavior {
                 break;
         }
 
-        if (type != -1) {
-            Uri uri = Uri.parse(intent.getAction());
-            DataMethods.changeToPastEvent(context, uri);
+        if (type == -1){
+            CommonBehavior.cancelAnyCurrentNotification(context);
+            return;
         }
+
+        Uri uri = Uri.parse(intent.getAction());
+        DataMethods.changeToPastEvent(context, uri);
     }
 
     public static int getType(Event finished, ArrayList<Event> upComingEvents, long currentTime){
