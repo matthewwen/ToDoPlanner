@@ -61,25 +61,6 @@
             android:layout_height="wrap_content" />
 
         <Button
-            android:id="@+id/developer_scenario_calender_event_b"
-            android:text="@string/developer_scenario_calender_event"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="developerScenarioCalendarEvent"/>
-
-        <Button
-            android:text="@string/developer_scenario_forward_early"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="developerScenarioCalendarForwardEvent"/>
-
-        <Button
-            android:onClick="developerScenarioJobService"
-            android:text="@string/developer_scenario_job_service"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <Button
             android:onClick="developerScenarioAllStation"
             android:text="@string/developer_scenario_stationary"
             android:layout_width="match_parent"

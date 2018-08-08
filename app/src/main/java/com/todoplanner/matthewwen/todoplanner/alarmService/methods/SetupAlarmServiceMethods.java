@@ -2,7 +2,9 @@ package com.todoplanner.matthewwen.todoplanner.alarmService.methods;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
@@ -22,6 +24,7 @@ public class SetupAlarmServiceMethods {
         Log.v(TAG, "Now Displaying Notification for Nonstatic Events");
         //make event in progress
         event.setInProgress();
+        event.setStartShown();
         DataMethods.updateTodayEvent(context, event);
         //display notification
         String type = NotificationsUtils.EVENT_REMINDER_START;
@@ -48,62 +51,77 @@ public class SetupAlarmServiceMethods {
         }
     }
 
-    public static void setUpStaticEvent(Context context, Event event){
+    public static void setUpStaticEvent(final Context context, final Event event){
         //display notification
         String type = NotificationsUtils.EVENT_REMINDER_START;
         NotificationsUtils.displayCalendarNotification(context, event, type);
-        //cancel any job service
-        CommonBehavior.cancelJobService(context);
-        //make the event in progress
-        event.setInProgress();
-        DataMethods.updateTodayEvent(context, event);
-        //change all the events
-        ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);
-        ArrayList<Event> changeEvents = new ArrayList<>();
-        boolean found = false;
-        for (int i = 0; i < allEvents.size() && !found; i++){
-            if (allEvents.get(i).getID() == event.getID()){
-                found  = true;
-            }else {
-                changeEvents.add(allEvents.get(i));
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //cancel any job service
+                CommonBehavior.cancelJobService(context);
+                //make the event in progress
+                event.setInProgress();
+                event.setStartShown();
+                DataMethods.updateTodayEvent(context, event);
+                //change all the events
+                ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);
+                ArrayList<Integer> contentID = new ArrayList<>();
+                //go through the list, get the pos of the event
+                boolean found = false;
+                while (!found){
+                    if (allEvents.size() > 0){
+                        if (allEvents.get(0).getID() == event.getID()){
+                            found = true;
+                        }else {
+                            contentID.add(allEvents.remove(0).getID());
+                        }
+                    }else {
+                        found = true;
+                    }
+                }
+                //set up alarm end service
+                if (allEvents.size() == 2){
+                    if (!(allEvents.get(0).getEventEnd() == allEvents.get(1).getEventStart())) {
+                        Log.v(TAG, "End Event is created");
+                        SetAlarmServiceMethods.setEndAlarmService(context, event);
+                    }
+                }else{
+                    SetAlarmServiceMethods.setEndAlarmService(context, event);
+                }
+                //get the last event
+                Event lastEvent = allEvents.get(allEvents.size() - 1);
+                if (lastEvent.isStatic()){
+                    Log.v(TAG,"The last event is static: " + lastEvent.getID());
+                    SetAlarmServiceMethods.setStaticAlarmService(context, lastEvent);
+                }
+                Log.v(TAG, "Event size: " + allEvents.size());
+                //update database
+                for (int i = 0; i < contentID.size(); i++){
+                    int id = contentID.get(i);
+                    Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, id);
+                    DataMethods.changeToPastEvent(context, uri);
+                }
             }
-        }
-        for (int i = 0; i < changeEvents.size(); i++){
-            Uri theUri = ContentUris.withAppendedId(
-                    DataContract.TodayEventEntry.EVENT_CONTENT_URI, changeEvents.get(i).getID()
-            );
-            DataMethods.changeToPastEvent(context, theUri);
-        }
-
-        //remove the gunk from the list
-        for (int i = 0; i < changeEvents.size(); i++){
-            allEvents.remove(0);
-        }
-
-        //get the last event
-        Event lastEvent = allEvents.get(allEvents.size() - 1);
-        if (lastEvent.isStatic()){
-            Log.v(TAG,"The last event is static: " + lastEvent.getID());
-            SetAlarmServiceMethods.setStaticAlarmService(context, lastEvent);
-        }
-
-        Log.v(TAG, "Event size: " + allEvents.size());
-
-        //set up alarm end service
-        if (allEvents.size() == 2){
-            if (!(allEvents.get(0).getEventEnd() == allEvents.get(1).getEventStart())) {
-                Log.v(TAG, "End Event is created");
-                SetAlarmServiceMethods.setEndAlarmService(context, event);
-            }
-        }
+        });
+        thread.start();
 
     }
 
-    public static void setUpEndEvent(Context context, Event event){
+    public static void setUpEndEvent(final Context context, final Event event){
         Log.v(TAG, "Show Notification for the end");
         //display the notification
         String type = NotificationsUtils.EVENT_REMINDER_END;
         NotificationsUtils.displayCalendarNotification(context, event, type);
+        //update the database
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                event.setEndShown();
+                DataMethods.updateTodayEvent(context, event);
+            }
+        });
+        thread.run();
         //create job service
         JobServiceMethods.cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
         JobServiceMethods.automatedDelayEventJobService(context);

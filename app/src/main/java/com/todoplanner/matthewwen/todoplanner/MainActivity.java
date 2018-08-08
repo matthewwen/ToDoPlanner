@@ -10,10 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetupAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperMainActivity;
 import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.jobServices.jobServiceClass.UpdateTodayDatabaseJobService;
+import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
@@ -45,6 +48,30 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        //Initial Job Services
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //job service
+                if (!JobServiceMethods.hasUpdateDatabaseJobService(MainActivity.this)){
+                    JobServiceMethods.settingUrgentPendingToToday(MainActivity.this);
+                    JobServiceMethods.automatedMoveToTodayJobService(MainActivity.this);
+                    Log.v(TAG, "Job Service Created");
+                }else {
+                    Log.v(TAG, "Job Service Already Exists");
+                }
+                //alarm service
+                SetAlarmServiceMethods.setAlarmService(MainActivity.this);
+
+            }
+        });
+        thread.run();
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -53,14 +80,8 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        //Initial Job Services
-        if (!JobServiceMethods.hasUpdateDatabaseJobService(this)){
-            JobServiceMethods.settingUrgentPendingToToday(this);
-            JobServiceMethods.automatedMoveToTodayJobService(this);
-            Log.v(TAG, "Job Service Created");
-        }else {
-            Log.v(TAG, "Job Service Already Exists");
-        }
+
+
     }
 
     @Override

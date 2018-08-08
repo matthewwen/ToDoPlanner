@@ -1,6 +1,8 @@
 package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
@@ -22,15 +24,21 @@ public class InAppBehavior {
     private static final int PROPORTION_FORWARD = 4;
     private static final int CREATE_NEXT_ALARM_SERVICE = 5;
 
-    public static void userPressedFinished(Context context){
+    public static void userPressedFinished(Context context, Event finished){
         //Cancel Job Service
         JobServiceMethods.cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
-
-        ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);  //First one is the finished one, Second one is the next event.
-        if (allEvents == null){
+        //change to past event
+        Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());
+        DataMethods.changeToPastEvent(context, uri);
+        Log.v(TAG, "Change to past event?");
+        //cancel the end alarm service
+        SetAlarmServiceMethods.cancelEndAlarmService(context);
+        //get all upcoming events
+        ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);  //First one is the finished one, Second one is the next finished.
+        if (allEvents == null || allEvents.size() == 0){
             return;
         }
-
+        //check for a static event
         Event lastEvent = allEvents.get(allEvents.size() - 1);
         if (lastEvent.isStatic()){
             if (lastEvent.getAlarmSet() ==
@@ -39,8 +47,6 @@ public class InAppBehavior {
             }
         }
 
-        Log.v(TAG, "This the All Events Size: "+ allEvents.size());
-        Event finished = allEvents.remove(0);
         int type = getType(finished, allEvents);
         Log.v(TAG, "This is the Type: "+ type);
         switch (type){

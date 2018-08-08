@@ -37,7 +37,7 @@
         android:layout_height="wrap_content" />
 
     <TextView
-        android:id="@+id/developer_event_pending_item_stationary"
+        android:id="@+id/developer_event_today_item_stationary_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

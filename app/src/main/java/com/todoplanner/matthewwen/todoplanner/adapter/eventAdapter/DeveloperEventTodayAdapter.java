@@ -51,6 +51,9 @@ public class DeveloperEventTodayAdapter extends RecyclerView.Adapter<DeveloperEv
         holder.noteTv.setText("Note: " + event.getNote());
         holder.inProgTv.setText("In Progress ID: " + Integer.toString(event.getTheProgress()));
         holder.stationTv.setText("Stationary: " + Integer.toString(event.getStaticInt()));
+        holder.alarmSetTv.setText("Alarm Set: " + Integer.toString(event.getAlarmSet()));
+        holder.startShownTV.setText("Start Shown: " + Boolean.toString(event.isStartShown()));
+        holder.endShownTV.setText("End Shown: " + Boolean.toString(event.isEndShown()));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,6 +93,9 @@ public class DeveloperEventTodayAdapter extends RecyclerView.Adapter<DeveloperEv
         TextView noteTv;
         TextView inProgTv;
         TextView stationTv;
+        TextView alarmSetTv;
+        TextView startShownTV;
+        TextView endShownTV;
         View itemView;
 
         ViewHolder(View itemView) {
@@ -102,7 +108,10 @@ public class DeveloperEventTodayAdapter extends RecyclerView.Adapter<DeveloperEv
             taskIDTv = itemView.findViewById(R.id.developer_event_task_today_item_id_tv);
             noteTv = itemView.findViewById(R.id.developer_event_today_item_note_tv);
             inProgTv = itemView.findViewById(R.id.developer_event_today_item_in_progress);
-            stationTv = itemView.findViewById(R.id.developer_event_pending_item_stationary);
+            stationTv = itemView.findViewById(R.id.developer_event_today_item_stationary_tv);
+            alarmSetTv = itemView.findViewById(R.id.developer_event_today_item_alarm_set_tv);
+            startShownTV = itemView.findViewById(R.id.developer_event_today_item_start_shown_tv);
+            endShownTV = itemView.findViewById(R.id.developer_event_today_item_end_shown_tv);
         }
     }
 }

@@ -25,15 +25,6 @@ public class DataMethods {
 
     private static final String TAG = DataMethods.class.getSimpleName();
 
-    //reset everything until all the events are not in progress
-    public static void noneInProgress(Context context){
-        ArrayList<Event> allTodayEvents = getAllTodayEvents(context);
-        for (int i = 0; i < allTodayEvents.size(); i++){
-            allTodayEvents.get(i).setNotInProgress();
-            updateTodayEvent(context, allTodayEvents.get(i));
-        }
-    }
-
     //This Rounds the time to the nearest minute
     public static long roundNearestMinute(long time){
         long remainder = time % TimeUnit.MINUTES.toMillis(1);
@@ -78,7 +69,9 @@ public class DataMethods {
             int inProg = cursor.getInt(DataContract.TodayEventEntry.COLUMN_EVENT_IN_PROGRESS_FULL_INDEX);
             int station = cursor.getInt(DataContract.TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX);
             int alarm = cursor.getInt(TodayEventEntry.COLUMN_EVENT_ALARM_SET_FULL_INDEX);
-            Event temp = new Event(id, name, start, end, taskId, note, inProg, station, alarm);
+            int startShown = cursor.getInt(TodayEventEntry.COLUMN_EVENT_START_SHOWN_FULL_INDEX);
+            int endShown = cursor.getInt(TodayEventEntry.COLUMN_EVENT_END_SHOWN_FULL_INDEX);
+            Event temp = new Event(id, name, start, end, taskId, note, inProg, station, alarm, startShown, endShown);
             allEvents.add(temp);
         }
 
@@ -146,6 +139,8 @@ public class DataMethods {
             values.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, staticType);
             values.put(TodayEventEntry.COLUMN_EVENT_ALARM_SET, alarmService);
             values.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, TodayEventEntry.EVENT_NOT_IN_PROGRESS);
+            values.put(TodayEventEntry.COLUMN_EVENT_START_SHOWN, TodayEventEntry.START_NOT_SHOWN);
+            values.put(TodayEventEntry.COLUMN_EVENT_END_SHOWN, TodayEventEntry.END_NOT_SHOWN);
             context.getContentResolver().insert(TodayEventEntry.EVENT_CONTENT_URI, values);
             SetAlarmServiceMethods.setAlarmService(context);
         }
@@ -184,8 +179,10 @@ public class DataMethods {
             int inProg = cursor.getInt(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS_FULL_INDEX);
             int station = cursor.getInt(TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX);
             int alarm = cursor.getInt(TodayEventEntry.COLUMN_EVENT_ALARM_SET_FULL_INDEX);
+            int startShown = cursor.getInt(TodayEventEntry.COLUMN_EVENT_START_SHOWN_FULL_INDEX);
+            int endShown = cursor.getInt(TodayEventEntry.COLUMN_EVENT_END_SHOWN_FULL_INDEX);
             cursor.close();
-            return new Event(id, name, start, end, taskId, note, inProg, station, alarm);
+            return new Event(id, name, start, end, taskId, note, inProg, station, alarm, startShown, endShown);
         }
         return null;
     }

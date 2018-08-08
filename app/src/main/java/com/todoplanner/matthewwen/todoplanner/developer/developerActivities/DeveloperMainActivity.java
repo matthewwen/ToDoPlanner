@@ -1,11 +1,14 @@
 package com.todoplanner.matthewwen.todoplanner.developer.developerActivities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.developer.DeveloperScenarios;
@@ -67,19 +70,21 @@ public class DeveloperMainActivity extends AppCompatActivity {
     }
 
     //These are all the scenarios
-    public void developerScenarioCalendarEvent(View view) {
-        DeveloperScenarios.developerTwentyEventScenarioOne(this);
-    }
-
-    public void developerScenarioCalendarForwardEvent(View view){
-        DeveloperScenarios.developerForwardConnectedEventScenarioTwo(this);
-    }
-
-    public void developerScenarioJobService(View view) {
-        DeveloperScenarios.developerJobServiceScenario(this);
-    }
-
     public void developerScenarioAllStation(View view) {
-        DeveloperScenarios.developerAllStaticScenario(this);
+        @SuppressLint("StaticFieldLeak")
+        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                DeveloperScenarios.developerAllStaticScenario(DeveloperMainActivity.this);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                Toast.makeText(DeveloperMainActivity.this, "All Tasks are added to database", Toast.LENGTH_LONG).show();
+            }
+        };
+        asyncTask.execute();
     }
 }

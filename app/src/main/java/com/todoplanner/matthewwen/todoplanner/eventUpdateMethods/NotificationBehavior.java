@@ -27,6 +27,13 @@ public class NotificationBehavior {
     public static void setUpNextEvent(Intent intent, Context context){
         //Cancel Job Service
         CommonBehavior.cancelJobService(context);
+        //Change the event to past event
+        Event finished = DataMethods.getTodayEvent(context, Uri.parse(intent.getAction()));
+        if (finished == null){
+            Log.v(TAG, "Finished Event is null");
+            return;
+        }
+        DataMethods.changeToPastEvent(context, Uri.parse(intent.getAction()));
 
         //First one is the finished one, Second one is the next event.
         ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);
@@ -46,7 +53,6 @@ public class NotificationBehavior {
 
         long currentTime = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
 
-        Event finished = allEvents.remove(0);
         int type = getType(finished, allEvents, currentTime);
         switch (type){
             case CHANGE_NOTHING_GO_TO_NEXT: CommonBehavior.changeNothingGoToNext(context, allEvents.get(0), finished);
@@ -65,11 +71,7 @@ public class NotificationBehavior {
 
         if (type == -1){
             CommonBehavior.cancelAnyCurrentNotification(context);
-            return;
         }
-
-        Uri uri = Uri.parse(intent.getAction());
-        DataMethods.changeToPastEvent(context, uri);
     }
 
     public static int getType(Event finished, ArrayList<Event> upComingEvents, long currentTime){

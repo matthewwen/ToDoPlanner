@@ -71,6 +71,8 @@ public class DataContract {
         public static final String COLUMN_EVENT_IN_PROGRESS = "eventProgress"; //if 0, then no. If 1, then yes.
         public static final String COLUMN_EVENT_STATIONARY = "eventStationary"; //if 0, then no. If 1, then yes
         public static final String COLUMN_EVENT_ALARM_SET = "eventAlarmSet"; //if 0, then no. If 1, then yes
+        public static final String COLUMN_EVENT_START_SHOWN = "eventStartIsShown";
+        public static final String COLUMN_EVENT_END_SHOWN = "eventEndIsShown";
 
         //this is for constant values
         public static final int NO_TASK_ID = -1;
@@ -85,6 +87,14 @@ public class DataContract {
         public static final int ALARM_SET = 1;
         public static final int ALARM_NOT_SET = 0;
 
+        //this is for the start notification is shown set vs. start notification not set
+        public static final int START_SHOWN = 1;
+        public static final int START_NOT_SHOWN = 0;
+
+        //this is for the end notification is shown vs. end notification not set
+        public static final int END_SHOWN = 1;
+        public static final int END_NOT_SHOWN = 0;
+
         //the projection
         public static final String[] PROJECTION = {
                 _ID,
@@ -95,7 +105,9 @@ public class DataContract {
             COLUMN_EVENT_NOTE,
             COLUMN_EVENT_IN_PROGRESS,
             COLUMN_EVENT_STATIONARY,
-            COLUMN_EVENT_ALARM_SET};
+            COLUMN_EVENT_ALARM_SET,
+            COLUMN_EVENT_START_SHOWN,
+            COLUMN_EVENT_END_SHOWN};
 
         //All the Index
         public static final int COLUMN_EVENT_ID_FULL_INDEX = 0;
@@ -107,6 +119,8 @@ public class DataContract {
         public static final int COLUMN_EVENT_IN_PROGRESS_FULL_INDEX = 6;
         public static final int COLUMN_EVENT_STATIONARY_FULL_INDEX = 7;
         public static final int COLUMN_EVENT_ALARM_SET_FULL_INDEX = 8;
+        public static final int COLUMN_EVENT_START_SHOWN_FULL_INDEX = 9;
+        public static final int COLUMN_EVENT_END_SHOWN_FULL_INDEX = 10;
 
         public static final String[] PROJECTION_DATE = {_ID,
             COLUMN_EVENT_START,

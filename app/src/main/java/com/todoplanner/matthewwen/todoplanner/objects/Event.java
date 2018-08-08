@@ -15,11 +15,14 @@ public class Event implements Story {
     private int inProgress;
     private int staticInt;
     private int alarmSet;
+    private int startShown;
+    private int endShown;
 
     //This is for the today view
-    public Event(int id, String eventName, long eventStart, long eventEnd, int taskId, String note, int inProgress, int staticInt, int alarmSet){
+    public Event(int id, String eventName, long eventStart, long eventEnd, int taskId, String note, int inProgress, int staticInt, int alarmSet, int startShown, int endShown){
         this.id = id; this.eventName = eventName; this.eventStart = eventStart; this.eventEnd = eventEnd; this.taskId = taskId;
         this.inProgress = inProgress; this.note = note; this.staticInt = staticInt; this.alarmSet = alarmSet;
+        this.startShown = startShown; this.endShown = endShown;
     }
 
     //This is for pending
@@ -91,8 +94,6 @@ public class Event implements Story {
         inProgress = DataContract.TodayEventEntry.EVENT_IN_PROGRESS;
     }
 
-    public void setNotInProgress(){inProgress = DataContract.TodayEventEntry.EVENT_NOT_IN_PROGRESS;}
-
     public long getRange(){
         return eventEnd - eventStart;
     }
@@ -111,5 +112,21 @@ public class Event implements Story {
 
     public boolean isAlarmSet(){
         return alarmSet == DataContract.TodayEventEntry.ALARM_SET;
+    }
+
+    public boolean isStartShown(){
+        return startShown == DataContract.TodayEventEntry.START_SHOWN;
+    }
+
+    public void setStartShown(){
+        startShown = DataContract.TodayEventEntry.START_SHOWN;
+    }
+
+    public boolean isEndShown(){
+        return endShown == DataContract.TodayEventEntry.END_SHOWN;
+    }
+
+    public void setEndShown(){
+        endShown = DataContract.TodayEventEntry.END_SHOWN;
     }
 }
