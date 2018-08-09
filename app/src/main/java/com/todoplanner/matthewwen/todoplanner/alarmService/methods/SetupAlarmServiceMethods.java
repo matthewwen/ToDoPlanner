@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.data.PreferenceUtils;
 import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.CommonBehavior;
 import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
@@ -21,7 +22,8 @@ public class SetupAlarmServiceMethods {
     private static final String TAG = SetupAlarmServiceMethods.class.getSimpleName();
 
     public static void setupStartEvent(Context context, Event event){
-        Log.v(TAG, "Now Displaying Notification for Nonstatic Events");
+        //Update Preference Utils
+        PreferenceUtils.resetNotifyEndJobService(context);
         //make event in progress
         event.setInProgress();
         event.setStartShown();
@@ -51,13 +53,15 @@ public class SetupAlarmServiceMethods {
         }
     }
 
-    public static void setUpStaticEvent(final Context context, final Event event){
+    public static void setupStaticEvent(final Context context, final Event event){
         //display notification
         String type = NotificationsUtils.EVENT_REMINDER_START;
         NotificationsUtils.displayCalendarNotification(context, event, type);
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                //reset preference about job service
+                PreferenceUtils.resetNotifyEndJobService(context);
                 //cancel any job service
                 CommonBehavior.cancelJobService(context);
                 //make the event in progress
@@ -121,7 +125,7 @@ public class SetupAlarmServiceMethods {
                 DataMethods.updateTodayEvent(context, event);
             }
         });
-        thread.run();
+        thread.start();
         //create job service
         JobServiceMethods.cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
         JobServiceMethods.automatedDelayEventJobService(context);

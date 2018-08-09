@@ -92,7 +92,8 @@ public class NotificationsUtils {
 
         //If the calendar event is type end. Two actions need to be added
         if (typeOfEvent.equals(EVENT_REMINDER_END)){
-            notify.addAction(NotificationAction.nextEvent(context, uri));
+            notify.addAction(NotificationAction.nextEventAction(context, uri));
+            notify.addAction(NotificationAction.ignoreAction(context));
         }
 
         //for devices with sdk less than oreo

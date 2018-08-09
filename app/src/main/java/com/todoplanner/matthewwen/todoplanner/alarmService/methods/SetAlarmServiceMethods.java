@@ -13,6 +13,7 @@ import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.alarmService.CalendarReminderReceiver;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
@@ -86,10 +87,16 @@ public class SetAlarmServiceMethods {
                 if (tempProg.getEventEnd() <= currentTime){
                     if (!tempProg.isEndShown()){
                         SetupAlarmServiceMethods.setUpEndEvent(context, tempProg);
+                    }else {
+                        //if it is shown and in progress. Make it the end and start job service
+                        JobServiceMethods.justCreateJobServiceDelay(context, tempProg, currentTime);
                     }
                 }else {
                     if (!tempProg.isEndShown()) {
                         setEndAlarmService(context, tempProg);
+                    }else {
+                        //if it is shown and in progress. Make it the end and start job service
+                        JobServiceMethods.justCreateJobServiceDelay(context, tempProg, currentTime);
                     }
                 }
             }
@@ -211,6 +218,5 @@ public class SetAlarmServiceMethods {
                 DEVELOPER_REMINDER_EVENT_END, eventEnd, PendingIntent.FLAG_UPDATE_CURRENT);
         manager.set(AlarmManager.RTC_WAKEUP, event.getEventEnd(), pendingIntentEndEvent);
     }
-
 
 }

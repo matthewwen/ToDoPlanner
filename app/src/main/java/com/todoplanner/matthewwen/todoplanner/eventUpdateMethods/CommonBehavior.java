@@ -65,18 +65,6 @@ public class CommonBehavior {
         EventChangeBehavior.moveEverythingForward(context, allEvents, true);
     }
 
-    private static long getDifference(Event eventOne, Event eventTwo){
-        return eventOne.getEventEnd() - eventTwo.getEventStart();
-    }
-
-    public static long getAmountBufferTime(ArrayList<Event> allEvents){
-        long sum = 0;
-        for (int i = 0; i < allEvents.size() - 1; i++){
-            sum += getDifference(allEvents.get(i), allEvents.get(i+1));
-        }
-        return sum;
-    }
-
     public static void setNextAlarmService(Context context, ArrayList<Event> allEvents){
         if (allEvents.get(0).isStatic()){
             return;

@@ -7,6 +7,7 @@ import android.net.Uri;
 
 import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.developerEvent.DeveloperEventViewActivity;
 import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperMainActivity;
+import com.todoplanner.matthewwen.todoplanner.service.IgnoreEventIntentService;
 import com.todoplanner.matthewwen.todoplanner.service.NextEventIntentService;
 
 public class NotificationPendingIntent {
@@ -38,6 +39,11 @@ public class NotificationPendingIntent {
     static PendingIntent nextEventPendingIntent(Context context, Uri uri){
         Intent intent = new Intent(context, NextEventIntentService.class);
         intent.setAction(uri.toString());
+        return PendingIntent.getService(context, NEXT_EVENT_INTENT_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    static PendingIntent ignoreEventPendingIntent(Context context){
+        Intent intent = new Intent(context, IgnoreEventIntentService.class);
         return PendingIntent.getService(context, NEXT_EVENT_INTENT_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }

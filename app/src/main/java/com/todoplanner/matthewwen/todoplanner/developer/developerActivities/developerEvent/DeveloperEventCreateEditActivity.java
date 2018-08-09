@@ -3,6 +3,9 @@ package com.todoplanner.matthewwen.todoplanner.developer.developerActivities.dev
 import android.annotation.SuppressLint;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
+import android.content.ContentUris;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 import com.todoplanner.matthewwen.todoplanner.R;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import com.todoplanner.matthewwen.todoplanner.popUpDialog.DateDialog;
 import com.todoplanner.matthewwen.todoplanner.popUpDialog.TimeDialog;
 
@@ -24,10 +28,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class DeveloperEventCreateActivity extends AppCompatActivity
+public class DeveloperEventCreateEditActivity extends AppCompatActivity
     implements DateDialog.DatePopUp, TimeDialog.TimePopUP {
 
-    private static final String TAG = DeveloperEventCreateActivity.class.getSimpleName();
+    private static final String TAG = DeveloperEventCreateEditActivity.class.getSimpleName();
 
     private EditText nameET;
     private EditText noteET;
@@ -53,6 +57,12 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
     private Calendar startCal;
     private Calendar endCal;
 
+    private boolean isCreating;
+
+    private FloatingActionButton fab;
+
+    private Event event;
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putLong(RANGE_KEY, range);
@@ -77,10 +87,109 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         newFragment.show(ft, DATE_PICKER_KEY);
     }
 
-    private void  showTimeDialog(int type, int hour, int minute){
+    private void showTimeDialog(int type, int hour, int minute){
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         TimeDialog newFragment = TimeDialog.newInstance(type, hour, minute);
         newFragment.show(ft, TIME_PICKER_KEY);
+    }
+
+    //creating event
+    private void createEvent(Bundle bundle){
+        event = null;
+        //restore state
+        if (bundle == null){
+            range = TimeUnit.HOURS.toMillis(1);
+            startDate = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
+        }else {
+            Log.v(TAG, "Restore instance state");
+            onRestoreInstanceState(bundle);
+        }
+        //set all the values
+        startCal = Calendar.getInstance();
+        startCal.setTimeInMillis(startDate);
+        long timeEndCal = startCal.getTimeInMillis() + range;
+        endCal = Calendar.getInstance();
+        endCal.setTimeInMillis(timeEndCal);
+
+        //floating action button
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onButtonClick();
+                DeveloperEventCreateEditActivity.super.onBackPressed();
+            }
+        });
+
+        //start date
+        startDateTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int yearStart = startCal.get(Calendar.YEAR);
+                int monthStart = startCal.get(Calendar.MONTH);
+                int dayOfMonthStart = startCal.get(Calendar.DAY_OF_MONTH);
+                showDateDialog(START_TIME, yearStart, monthStart, dayOfMonthStart);
+            }
+        });
+
+        //start time
+        startTimeTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int hourStart = startCal.get(Calendar.HOUR_OF_DAY);
+                int minuteStart = startCal.get(Calendar.MINUTE);
+                showTimeDialog(START_TIME, hourStart, minuteStart);
+            }
+        });
+
+        //end date
+        endDateTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int yearEnd = endCal.get(Calendar.YEAR);
+                int monthEnd = endCal.get(Calendar.MONTH);
+                int dayOfMonthEnd = endCal.get(Calendar.DAY_OF_MONTH);
+                showDateDialog(END_TIME, yearEnd, monthEnd, dayOfMonthEnd);
+            }
+        });
+
+        //end time
+        endTimeTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int hourEnd = endCal.get(Calendar.HOUR_OF_DAY);
+                int minuteEnd = endCal.get(Calendar.MINUTE);
+                showTimeDialog(END_TIME, hourEnd, minuteEnd);
+            }
+        });
+    }
+
+    //edit event
+    private void editEvent(Bundle bundle, String uriString){
+        //get Event
+        Uri theUri = Uri.parse(uriString);
+        event = DataMethods.getTodayEvent(this, theUri);
+        if (event == null){
+            Log.v(TAG, "There seems to be an error");
+            return;
+        }
+        if (bundle == null){
+            range = event.getRange();
+            startDate = event.getEventStart();
+        }else {
+            Log.v(TAG, "Restore instance state");
+            onRestoreInstanceState(bundle);
+            return;
+        }
+        //set all the values
+        startCal = Calendar.getInstance();
+        startCal.setTimeInMillis(startDate);
+        long timeEndCal = startCal.getTimeInMillis() + range;
+        endCal = Calendar.getInstance();
+        endCal.setTimeInMillis(timeEndCal);
+        //put values in textviews
+        nameET.setText(event.getEventName());
+        noteET.setText(event.getNote());
+        stationS.setChecked(event.isStatic());
     }
 
     @Override
@@ -93,31 +202,37 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         noteET = findViewById(R.id.developer_create_event_note_et);
         stationS = findViewById(R.id.developer_create_event_stationary_s);
 
-        if (savedInstanceState == null){
-            range = TimeUnit.HOURS.toMillis(1);
-            startDate = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
+        fab = findViewById(R.id.developer_create_event_fab);
+        startDateTV = findViewById(R.id.developer_create_event_start_date_tv);
+        startTimeTV = findViewById(R.id.developer_create_event_start_time_tv);
+        endDateTV = findViewById(R.id.developer_create_event_end_date_tv);
+        endTimeTV = findViewById(R.id.developer_create_event_end_time_tv);
+
+        Intent intent = getIntent();
+        String uriString = "";
+        if (intent != null){
+            uriString = intent.getAction();
+            isCreating = uriString == null;
         }else {
-            Log.v(TAG, "Restore instance state");
-            onRestoreInstanceState(savedInstanceState);
+            isCreating = true;
         }
 
-        //set all the values
-        startCal = Calendar.getInstance();
-        startCal.setTimeInMillis(startDate);
-        long timeEndCal = startCal.getTimeInMillis() + range;
-        endCal = Calendar.getInstance();
-        endCal.setTimeInMillis(timeEndCal);
+        if (isCreating){
+            createEvent(savedInstanceState);
+        }else {
+            editEvent(savedInstanceState, uriString);
+        }
 
-        FloatingActionButton fab = findViewById(R.id.developer_create_event_fab);
+        //floating action button
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onButtonClick();
-                DeveloperEventCreateActivity.super.onBackPressed();
+                DeveloperEventCreateEditActivity.super.onBackPressed();
             }
         });
 
-        startDateTV = findViewById(R.id.developer_create_event_start_date_tv);
+        //start date
         startDateTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,7 +243,7 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
             }
         });
 
-        startTimeTV = findViewById(R.id.developer_create_event_start_time_tv);
+        //start time
         startTimeTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,7 +253,7 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
             }
         });
 
-        endDateTV = findViewById(R.id.developer_create_event_end_date_tv);
+        //end date
         endDateTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,7 +264,7 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
             }
         });
 
-        endTimeTV = findViewById(R.id.developer_create_event_end_time_tv);
+        //end time
         endTimeTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,12 +299,23 @@ public class DeveloperEventCreateActivity extends AppCompatActivity
         int staticOrNah = getSwitchInteger(stationS);
         String name = nameET.getText().toString();
         String note = noteET.getText().toString();
-        DataMethods.createEvent(this,
-                name,
-                note,
-                DataMethods.roundNearestMinute(startDate),
-                DataMethods.roundNearestMinute(startDate + range),
-                staticOrNah);
+        if (isCreating) {
+            DataMethods.createEvent(this,
+                    name,
+                    note,
+                    DataMethods.roundNearestMinute(startDate),
+                    DataMethods.roundNearestMinute(startDate + range),
+                    staticOrNah);
+        }else if (event != null){
+            event.setEventName(name);
+            event.setEventNote(note);
+            event.setEventStart(DataMethods.roundNearestMinute(startDate));
+            event.setEventEnd(DataMethods.roundNearestMinute(startDate + range));
+            event.setStaticInt(staticOrNah);
+            DataMethods.updateTodayEvent(this, event);
+        }else {
+            Log.e(TAG, "There as been an issue");
+        }
     }
 
     @Override

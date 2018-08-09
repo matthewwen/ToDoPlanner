@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.todoplanner.matthewwen.todoplanner.R;
+import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.NotificationBehavior;
 
 public class NotificationAction {
 
@@ -31,11 +32,20 @@ public class NotificationAction {
         return builder.build();
     }
 
-    static NotificationCompat.Action nextEvent(Context context, Uri uri){
+    static NotificationCompat.Action nextEventAction(Context context, Uri uri){
         NotificationCompat.Action.Builder builder = new NotificationCompat.Action.Builder(
                 NOTIFICATION_ACTION_NEXT,
                 context.getString(R.string.notification_action_next),
                         NotificationPendingIntent.nextEventPendingIntent(context, uri)
+        );
+        return builder.build();
+    }
+
+    static NotificationCompat.Action ignoreAction(Context context){
+        NotificationCompat.Action.Builder builder = new NotificationCompat.Action.Builder(
+                NOTIFICATION_ACTION_NEXT,
+                context.getString(R.string.notification_action_ignore),
+                NotificationPendingIntent.ignoreEventPendingIntent(context)
         );
         return builder.build();
     }

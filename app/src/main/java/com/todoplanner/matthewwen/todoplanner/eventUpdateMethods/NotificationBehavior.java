@@ -1,5 +1,6 @@
 package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
 
+import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -8,6 +9,7 @@ import android.util.Log;
 import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.data.PreferenceUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
@@ -25,6 +27,8 @@ public class NotificationBehavior {
     public static final String TAG = NotificationBehavior.class.getSimpleName();
 
     public static void setUpNextEvent(Intent intent, Context context){
+        //cancel any current notifications
+        CommonBehavior.cancelAnyCurrentNotification(context);
         //Cancel Job Service
         CommonBehavior.cancelJobService(context);
         //Change the event to past event
@@ -35,11 +39,10 @@ public class NotificationBehavior {
         }
         DataMethods.changeToPastEvent(context, Uri.parse(intent.getAction()));
 
-        //First one is the finished one, Second one is the next event.
+        //these are the events that are due next
         ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);
-        if (allEvents == null){
+        if (allEvents == null || allEvents.size() == 0){
             Log.v(TAG, "All Events are null");
-            CommonBehavior.cancelAnyCurrentNotification(context);
             return;
         }
 
@@ -69,9 +72,6 @@ public class NotificationBehavior {
                 break;
         }
 
-        if (type == -1){
-            CommonBehavior.cancelAnyCurrentNotification(context);
-        }
     }
 
     public static int getType(Event finished, ArrayList<Event> upComingEvents, long currentTime){
@@ -125,6 +125,13 @@ public class NotificationBehavior {
             return NNEVENT_STATIC_NO_END_ALARM;
         }
         return NNEVENT_STATIC_NEED_END_ALARM;
+    }
+
+    public static void setUpIgnore(Intent intent, Context context){
+        //cancel any current notifications
+        CommonBehavior.cancelAnyCurrentNotification(context);
+        //Setting up the preference
+        PreferenceUtils.setShowNotifyEndJobService(context, false);
     }
 
 

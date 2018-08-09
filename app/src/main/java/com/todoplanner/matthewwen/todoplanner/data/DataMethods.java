@@ -42,6 +42,8 @@ public class DataMethods {
         contentValues.put(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS, event.getTheProgress());
         contentValues.put(TodayEventEntry.COLUMN_EVENT_STATIONARY, event.getStaticInt());
         contentValues.put(TodayEventEntry.COLUMN_EVENT_ALARM_SET, event.getAlarmSet());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_START_SHOWN,  event.getStartShown());
+        contentValues.put(TodayEventEntry.COLUMN_EVENT_END_SHOWN, event.getEndShown());
         Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, event.getID());
         context.getContentResolver().update(uri, contentValues, null, null);
     }
@@ -100,15 +102,11 @@ public class DataMethods {
         return allEvents;
     }
 
-    //get event based off of id
-    public static Event getTodayEvent(ArrayList<Event> allEvents, Uri uri){
-        if (allEvents == null){
-            return null;
-        }
-        int id = (int) ContentUris.parseId(uri);
-        for (int i = 0 ; i < allEvents.size(); i++){
-            if (id == allEvents.get(i).getID()){
-                return allEvents.get(i);
+    //get event in progress
+    public static Event getEventInProgress(ArrayList<Event> allEvents){
+        for (Event temp: allEvents){
+            if (temp.getInProgress()){
+                return temp;
             }
         }
         return null;

@@ -22,12 +22,15 @@ public class DelayBehavior {
         long current = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
 
 
-        int type = getType(inProgress, pendingEvents);
+        int type = getType(pendingEvents);
 
         //making the event extend by 15 minutes
         inProgress.setEventEnd(current);
-        if (showNotification)
-            NotificationsUtils.displayCalendarNotification(context, inProgress,  NotificationsUtils.EVENT_REMINDER_END);
+        if (showNotification) {
+            NotificationsUtils.displayCalendarNotification(context, inProgress, NotificationsUtils.EVENT_REMINDER_END);
+        }
+
+        inProgress.setEventEnd(current);
         DataMethods.updateTodayEvent(context, inProgress);
 
         switch (type){
@@ -37,22 +40,18 @@ public class DelayBehavior {
 
     }
 
-    private static int getType(Event inProgress, ArrayList<Event> pendingEvents){
+    private static int getType(ArrayList<Event> pendingEvents){
         Log.v(TAG, "The size of pendingEvents: " + pendingEvents.size());
         if (pendingEvents.size() == 0){
             return DELAY_EVERY_EVENT;
         }
         boolean lastStatic = pendingEvents.get(pendingEvents.size() - 1).isStatic();
-        long originalEndTime = inProgress.getEventEnd();
-        long current = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
 
         if (lastStatic){
-            long bufferTime = CommonBehavior.getAmountBufferTime(pendingEvents);
-            long difference = current - originalEndTime - bufferTime;
-            if (difference > 0){
-                return PROPORTION_DELAY;
+            if (pendingEvents.size() == 1){
+                return -1;
             }
-            return DELAY_EVERY_EVENT;
+            return PROPORTION_DELAY;
         }else {
             return DELAY_EVERY_EVENT;
         }

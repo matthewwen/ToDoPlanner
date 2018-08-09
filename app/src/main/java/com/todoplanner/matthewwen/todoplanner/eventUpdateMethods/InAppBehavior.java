@@ -82,8 +82,4 @@ public class InAppBehavior {
         }
         return FORWARD_EVERY_EVENT;
     }
-
-
-
-
 }

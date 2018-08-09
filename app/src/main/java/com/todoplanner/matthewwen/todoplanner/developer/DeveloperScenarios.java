@@ -24,14 +24,14 @@ public class DeveloperScenarios {
         //events 2 minutes long, 1 minute apart.
         long start = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis())
                 + TimeUnit.MINUTES.toMillis(1);
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 2; i++){
             DataMethods.createEvent(context,
                     "Event " + (i+1),
                     "Purdue University",
                     start,
-                    start + TimeUnit.MINUTES.toMillis(2),
+                    start + TimeUnit.MINUTES.toMillis(1),
                     DataContract.TodayEventEntry.EVENT_STATIONARY);
-            start += TimeUnit.MINUTES.toMillis(3);
+            start += TimeUnit.MINUTES.toMillis(2);
         }
 
     }

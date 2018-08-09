@@ -3,12 +3,17 @@ package com.todoplanner.matthewwen.todoplanner.jobServices;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 
+import com.firebase.jobdispatcher.JobService;
 import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
+import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.DelayBehavior;
+import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.NotificationBehavior;
 import com.todoplanner.matthewwen.todoplanner.jobServices.jobServiceClass.NotifyMoveEventJobService;
 import com.todoplanner.matthewwen.todoplanner.jobServices.jobServiceClass.UpdateTodayDatabaseJobService;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
@@ -25,6 +30,8 @@ public class JobServiceMethods {
     //ID and Tag for Job Services
     public static final int DELAY_AND_NOTIFY = 1;
     public static final int UPDATE_TODAY_DATABASE = 2;
+    //Bundle Keys
+    private static final String EVENT_URI_BUNDLE_KEY = "event-uri-bundle-key";
 
     /**
      *All The Methods to Create the Job Service
@@ -79,11 +86,15 @@ public class JobServiceMethods {
      */
     //extend events
     public static void eventExtend(Context context, boolean showNotifications){
-        ArrayList<Event> allEvents = DataMethods.getAllTodayEvents(context);
+        ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);
         if (allEvents.size() < 1){
             return;
         }
-        Event inProgress = allEvents.remove(0);
+        Event inProgress = DataMethods.getEventInProgress(allEvents);
+        if (inProgress == null){
+            return;
+        }
+        allEvents.remove(inProgress);
         DelayBehavior.delayAllEvents(context, inProgress, allEvents, showNotifications);
     }
     //update database
@@ -109,4 +120,17 @@ public class JobServiceMethods {
         assert scheduler != null;
         return jobExist(UPDATE_TODAY_DATABASE, scheduler.getAllPendingJobs());
     }
+    //automatically create job service, no notification need to be shown aka if it is shown and in progress. Make it the end and start job service
+    public static void justCreateJobServiceDelay(Context context, Event tempProg, long currentTime){
+        JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        assert scheduler != null;
+        if (jobExist(DELAY_AND_NOTIFY, scheduler.getAllPendingJobs())){
+            return;
+        }
+        tempProg.setEventEnd(currentTime);
+        DataMethods.updateTodayEvent(context, tempProg);
+        cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
+        automatedDelayEventJobService(context);
+    }
+
 }

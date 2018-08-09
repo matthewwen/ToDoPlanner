@@ -129,4 +129,24 @@ public class Event implements Story {
     public void setEndShown(){
         endShown = DataContract.TodayEventEntry.END_SHOWN;
     }
+
+    public int getStartShown(){
+        return startShown;
+    }
+
+    public int getEndShown(){
+        return endShown;
+    }
+
+    public void setEventName(String eventName){
+        this.eventName = eventName;
+    }
+
+    public void setEventNote(String eventNote){
+        this.note = eventNote;
+    }
+
+    public void setStaticInt(int isStatic){
+        this.staticInt = isStatic;
+    }
 }

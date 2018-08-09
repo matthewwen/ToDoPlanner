@@ -50,7 +50,9 @@
         <!-- Alarm Service Receivers -->
         <receiver android:name=".alarmService.CalendarReminderReceiver" />
 
+        <!-- Intent Service -->
         <service android:name=".service.NextEventIntentService" />
+        <service android:name=".service.IgnoreEventIntentService" />
 
         <!-- This is developer view past events -->
         <activity
@@ -62,7 +64,8 @@
             android:name=".developer.developerActivities.developerDisplayDatabase.developerEventActivities.DeveloperPendingEventActivity"
             android:label="@string/developer_pending_event_list" />
         <activity android:name=".developer.developerActivities.developerEvent.DeveloperEventViewActivity" />
-        <activity android:name=".developer.developerActivities.developerEvent.DeveloperEventCreateActivity" />
+        <activity android:name=".developer.developerActivities.developerEvent.DeveloperEventCreateEditActivity" />
+
     </application>
 
 </manifest>
