@@ -58,9 +58,9 @@ public class NotificationBehavior {
 
         int type = getType(finished, allEvents, currentTime);
         switch (type){
-            case CHANGE_NOTHING_GO_TO_NEXT: CommonBehavior.changeNothingGoToNext(context, allEvents.get(0), finished);
+            case CHANGE_NOTHING_GO_TO_NEXT: CommonBehavior.changeNothingGoToNext(context, allEvents.get(0));
                 break;
-            case DELAY_EVERY_EVENT: CommonBehavior.delayEveryEvent(context, allEvents, finished);
+            case DELAY_EVERY_EVENT: CommonBehavior.delayEveryEvent(context, allEvents);
                 break;
             case PROPORTION_DELAY:
                 break;

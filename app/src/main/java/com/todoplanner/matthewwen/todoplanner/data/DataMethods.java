@@ -200,7 +200,10 @@ public class DataMethods {
         int noteIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_NOTE);
         int taskIndex = cursor.getColumnIndex(TodayEventEntry.COLUMN_EVENT_TASK_ID);
 
-        cursor.moveToPosition(0);
+        boolean success = cursor.moveToPosition(0);
+        if (!success){
+            return null;
+        }
         ContentValues contentValues = new ContentValues();
         contentValues.put(TodayEventEntry.COLUMN_EVENT_NAME, cursor.getString(nameIndex));
         contentValues.put(TodayEventEntry.COLUMN_EVENT_START, cursor.getLong(startIndex));
@@ -289,6 +292,44 @@ public class DataMethods {
         Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, event.getID());
         context.getContentResolver().delete(uri, null, null);
 
+    }
+
+    //get the start and end time for the most ideal time period to add an event
+    public static Event getIdealStartAndEndTime(Context context){
+        Event result = new Event();
+        ArrayList<Event> allEvents = getAllTodayEvents(context);
+        long current = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
+        //start time is current time
+        if (allEvents.size() == 0){
+            result.setEventStart(current);
+            result.setEventEnd(current + TimeUnit.HOURS.toMillis(1));
+            return result;
+        }
+        if (allEvents.get(0).getInProgress()){
+            current = allEvents.remove(0).getEventEnd();
+        }
+        //start time is after the current event
+        if (allEvents.size() == 0){
+            result.setEventStart(current);
+            result.setEventEnd(current + TimeUnit.HOURS.toMillis(1));
+            return result;
+        }
+        //what is left is all the other events
+        for (int i = 0; i < allEvents.size(); i++){
+            Event one = allEvents.get(i);
+            long diff = current - one.getEventStart();
+            //cannot add it if time is less than 15 minutes
+            if (diff > TimeUnit.MINUTES.toMillis(15)){
+                result.setEventStart(current);
+                result.setEventEnd(one.getEventStart());
+                return result;
+            }
+            current = one.getEventEnd();
+        }
+        result.setEventStart(current);
+        result.setEventEnd(current + TimeUnit.HOURS.toMillis(1));
+
+        return  result;
     }
 
 }

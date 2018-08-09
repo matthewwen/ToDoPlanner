@@ -50,11 +50,11 @@ public class InAppBehavior {
         int type = getType(finished, allEvents);
         Log.v(TAG, "This is the Type: "+ type);
         switch (type){
-            case CHANGE_NOTHING_GO_TO_NEXT: CommonBehavior.changeNothingGoToNext(context, allEvents.get(0), finished);
+            case CHANGE_NOTHING_GO_TO_NEXT: CommonBehavior.changeNothingGoToNext(context, allEvents.get(0));
                 break;
-            case DELAY_EVERY_EVENT: CommonBehavior.delayEveryEvent(context, allEvents, finished);
+            case DELAY_EVERY_EVENT: CommonBehavior.delayEveryEvent(context, allEvents);
                 break;
-            case FORWARD_EVERY_EVENT: CommonBehavior.forwardEveryEvent(context, allEvents, finished);
+            case FORWARD_EVERY_EVENT: CommonBehavior.forwardEveryEvent(context, allEvents);
                 break;
             case PROPORTION_DELAY:
                 break;

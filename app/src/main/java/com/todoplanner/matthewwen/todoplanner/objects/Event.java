@@ -36,6 +36,9 @@ public class Event implements Story {
         this.id = id; this.eventName = name; this.eventStart = start; this.eventEnd = end; this.note = note; this.taskId = taskId;
     }
 
+    //just store ideal start and end time
+    public Event(){}
+
     @Override
     public int getID() {
         return id;

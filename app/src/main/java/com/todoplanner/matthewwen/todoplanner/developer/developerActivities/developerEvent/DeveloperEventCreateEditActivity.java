@@ -98,8 +98,9 @@ public class DeveloperEventCreateEditActivity extends AppCompatActivity
         event = null;
         //restore state
         if (bundle == null){
-            range = TimeUnit.HOURS.toMillis(1);
-            startDate = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis());
+            Event startEnd = DataMethods.getIdealStartAndEndTime(this);
+            range = DataMethods.roundNearestMinute(startEnd.getRange());
+            startDate = DataMethods.roundNearestMinute(startEnd.getEventStart());
         }else {
             Log.v(TAG, "Restore instance state");
             onRestoreInstanceState(bundle);

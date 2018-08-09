@@ -23,24 +23,16 @@ public class CommonBehavior {
 
     }
 
-    public static void changeNothingGoToNext(Context context, Event nextEvent, Event finished){
+    public static void changeNothingGoToNext(Context context, Event nextEvent){
         cancelAnyCurrentNotification(context);
         NotificationsUtils.displayCalendarNotification(context, nextEvent,  NotificationsUtils.EVENT_REMINDER_START);
-        Uri uri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());
-        DataMethods.changeToPastEvent(context, uri);
         SetAlarmServiceMethods.setEndAlarmService(context, nextEvent);
         nextEvent.setInProgress();
         DataMethods.updateTodayEvent(context, nextEvent);
     }
 
-    public static void delayEveryEvent(Context context, ArrayList<Event> allEvents,
-                                        Event finished){
+    public static void delayEveryEvent(Context context, ArrayList<Event> allEvents){
         cancelAnyCurrentNotification(context);
-
-        //Put the event in the Past
-        Uri oldEventUri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI,
-                finished.getID());
-        DataMethods.changeToPastEvent(context, oldEventUri);
 
         //Setting the next one to be in progress.
         Event nextEvent = allEvents.get(0);
@@ -52,15 +44,12 @@ public class CommonBehavior {
     }
 
     public static void forwardEveryEvent(Context context,
-                                          ArrayList<Event> allEvents, Event finished){
+                                          ArrayList<Event> allEvents){
         cancelAnyCurrentNotification(context);
         //Set the Event in Progress
         Event nextEvent = allEvents.get(0);
         nextEvent.setInProgress();
         DataMethods.updateTodayEvent(context, nextEvent);
-        //Change to past events
-        Uri oldUri = ContentUris.withAppendedId(DataContract.TodayEventEntry.EVENT_CONTENT_URI, finished.getID());
-        DataMethods.changeToPastEvent(context, oldUri);
         //Adding change to the database
         EventChangeBehavior.moveEverythingForward(context, allEvents, true);
     }
@@ -85,6 +74,7 @@ public class CommonBehavior {
         JobServiceMethods.cancelEventJobService(context, JobServiceMethods.DELAY_AND_NOTIFY);
     }
 
+    //unsure about this method
     public static void nnEventNeedEndStatic(Context context, long currentTime, Event nEvent){
         cancelAnyCurrentNotification(context);
         if (DataMethods.roundNearestMinute(currentTime) == nEvent.getEventStart()){
@@ -97,6 +87,7 @@ public class CommonBehavior {
         SetAlarmServiceMethods.setStartAlarmService(context, nEvent);
     }
 
+    //unsure about this method too
     public static void nnEventNoEndStatic(Context context, long currentTime, Event nEvent){
         cancelAnyCurrentNotification(context);
         if (DataMethods.roundNearestMinute(currentTime) == nEvent.getEventStart()){
