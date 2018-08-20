@@ -80,9 +80,12 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 if (event.getEventEnd() < current){
-                    //event.setEventEnd(current);
-                    //DataMethods.updateTodayEvent(context, event);
                     ArrayList<Event> allEvents = DataMethods.getAllTodayEvents(context);
+                    //remove the event in progress and also update it.
+                    allEvents.remove(event);
+                    event.setEventEnd(current);
+                    DataMethods.updateTodayEvent(context, event);
+                    //delay all pending events.
                     DelayBehavior.delayAllEvents(context, allEvents, current);
                 }
             }

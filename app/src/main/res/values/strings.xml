@@ -36,7 +36,6 @@
     <string name="developer_today_event_list">Today Event Database</string>
     <string name="developer_pending_event_list">Pending Event Database</string>
     <string name="developer_past_event_list">Past Event Database</string>
-    <string name="developer_scenario_stationary">Scenario All Stationary</string>
     <!-- Headings and Labels for each section -->
     <string name="developer_heading_database">Databases</string>
     <string name="developer_heading_scenario">Scenarios</string>

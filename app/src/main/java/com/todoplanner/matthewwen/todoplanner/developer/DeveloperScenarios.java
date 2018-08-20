@@ -18,25 +18,6 @@ public class DeveloperScenarios {
 
     private static final String TAG = DeveloperScenarios.class.getSimpleName();
 
-    public static void developerAllStaticScenario(Context context){
-        //Delete all the events
-        context.getContentResolver().delete(DataContract.TodayEventEntry.EVENT_CONTENT_URI, null, null);
-
-        //events 2 minutes long, 1 minute apart.
-        long start = DataMethods.getCurrentTime(context)
-                + TimeUnit.MINUTES.toMillis(1);
-        for (int i = 0; i < 2; i++){
-            DataMethods.createEvent(context,
-                    "Event " + (i+1),
-                    "Purdue University",
-                    start,
-                    start + TimeUnit.MINUTES.toMillis(1),
-                    DataContract.TodayEventEntry.EVENT_STATIONARY);
-            start += TimeUnit.MINUTES.toMillis(2);
-        }
-
-    }
-
     public static void developerUpdateOnView(Context context){
         //Delete all the events
         context.getContentResolver().delete(DataContract.TodayEventEntry.EVENT_CONTENT_URI, null, null);

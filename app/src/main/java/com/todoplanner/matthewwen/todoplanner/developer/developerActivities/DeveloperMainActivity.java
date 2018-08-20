@@ -69,26 +69,6 @@ public class DeveloperMainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    //These are all the scenarios
-    public void developerScenarioAllStation(View view) {
-        @SuppressLint("StaticFieldLeak")
-        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                DeveloperScenarios.developerAllStaticScenario(DeveloperMainActivity.this);
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                Toast.makeText(DeveloperMainActivity.this, "All Tasks are added to database", Toast.LENGTH_LONG).show();
-            }
-        };
-        asyncTask.execute();
-    }
-
-
     public void developerScenarioUpdateNow(View view) {
         @SuppressLint("StaticFieldLeak")
         AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
@@ -101,7 +81,7 @@ public class DeveloperMainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                Toast.makeText(DeveloperMainActivity.this, "All Tasks are added to dattabase", Toast.LENGTH_LONG).show();
+                Toast.makeText(DeveloperMainActivity.this, "All Tasks are added to database", Toast.LENGTH_LONG).show();
             }
         };
         asyncTask.execute();
