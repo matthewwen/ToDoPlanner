@@ -2,15 +2,13 @@ package com.todoplanner.matthewwen.todoplanner.alarmService.methods;
 
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.data.PreferenceUtils;
-import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.CommonBehavior;
+import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.adaption.CommonBehavior;
 import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;

@@ -16,6 +16,7 @@ import com.todoplanner.matthewwen.todoplanner.objects.Event;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class DataMethods {
@@ -80,6 +81,33 @@ public class DataMethods {
         cursor.close();
 
         return allEvents;
+    }
+
+    //Get the event inProgress
+    public static Event getEventInProgress(Context context){
+        Cursor cursor = context.getContentResolver().query(TodayEventEntry.EVENT_CONTENT_URI,
+                TodayEventEntry.PROJECTION,
+                TodayEventEntry.COLUMN_EVENT_IN_PROGRESS + "=?",
+                new String[]{Integer.toString(TodayEventEntry.EVENT_IN_PROGRESS)},
+                null);
+        if (cursor == null || cursor.getCount() == 0){
+            return null;
+        }
+        cursor.moveToPosition(0);
+        Event newEvent = new Event(cursor.getInt(TodayEventEntry.COLUMN_EVENT_ID_FULL_INDEX),
+                cursor.getString(TodayEventEntry.COLUMN_EVENT_NAME_FULL_INDEX),
+                cursor.getLong(TodayEventEntry.COLUMN_EVENT_START_SHOWN_FULL_INDEX),
+                cursor.getLong(TodayEventEntry.COLUMN_EVENT_END_SHOWN_FULL_INDEX),
+                cursor.getInt(TodayEventEntry.COLUMN_EVENT_ID_FULL_INDEX),
+                cursor.getString(TodayEventEntry.COLUMN_EVENT_NOTE_FULL_INDEX),
+                cursor.getInt(TodayEventEntry.COLUMN_EVENT_IN_PROGRESS_FULL_INDEX),
+                cursor.getInt(TodayEventEntry.COLUMN_EVENT_STATIONARY_FULL_INDEX),
+                cursor.getInt(TodayEventEntry.COLUMN_EVENT_ALARM_SET_FULL_INDEX),
+                cursor.getInt(TodayEventEntry.COLUMN_EVENT_START_SHOWN_FULL_INDEX),
+                cursor.getInt(TodayEventEntry.COLUMN_EVENT_END_SHOWN_FULL_INDEX));
+        Log.v(TAG, "Event Start: " + new Date(newEvent.getEventStart()).toString());
+        cursor.close();
+        return newEvent;
     }
 
     //get custom array list of only the important array list
@@ -148,6 +176,12 @@ public class DataMethods {
     public static void createEvent(Context context, String name, String note,
                                    long startValue, long endValue, int staticType){
         createEvent(context, name, note, startValue, endValue, staticType, TodayEventEntry.ALARM_NOT_SET);
+    }
+
+    //adding an event
+    public static void createEvent(Context context, Event event){
+        createEvent(context, event.getEventName(), event.getNote(), event.getEventStart(), event.getEventEnd(),
+                event.getStaticInt(), event.getAlarmSet());
     }
 
     //create past event (Last Thing that happens before starting the next event)
@@ -289,9 +323,13 @@ public class DataMethods {
 
     //delete the event
     public static void deleteTodayEvent(Context context, Event event){
-        Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, event.getID());
-        context.getContentResolver().delete(uri, null, null);
+        deleteTodayEvent(context, event.getID());
+    }
 
+    //delete the event
+    public static void deleteTodayEvent(Context context, int id){
+        Uri uri = ContentUris.withAppendedId(TodayEventEntry.EVENT_CONTENT_URI, id);
+        context.getContentResolver().delete(uri, null, null);
     }
 
     //get the start and end time for the most ideal time period to add an event
@@ -330,6 +368,11 @@ public class DataMethods {
         result.setEventEnd(current + TimeUnit.HOURS.toMillis(1));
 
         return  result;
+    }
+
+    //get the current time
+    public static long getCurrentTime(Context context){
+        return roundNearestMinute(Calendar.getInstance().getTimeInMillis());
     }
 
 }

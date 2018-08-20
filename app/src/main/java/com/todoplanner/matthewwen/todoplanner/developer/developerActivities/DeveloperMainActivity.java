@@ -87,4 +87,23 @@ public class DeveloperMainActivity extends AppCompatActivity {
         };
         asyncTask.execute();
     }
+
+
+    public void developerScenarioUpdateNow(View view) {
+        @SuppressLint("StaticFieldLeak")
+        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                DeveloperScenarios.developerUpdateOnView(DeveloperMainActivity.this);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                Toast.makeText(DeveloperMainActivity.this, "All Tasks are added to dattabase", Toast.LENGTH_LONG).show();
+            }
+        };
+        asyncTask.execute();
+    }
 }

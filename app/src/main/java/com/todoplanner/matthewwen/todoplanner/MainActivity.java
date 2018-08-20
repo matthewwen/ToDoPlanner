@@ -1,5 +1,6 @@
 package com.todoplanner.matthewwen.todoplanner;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServi
 import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetupAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
 import com.todoplanner.matthewwen.todoplanner.developer.developerActivities.DeveloperMainActivity;
+import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.adaption.DelayBehavior;
 import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.jobServices.jobServiceClass.UpdateTodayDatabaseJobService;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
@@ -67,7 +69,26 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        Thread thread2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Context context = MainActivity.this;
+                Event event = DataMethods.getEventInProgress(context);
+                long current = DataMethods.getCurrentTime(context);
+                if (event == null){
+                    return;
+                }
+                if (event.getEventEnd() < current){
+                    //event.setEventEnd(current);
+                    //DataMethods.updateTodayEvent(context, event);
+                    ArrayList<Event> allEvents = DataMethods.getAllTodayEvents(context);
+                    DelayBehavior.delayAllEvents(context, allEvents, current);
+                }
+            }
+        });
         thread.run();
+        thread2.run();
 
     }
 
@@ -79,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
         //Bottom navigation view
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-
 
     }
 

@@ -4,7 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
-import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.NotificationBehavior;
+import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.adaption.NotificationBehavior;
 
 public class IgnoreEventIntentService extends IntentService {
 

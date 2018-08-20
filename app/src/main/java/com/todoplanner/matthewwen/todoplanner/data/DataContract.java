@@ -121,14 +121,6 @@ public class DataContract {
         public static final int COLUMN_EVENT_ALARM_SET_FULL_INDEX = 8;
         public static final int COLUMN_EVENT_START_SHOWN_FULL_INDEX = 9;
         public static final int COLUMN_EVENT_END_SHOWN_FULL_INDEX = 10;
-
-        public static final String[] PROJECTION_DATE = {_ID,
-            COLUMN_EVENT_START,
-            COLUMN_EVENT_END,
-            COLUMN_EVENT_IN_PROGRESS};
-
-        public static final String[] PROJECTION_IN_PROGRESS = {_ID,
-            COLUMN_EVENT_IN_PROGRESS};
     }
 
     public static final class PendingEventEntry implements BaseColumns{

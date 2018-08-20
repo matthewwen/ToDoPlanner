@@ -45,19 +45,17 @@ public class SetAlarmServiceMethods {
         DataMethods.updateTodayEvent(context, event);
     }
 
-    //change all the events to not set
-    private static void setAllAlarmNotSet(Context context, ArrayList<Event> allEvents){
-        for (int i = 0; i < allEvents.size(); i++){
-            Event temp = allEvents.get(0);
-            temp.setAlarmNotSet();
-            DataMethods.updateTodayEvent(context, temp);
-        }
-    }
-
     //cancel any in app behavior
     public static void cancelEndAlarmService(Context context){
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         assert manager != null;
+        if (pendingIntentEndEvent != null) manager.cancel(pendingIntentEndEvent);
+    }
+
+    //cancel any alarm services
+    public static void cancelAlarmService(AlarmManager manager){
+        if (pendingIntentStartEvent != null) manager.cancel(pendingIntentStartEvent);
+        if (pendingIntentStaticStartEvent != null) manager.cancel(pendingIntentStaticStartEvent);
         if (pendingIntentEndEvent != null) manager.cancel(pendingIntentEndEvent);
     }
 
@@ -69,9 +67,7 @@ public class SetAlarmServiceMethods {
         //check if none, then cancel all
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         assert manager != null;
-        if (pendingIntentStartEvent != null) manager.cancel(pendingIntentStartEvent);
-        if (pendingIntentStaticStartEvent != null) manager.cancel(pendingIntentStaticStartEvent);
-        if (pendingIntentEndEvent != null) manager.cancel(pendingIntentEndEvent);
+        cancelAlarmService(manager);
         if (allEvents.size() == 0){
             return;
         }
@@ -105,8 +101,6 @@ public class SetAlarmServiceMethods {
         if (allEvents.size() < 1){
             return;
         }
-        //set all alarms to not set
-        setAllAlarmNotSet(context, allEvents);
         //set the static event
         Event lastEvent = allEvents.get(allEvents.size() - 1);
         if (lastEvent.isStatic()){

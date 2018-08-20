@@ -1,6 +1,5 @@
-package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
+package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.adaption;
 
-import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;

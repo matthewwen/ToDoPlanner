@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.todoplanner.matthewwen.todoplanner.R;
-import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.NotificationBehavior;
 
 public class NotificationAction {
 

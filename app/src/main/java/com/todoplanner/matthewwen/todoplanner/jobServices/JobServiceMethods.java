@@ -3,19 +3,16 @@ package com.todoplanner.matthewwen.todoplanner.jobServices;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.Context;
-import android.os.Bundle;
 import android.util.Log;
 
-import com.firebase.jobdispatcher.JobService;
 import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
-import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
-import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.DelayBehavior;
-import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.NotificationBehavior;
+import com.todoplanner.matthewwen.todoplanner.data.PreferenceUtils;
+import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.adaption.DelayBehavior;
 import com.todoplanner.matthewwen.todoplanner.jobServices.jobServiceClass.NotifyMoveEventJobService;
 import com.todoplanner.matthewwen.todoplanner.jobServices.jobServiceClass.UpdateTodayDatabaseJobService;
+import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
@@ -30,6 +27,9 @@ public class JobServiceMethods {
     //ID and Tag for Job Services
     public static final int DELAY_AND_NOTIFY = 1;
     public static final int UPDATE_TODAY_DATABASE = 2;
+    //ID and Tag for type of service.
+    private static final int DELAY_EVERY_EVENT = 1;
+    private static final int PROPORTION_DELAY = 3;
     //Bundle Keys
     private static final String EVENT_URI_BUNDLE_KEY = "event-uri-bundle-key";
 
@@ -81,21 +81,37 @@ public class JobServiceMethods {
         scheduler.cancel(id);
     }
 
+    //get the type of operation to do
+    public static int getType(ArrayList<Event> pendingEvents){
+        for (Event temp: pendingEvents){
+            if (temp.isStatic()){
+                return PROPORTION_DELAY;
+            }
+        }
+        return DELAY_EVERY_EVENT;
+    }
+
     /**
      * Methods/Actions that the application does
      */
-    //extend events
-    public static void eventExtend(Context context, boolean showNotifications){
-        ArrayList<Event> allEvents = DataMethods.getNecessaryTodayEvents(context);
-        if (allEvents.size() < 1){
+    //update current event to extend to current time
+    public static void eventExtend(Context context, ArrayList<Event> pendingEvents, long current){
+        if (pendingEvents == null){
             return;
         }
-        Event inProgress = DataMethods.getEventInProgress(allEvents);
+        //get the event in progress
+        Event inProgress = DataMethods.getEventInProgress(pendingEvents);
         if (inProgress == null){
             return;
         }
-        allEvents.remove(inProgress);
-        DelayBehavior.delayAllEvents(context, inProgress, allEvents, showNotifications);
+        pendingEvents.remove(inProgress);
+        //making the event extend by 15 minutes and show notification
+        inProgress.setEventEnd(current);
+        boolean showNotification = PreferenceUtils.getNotifyEndJobService(context);
+        if (showNotification) {
+            NotificationsUtils.displayCalendarNotification(context, inProgress, NotificationsUtils.EVENT_REMINDER_END);
+        }
+        DataMethods.updateTodayEvent(context, inProgress);
     }
     //update database
     public static void settingUrgentPendingToToday(Context context){

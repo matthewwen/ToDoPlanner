@@ -1,4 +1,4 @@
-package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
+package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.adaption;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -40,12 +40,7 @@ public class InAppBehavior {
         }
         //check for a static event
         Event lastEvent = allEvents.get(allEvents.size() - 1);
-        if (lastEvent.isStatic()){
-            if (lastEvent.getAlarmSet() ==
-                    DataContract.TodayEventEntry.ALARM_NOT_SET){
-                SetAlarmServiceMethods.setStaticAlarmService(context, lastEvent);
-            }
-        }
+        SetAlarmServiceMethods.setStaticAlarmService(context, lastEvent);
 
         int type = getType(finished, allEvents);
         Log.v(TAG, "This is the Type: "+ type);
@@ -54,7 +49,10 @@ public class InAppBehavior {
                 break;
             case DELAY_EVERY_EVENT: CommonBehavior.delayEveryEvent(context, allEvents);
                 break;
-            case FORWARD_EVERY_EVENT: CommonBehavior.forwardEveryEvent(context, allEvents);
+            case FORWARD_EVERY_EVENT:
+                long diff = allEvents.get(0).getEventStart() - finished.getEventEnd();
+                long runOff = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis()) - diff;
+                CommonBehavior.forwardEveryEvent(context, allEvents, runOff);
                 break;
             case PROPORTION_DELAY:
                 break;

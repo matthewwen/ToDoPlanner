@@ -1,18 +1,17 @@
-package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods;
+package com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.adaption;
 
 import android.app.NotificationManager;
-import android.content.ContentUris;
 import android.content.Context;
-import android.net.Uri;
 
 import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
-import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.eventUpdateMethods.EventChangeBehavior;
 import com.todoplanner.matthewwen.todoplanner.jobServices.JobServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.notifications.NotificationsUtils;
 import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class CommonBehavior {
 
@@ -40,18 +39,20 @@ public class CommonBehavior {
         DataMethods.updateTodayEvent(context, allEvents.get(0));
 
         //Adding Change into database.
-        EventChangeBehavior.moveEverythingBack(context, allEvents, true);
+        long difference = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis())
+                - allEvents.get(0).getEventStart();
+        EventChangeBehavior.moveEverythingBack(context, allEvents, true, difference);
     }
 
     public static void forwardEveryEvent(Context context,
-                                          ArrayList<Event> allEvents){
+                                          ArrayList<Event> allEvents, long runOff){
         cancelAnyCurrentNotification(context);
         //Set the Event in Progress
         Event nextEvent = allEvents.get(0);
         nextEvent.setInProgress();
         DataMethods.updateTodayEvent(context, nextEvent);
         //Adding change to the database
-        EventChangeBehavior.moveEverythingForward(context, allEvents, true);
+        EventChangeBehavior.moveEverythingForward(context, allEvents, true, runOff);
     }
 
     public static void setNextAlarmService(Context context, ArrayList<Event> allEvents){

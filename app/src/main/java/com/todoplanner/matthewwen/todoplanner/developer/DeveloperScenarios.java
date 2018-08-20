@@ -7,6 +7,7 @@ import android.util.Log;
 import com.todoplanner.matthewwen.todoplanner.alarmService.methods.SetAlarmServiceMethods;
 import com.todoplanner.matthewwen.todoplanner.data.DataContract;
 import com.todoplanner.matthewwen.todoplanner.data.DataMethods;
+import com.todoplanner.matthewwen.todoplanner.objects.Event;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,7 +23,7 @@ public class DeveloperScenarios {
         context.getContentResolver().delete(DataContract.TodayEventEntry.EVENT_CONTENT_URI, null, null);
 
         //events 2 minutes long, 1 minute apart.
-        long start = DataMethods.roundNearestMinute(Calendar.getInstance().getTimeInMillis())
+        long start = DataMethods.getCurrentTime(context)
                 + TimeUnit.MINUTES.toMillis(1);
         for (int i = 0; i < 2; i++){
             DataMethods.createEvent(context,
@@ -34,5 +35,22 @@ public class DeveloperScenarios {
             start += TimeUnit.MINUTES.toMillis(2);
         }
 
+    }
+
+    public static void developerUpdateOnView(Context context){
+        //Delete all the events
+        context.getContentResolver().delete(DataContract.TodayEventEntry.EVENT_CONTENT_URI, null, null);
+
+        //create 3 events, 2 minutes long, one in progress.
+        long start  = DataMethods.getCurrentTime(context) - TimeUnit.MINUTES.toMillis(3);
+        for (int i = 0; i < 3; i++){
+            DataMethods.createEvent(context,
+                    "Event " + (i+1),
+                    "Junior Credit",
+                    start,
+                    start + TimeUnit.MINUTES.toMillis(2),
+                    DataContract.TodayEventEntry.EVENT_NOT_STATIONARY);
+            start += TimeUnit.MINUTES.toMillis(3);
+        }
     }
 }
