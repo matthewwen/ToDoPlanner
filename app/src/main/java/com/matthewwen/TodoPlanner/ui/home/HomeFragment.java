@@ -25,20 +25,25 @@ public class HomeFragment extends Fragment {
 
     private HomeViewModel   homeViewModel;
     private RecyclerView    recyclerView;
-    private ArrayList<Task> list_task;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         recyclerView  = root.findViewById(R.id.recycle_view_home);
-        list_task     = new ArrayList<>();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 Log.v(TAG, "It Changed to Home: " + s);
+            }
+        });
+
+        homeViewModel.getListTask().observe(getViewLifecycleOwner(), new Observer<ArrayList<Task>>() {
+            @Override
+            public void onChanged(ArrayList<Task> tasks) {
+
             }
         });
         return root;
