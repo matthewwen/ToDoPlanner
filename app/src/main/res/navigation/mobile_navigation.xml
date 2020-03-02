@@ -12,14 +12,14 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.matthewwen.todoplanner.ui.dashboard.DashboardFragment"
+        android:id="@+id/navigation_create"
+        android:name="com.matthewwen.todoplanner.ui.create.CreateFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_create" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.matthewwen.todoplanner.ui.notifications.NotificationsFragment"
+        android:id="@+id/navigation_task"
+        android:name="com.matthewwen.todoplanner.ui.tasks.TasksFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_tasks" />
 </navigation>
