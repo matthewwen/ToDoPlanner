@@ -39,8 +39,14 @@
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        app:headerLayout="@layout/navigation_section"
         android:layout_gravity="start|left"
-        tools:ignore="RtlHardcoded" />
+        tools:ignore="RtlHardcoded" >
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/section_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

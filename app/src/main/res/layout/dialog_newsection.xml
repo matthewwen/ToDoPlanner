@@ -50,6 +50,7 @@
                 android:id="@+id/select_date_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="10dp"
                 android:text="Set Date"/>
 
         </LinearLayout>

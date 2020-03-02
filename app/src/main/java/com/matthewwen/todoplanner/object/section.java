@@ -2,7 +2,7 @@ package com.matthewwen.todoplanner.object;
 
 public class section {
     long id;
-    String name;
+    public String name;
     long duedate;
     long complete;
 

@@ -1,5 +1,7 @@
 package com.matthewwen.todoplanner.ui.tasks;
 
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,16 +23,23 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
+import com.matthewwen.todoplanner.ApiRequest;
 import com.matthewwen.todoplanner.R;
+import com.matthewwen.todoplanner.object.section;
+import com.matthewwen.todoplanner.rv.SectionAdapter;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class TasksFragment extends Fragment {
 
     private TasksViewModel tasksViewModel;
 
+    @SuppressLint("StaticFieldLeak")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -41,11 +50,27 @@ public class TasksFragment extends Fragment {
         Toolbar toolbar = root.findViewById(R.id.toolbar);
         final DrawerLayout drawerLayout = root.findViewById(R.id.drawer_layout);
 
-        final NavigationView navigationView = root.findViewById(R.id.nav_view);
+        RecyclerView rv = root.findViewById(R.id.section_rv);
+        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        final SectionAdapter adapter = new SectionAdapter(new ArrayList<section>());
+        rv.setAdapter(adapter);
+        new AsyncTask<Void, Void, ArrayList<section>>() {
+            @Override
+            protected ArrayList<section> doInBackground(Void... voids) {
+                return ApiRequest.get_section(getContext());
+            }
+            @Override
+            protected void onPostExecute(ArrayList<section> sections) {
+                super.onPostExecute(sections);
+                adapter.sectionList = sections;
+                adapter.notifyDataSetChanged();
+            }
+        }.execute();
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RtlHardcoded")
             @Override
             public void onClick(View v) {
-                Log.v("MWEN", navigationView.isShown() ? "YES": "NO");
                 drawerLayout.openDrawer(Gravity.LEFT);
             }
         });

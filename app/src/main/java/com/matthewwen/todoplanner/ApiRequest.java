@@ -8,6 +8,10 @@ import android.util.Log;
 
 import com.matthewwen.todoplanner.object.section;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -108,6 +112,39 @@ public class ApiRequest {
         }
         Log.v("MWEN", returnStr != null ? returnStr: "It is NULL");
 
-        return new ArrayList<>();
+        JSONObject obj = null;
+        try {
+            assert returnStr != null;
+            obj = new JSONObject(returnStr);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JSONArray array = null;
+        if (obj != null) {
+            try {
+                array = obj.getJSONArray("data");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        ArrayList<section> allSection = new ArrayList<>();
+        if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+                try {
+                    JSONObject temp = array.getJSONObject(i);
+                    section sectionTemp = new section(temp.getLong("Id"),
+                                                      temp.getString("name"),
+                                                      temp.getLong("duedate"),
+                                                      temp.getLong("complete"));
+                     allSection.add(sectionTemp);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return allSection;
     }
 }
