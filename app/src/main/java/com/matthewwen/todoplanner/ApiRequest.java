@@ -6,7 +6,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.matthewwen.todoplanner.object.section;
+import com.matthewwen.todoplanner.object.Section;
+import com.matthewwen.todoplanner.object.TodoTasks;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -90,14 +91,35 @@ public class ApiRequest {
         return returnStr;
     }
 
-    public static ArrayList<section> get_section(Context context) {
+    public static void create_task(Context context, String name, long section) {
         String returnStr  = null;
         String msgForHash = String.format("{\"time\":\"%s\",\"password\":\"%s\"}", getSecurityDate(), getPassword(context));
         String hash       = getHash(msgForHash);
         @SuppressLint("DefaultLocale")
-        String mUrl = String.format("%s/section/", URL);
+        String mUrl = String.format("%s/task/create?name=%s&section=%d", URL, name, section);
         OkHttpClient client = new OkHttpClient();
-        Log.v("MAIN", getSecurityDate());
+        Request request = new Request.Builder()
+                .url(mUrl)
+                .header("expires", getSecurityDate())
+                .addHeader("Authorization", hash)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            assert response.body() != null;
+            returnStr = response.body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.v("MWEN", returnStr != null ? returnStr: "It is NULL");
+    }
+    
+    public static ArrayList<TodoTasks> get_tasks(Context context, long sectionId) {
+        String returnStr  = null;
+        String msgForHash = String.format("{\"time\":\"%s\",\"password\":\"%s\"}", getSecurityDate(), getPassword(context));
+        String hash       = getHash(msgForHash);
+        @SuppressLint("DefaultLocale")
+        String mUrl = String.format("%s/task?id=%d", URL, sectionId);
+        OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(mUrl)
                 .header("expires", getSecurityDate())
@@ -129,12 +151,65 @@ public class ApiRequest {
             }
         }
 
-        ArrayList<section> allSection = new ArrayList<>();
+        ArrayList<TodoTasks> allTask = new ArrayList<>();
+        assert array != null;
+        for (int i = 0; i < array.length(); i++) {
+            try {
+                JSONObject temp = array.getJSONObject(i);
+                allTask.add(new TodoTasks(temp.getLong("Id"), temp.getString("name"),
+                        temp.getLong("duedate"), temp.getLong("complete"), temp.getLong("section")));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return allTask;
+    } 
+
+    public static ArrayList<Section> get_section(Context context) {
+        String returnStr  = null;
+        String msgForHash = String.format("{\"time\":\"%s\",\"password\":\"%s\"}", getSecurityDate(), getPassword(context));
+        String hash       = getHash(msgForHash);
+        @SuppressLint("DefaultLocale")
+        String mUrl = String.format("%s/section/", URL);
+        OkHttpClient client = new OkHttpClient();
+        Log.v("MAIN", getSecurityDate());
+        Request request = new Request.Builder()
+                .url(mUrl)
+                .header("expires", getSecurityDate())
+                .addHeader("Authorization", hash)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            assert response.body() != null;
+            returnStr = response.body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject obj = null;
+        try {
+            assert returnStr != null;
+            obj = new JSONObject(returnStr);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JSONArray array = null;
+        if (obj != null) {
+            try {
+                array = obj.getJSONArray("data");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        ArrayList<Section> allSection = new ArrayList<>();
         if (array != null) {
             for (int i = 0; i < array.length(); i++) {
                 try {
                     JSONObject temp = array.getJSONObject(i);
-                    section sectionTemp = new section(temp.getLong("Id"),
+                    Section sectionTemp = new Section(temp.getLong("Id"),
                                                       temp.getString("name"),
                                                       temp.getLong("duedate"),
                                                       temp.getLong("complete"));
