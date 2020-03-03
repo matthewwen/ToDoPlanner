@@ -47,7 +47,9 @@ public class TasksFragment extends Fragment {
         RecyclerView taskRv = root.findViewById(R.id.task_rv);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         taskRv.setLayoutManager(new LinearLayoutManager(getContext()));
-        final SectionAdapter adapter = new SectionAdapter(getContext(), new ArrayList<Section>(), new TaskAdapter(), drawerLayout, toolbar);
+
+        tasksViewModel.setView(getContext(), drawerLayout, toolbar);
+        final SectionAdapter adapter = tasksViewModel.adapter;
         rv.setAdapter(adapter);
         taskRv.setAdapter(adapter.taskAdapter);
 
@@ -73,12 +75,7 @@ public class TasksFragment extends Fragment {
                 drawerLayout.openDrawer(Gravity.LEFT);
             }
         });
-        tasksViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
 
-            }
-        });
         return root;
     }
 }

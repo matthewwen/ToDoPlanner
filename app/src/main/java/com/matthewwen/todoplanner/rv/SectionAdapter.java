@@ -29,7 +29,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
     public TaskAdapter taskAdapter;
     public Context context;
     public DrawerLayout drawerLayout;
-    private Toolbar toolbar;
+    public Toolbar toolbar;
 
     public SectionAdapter(Context context, ArrayList<Section> sectionList, TaskAdapter taskAdapter, DrawerLayout drawerLayout, Toolbar toolbar) {
         this.sectionList = sectionList;

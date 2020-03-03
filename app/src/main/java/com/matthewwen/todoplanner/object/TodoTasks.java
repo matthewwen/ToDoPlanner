@@ -5,7 +5,7 @@ public class TodoTasks {
     long complete;
     long duedate;
     public String name;
-    long id;
+    public long id;
 
     public TodoTasks(long id, String name, long duedate, long complete, long section) {
         this.id = id;

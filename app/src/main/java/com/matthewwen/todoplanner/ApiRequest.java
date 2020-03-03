@@ -118,7 +118,7 @@ public class ApiRequest {
         String msgForHash = String.format("{\"time\":\"%s\",\"password\":\"%s\"}", getSecurityDate(), getPassword(context));
         String hash       = getHash(msgForHash);
         @SuppressLint("DefaultLocale")
-        String mUrl = String.format("%s/task?id=%d", URL, sectionId);
+        String mUrl = String.format("%s/task?id=%d&query=uncompleted", URL, sectionId);
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(mUrl)
@@ -221,5 +221,28 @@ public class ApiRequest {
         }
 
         return allSection;
+    }
+
+    public static String complete_task(Context context, long id) {
+        String returnStr  = null;
+        String msgForHash = String.format("{\"time\":\"%s\",\"password\":\"%s\"}", getSecurityDate(), getPassword(context));
+        String hash       = getHash(msgForHash);
+        @SuppressLint("DefaultLocale")
+        String mUrl = String.format("%s/task/complete?id=%d", URL, id);
+        OkHttpClient client = new OkHttpClient();
+        Log.v("MAIN", getSecurityDate());
+        Request request = new Request.Builder()
+                .url(mUrl)
+                .header("expires", getSecurityDate())
+                .addHeader("Authorization", hash)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            assert response.body() != null;
+            returnStr = response.body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return  returnStr;
     }
 }
