@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,12 +29,14 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
     public TaskAdapter taskAdapter;
     public Context context;
     public DrawerLayout drawerLayout;
+    private Toolbar toolbar;
 
-    public SectionAdapter(Context context, ArrayList<Section> sectionList, TaskAdapter taskAdapter, DrawerLayout drawerLayout) {
+    public SectionAdapter(Context context, ArrayList<Section> sectionList, TaskAdapter taskAdapter, DrawerLayout drawerLayout, Toolbar toolbar) {
         this.sectionList = sectionList;
         this.taskAdapter = taskAdapter;
         this.context = context;
         this.drawerLayout = drawerLayout;
+        this.toolbar = toolbar;
     }
 
     @NonNull
@@ -42,6 +46,36 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
         return new SectionViewHolder(view);
     }
 
+    @SuppressLint("StaticFieldLeak")
+    public void updateData(final int position) {
+        if (sectionList.size() > 0) {
+            new AsyncTask<Void, Void, ArrayList<TodoTasks>>() {
+                @Override
+                public ArrayList<TodoTasks> doInBackground(Void... voids) {
+                    return get_tasks(context, sectionList.get(position).id);
+                }
+
+                @SuppressLint("RtlHardcoded")
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    drawerLayout.closeDrawer(Gravity.LEFT);
+                    taskAdapter.allTasks = sectionList.get(position).allTask;
+                    taskAdapter.notifyDataSetChanged();
+                    toolbar.setTitle(sectionList.get(position).name);
+                }
+
+                @Override
+                protected void onPostExecute(ArrayList<TodoTasks> Tasks) {
+                    super.onPostExecute(Tasks);
+                    taskAdapter.allTasks = Tasks;
+                    taskAdapter.notifyDataSetChanged();
+                    sectionList.get(position).allTask = Tasks;
+                }
+            }.execute();
+        }
+    }
+
     @Override
     public void onBindViewHolder(@NonNull SectionViewHolder holder, final int position) {
         holder.textView.setText(sectionList.get(position).name);
@@ -49,27 +83,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
             @SuppressLint("StaticFieldLeak")
             @Override
             public void onClick(View v) {
-                new AsyncTask<Void, Void, ArrayList<TodoTasks>>() {
-                    @Override
-                    public ArrayList<TodoTasks> doInBackground(Void... voids) {
-                        return get_tasks(context, sectionList.get(position).id);
-                    }
-
-                    @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
-                        drawerLayout.closeDrawer(Gravity.LEFT);
-                        taskAdapter.allTasks = new ArrayList<>();
-                        taskAdapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    protected void onPostExecute(ArrayList<TodoTasks> Tasks) {
-                        super.onPostExecute(Tasks);
-                        taskAdapter.allTasks = Tasks;
-                        taskAdapter.notifyDataSetChanged();
-                    }
-                }.execute();
+                updateData(position);
             }
         });
         holder.view.setOnLongClickListener(new View.OnLongClickListener() {

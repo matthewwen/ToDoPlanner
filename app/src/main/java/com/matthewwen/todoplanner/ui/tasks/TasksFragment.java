@@ -47,9 +47,10 @@ public class TasksFragment extends Fragment {
         RecyclerView taskRv = root.findViewById(R.id.task_rv);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         taskRv.setLayoutManager(new LinearLayoutManager(getContext()));
-        final SectionAdapter adapter = new SectionAdapter(getContext(), new ArrayList<Section>(), new TaskAdapter(), drawerLayout);
+        final SectionAdapter adapter = new SectionAdapter(getContext(), new ArrayList<Section>(), new TaskAdapter(), drawerLayout, toolbar);
         rv.setAdapter(adapter);
         taskRv.setAdapter(adapter.taskAdapter);
+
         new AsyncTask<Void, Void, ArrayList<Section>>() {
             @Override
             protected ArrayList<Section> doInBackground(Void... voids) {
@@ -60,6 +61,7 @@ public class TasksFragment extends Fragment {
                 super.onPostExecute(Sections);
                 adapter.sectionList = Sections;
                 adapter.notifyDataSetChanged();
+                adapter.updateData(0);
             }
         }.execute();
 
