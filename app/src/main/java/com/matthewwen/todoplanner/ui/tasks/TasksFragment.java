@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -42,7 +43,7 @@ public class TasksFragment extends Fragment {
     @SuppressLint("StaticFieldLeak")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                             final ViewGroup container, Bundle savedInstanceState) {
         tasksViewModel = ViewModelProviders.of(this).get(TasksViewModel.class);
         View root = inflater.inflate(R.layout.fragment_tasks, container, false);
 
@@ -66,7 +67,8 @@ public class TasksFragment extends Fragment {
                 super.onPreExecute();
                 adapter.sectionList = PhoneDatabase.getTodoSection(getContext());
                 adapter.notifyDataSetChanged();
-                adapter.updateData(0);
+                long id = PreferenceManager.getDefaultSharedPreferences(getContext()).getLong("SectionId", -1);
+                adapter.updateData(id);
 
                 Log.v("MWEN", "SECTION SIZE: " + adapter.sectionList.size());
                 for (int i = 0; i < adapter.sectionList.size(); i++) {
@@ -83,7 +85,8 @@ public class TasksFragment extends Fragment {
                 super.onPostExecute(Sections);
                 adapter.sectionList = Sections;
                 adapter.notifyDataSetChanged();
-                adapter.updateData(0);
+                long id = PreferenceManager.getDefaultSharedPreferences(getContext()).getLong("SectionId", -1);
+                adapter.updateData(id);
 
                 for (int i = 0; i < Sections.size(); i++) {
                     PhoneDatabase.insertSection(getContext(), Sections.get(i));
