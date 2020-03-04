@@ -1,4 +1,5 @@
 package com.matthewwen.todoplanner.rv;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,7 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.matthewwen.todoplanner.ApiRequest;
+import com.matthewwen.todoplanner.PhoneDatabase;
 import com.matthewwen.todoplanner.R;
 import com.matthewwen.todoplanner.object.Section;
 import com.matthewwen.todoplanner.object.TodoTasks;
@@ -59,18 +60,35 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
                 @Override
                 protected void onPreExecute() {
                     super.onPreExecute();
+                    Section section = sectionList.get(position);
+
+                    // Read from database
+                    section.allTask = PhoneDatabase.getTodoTask(context, section.id);
+                    Log.v("MWEN", "list size: " + section.allTask.size());
+
                     drawerLayout.closeDrawer(Gravity.LEFT);
-                    taskAdapter.allTasks = sectionList.get(position).allTask;
-                    taskAdapter.notifyDataSetChanged();
                     toolbar.setTitle(sectionList.get(position).name);
+                    taskAdapter.allTasks = section.allTask;
+                    taskAdapter.notifyDataSetChanged();
+
+                    // memory and data change
+                    sectionList.set(position, section);
                 }
 
+                @SuppressLint("Assert")
                 @Override
                 protected void onPostExecute(ArrayList<TodoTasks> Tasks) {
                     super.onPostExecute(Tasks);
-                    taskAdapter.allTasks = Tasks;
-                    taskAdapter.notifyDataSetChanged();
-                    sectionList.get(position).allTask = Tasks;
+
+                    if (Tasks != null) {
+                        // memory and database change.
+                        taskAdapter.allTasks = Tasks;
+                        taskAdapter.notifyDataSetChanged();
+                        PhoneDatabase.deleteSectionTodo(sectionList.get(position).id);
+                        for (int i = 0; i < Tasks.size(); i++) {
+                            PhoneDatabase.insertTask(context, Tasks.get(i));
+                        }
+                    }
                 }
             }.execute();
         }

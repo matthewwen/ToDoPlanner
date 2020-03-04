@@ -1,9 +1,9 @@
 package com.matthewwen.todoplanner.object;
 
 public class TodoTasks {
-    long section;
-    long complete;
-    long duedate;
+    public long section;
+    public long complete;
+    public long duedate;
     public String name;
     public long id;
 

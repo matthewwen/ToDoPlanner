@@ -143,26 +143,30 @@ public class ApiRequest {
         }
 
         JSONArray array = null;
+        boolean success = false;
         if (obj != null) {
             try {
                 array = obj.getJSONArray("data");
+                success = obj.getBoolean("success");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
-        ArrayList<TodoTasks> allTask = new ArrayList<>();
-        assert array != null;
-        for (int i = 0; i < array.length(); i++) {
-            try {
-                JSONObject temp = array.getJSONObject(i);
-                allTask.add(new TodoTasks(temp.getLong("Id"), temp.getString("name"),
-                        temp.getLong("duedate"), temp.getLong("complete"), temp.getLong("section")));
-            } catch (JSONException e) {
-                e.printStackTrace();
+        ArrayList<TodoTasks> allTask = null;
+        if (success) {
+            allTask = new ArrayList<>();
+            for (int i = 0; i < array.length(); i++) {
+                try {
+                    JSONObject temp = array.getJSONObject(i);
+                    allTask.add(new TodoTasks(temp.getLong("Id"), temp.getString("name"),
+                            temp.getLong("duedate"), temp.getLong("complete"), temp.getLong("section")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        
+
         return allTask;
     } 
 

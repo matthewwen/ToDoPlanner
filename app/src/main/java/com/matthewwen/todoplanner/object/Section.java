@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class Section {
     public long id;
     public String name;
-    private long duedate;
-    private long complete;
+    public long duedate;
+    public long complete;
 
     public ArrayList<TodoTasks> allTask;
 
@@ -15,7 +15,7 @@ public class Section {
         this.name = name;
         this.duedate = duedate;
         this.complete = complete;
-        this.allTask = new ArrayList<>();
+        this.allTask = null;
     }
 
 }

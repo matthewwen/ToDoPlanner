@@ -4,33 +4,40 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.matthewwen.todoplanner.ApiRequest;
+import com.matthewwen.todoplanner.PhoneDatabase;
 import com.matthewwen.todoplanner.R;
 import com.matthewwen.todoplanner.object.Section;
 import com.matthewwen.todoplanner.rv.SectionAdapter;
-import com.matthewwen.todoplanner.rv.TaskAdapter;
 
 import java.util.ArrayList;
 
 public class TasksFragment extends Fragment {
 
     private TasksViewModel tasksViewModel;
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        PhoneDatabase.tearDown();
+    }
+
+
 
     @SuppressLint("StaticFieldLeak")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -55,6 +62,19 @@ public class TasksFragment extends Fragment {
 
         new AsyncTask<Void, Void, ArrayList<Section>>() {
             @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                adapter.sectionList = PhoneDatabase.getTodoSection(getContext());
+                adapter.notifyDataSetChanged();
+                adapter.updateData(0);
+
+                Log.v("MWEN", "SECTION SIZE: " + adapter.sectionList.size());
+                for (int i = 0; i < adapter.sectionList.size(); i++) {
+                    Log.v("MWEN", "DATABASE: " + adapter.sectionList.get(i).name);
+                }
+            }
+
+            @Override
             protected ArrayList<Section> doInBackground(Void... voids) {
                 return ApiRequest.get_section(getContext());
             }
@@ -64,6 +84,10 @@ public class TasksFragment extends Fragment {
                 adapter.sectionList = Sections;
                 adapter.notifyDataSetChanged();
                 adapter.updateData(0);
+
+                for (int i = 0; i < Sections.size(); i++) {
+                    PhoneDatabase.insertSection(getContext(), Sections.get(i));
+                }
             }
         }.execute();
 

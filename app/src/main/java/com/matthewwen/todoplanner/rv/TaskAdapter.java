@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.matthewwen.todoplanner.ApiRequest;
+import com.matthewwen.todoplanner.PhoneDatabase;
 import com.matthewwen.todoplanner.R;
 import com.matthewwen.todoplanner.object.TodoTasks;
 
@@ -41,14 +42,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked && context != null) {
-                    final TodoTasks task = allTasks.remove(position);
-                    notifyDataSetChanged();
+                    final TodoTasks task = allTasks.get(position);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             ApiRequest.complete_task(context, task.id);
                         }
                     }).start();
+                    new android.os.Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            allTasks.remove(position);
+                            notifyItemRemoved(position);
+                            PhoneDatabase.deleteSectionTodo(task.section);
+                            holder.checkBox.setChecked(false);
+                        }
+                    }, 300);
                 }
             }
         });

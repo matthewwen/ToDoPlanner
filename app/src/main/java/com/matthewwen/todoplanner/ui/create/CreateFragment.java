@@ -25,8 +25,10 @@ import androidx.lifecycle.ViewModelProviders;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.matthewwen.todoplanner.ApiRequest;
+import com.matthewwen.todoplanner.PhoneDatabase;
 import com.matthewwen.todoplanner.R;
 import com.matthewwen.todoplanner.object.Section;
+import com.matthewwen.todoplanner.object.TodoTasks;
 import com.matthewwen.todoplanner.rv.MenuAdapter;
 import com.matthewwen.todoplanner.ui.dialog.NewSectionDialog;
 
@@ -83,6 +85,7 @@ public class CreateFragment extends Fragment {
                             ApiRequest.create_task(getContext(), name, myAdapter.id);
                         }
                     }).start();
+                    PhoneDatabase.insertTask(null, new TodoTasks(-1, name, 0,0,myAdapter.id));
                     editText.setText("");
                     Toast.makeText(getContext(), "Created Task", Toast.LENGTH_LONG);
                 }
