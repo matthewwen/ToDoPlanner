@@ -46,7 +46,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            ApiRequest.complete_task(context, task.id, task.section);
+                            ApiRequest.completeTask(context, task.id, task.section);
                         }
                     }).start();
                     new android.os.Handler().postDelayed(new Runnable() {

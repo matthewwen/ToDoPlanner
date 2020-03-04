@@ -227,7 +227,7 @@ public class ApiRequest {
         return allSection;
     }
 
-    public static String complete_task(Context context, long id, long section) {
+    public static String completeTask(Context context, long id, long section) {
         String returnStr  = null;
         String msgForHash = String.format("{\"time\":\"%s\",\"password\":\"%s\"}", getSecurityDate(), getPassword(context));
         String hash       = getHash(msgForHash);
