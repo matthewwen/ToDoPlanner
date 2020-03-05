@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.matthewwen.MyApplication;
 import com.matthewwen.todoplanner.ApiRequest;
 import com.matthewwen.todoplanner.PhoneDatabase;
 import com.matthewwen.todoplanner.R;
@@ -31,14 +32,23 @@ import java.util.ArrayList;
 public class TasksFragment extends Fragment {
 
     private TasksViewModel tasksViewModel;
+    private AsyncTask<Void, Void, ArrayList<Section>> asyncTask = null;
+    private long loadedId = -1;
 
     @Override
     public void onStop() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PhoneDatabase.tearDown();
+                if (asyncTask != null) {
+                    asyncTask.cancel(true);
+                    asyncTask = null;
+                }
+            }
+        }).start();
         super.onStop();
-        PhoneDatabase.tearDown();
     }
-
-
 
     @SuppressLint("StaticFieldLeak")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -61,7 +71,7 @@ public class TasksFragment extends Fragment {
         rv.setAdapter(adapter);
         taskRv.setAdapter(adapter.taskAdapter);
 
-        new AsyncTask<Void, Void, ArrayList<Section>>() {
+        this.asyncTask = new AsyncTask<Void, Void, ArrayList<Section>>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -69,11 +79,7 @@ public class TasksFragment extends Fragment {
                 adapter.notifyDataSetChanged();
                 long id = PreferenceManager.getDefaultSharedPreferences(getContext()).getLong("SectionId", -1);
                 adapter.updateData(id);
-
-                Log.v("MWEN", "SECTION SIZE: " + adapter.sectionList.size());
-                for (int i = 0; i < adapter.sectionList.size(); i++) {
-                    Log.v("MWEN", "DATABASE: " + adapter.sectionList.get(i).name);
-                }
+                loadedId = id;
             }
 
             @Override
@@ -83,17 +89,22 @@ public class TasksFragment extends Fragment {
             @Override
             protected void onPostExecute(ArrayList<Section> Sections) {
                 super.onPostExecute(Sections);
+                if (isCancelled()) {
+                    return;
+                }
                 adapter.sectionList = Sections;
                 adapter.notifyDataSetChanged();
-                long id = PreferenceManager.getDefaultSharedPreferences(getContext()).getLong("SectionId", -1);
-                adapter.updateData(id);
+                long id = PreferenceManager.getDefaultSharedPreferences(MyApplication.getAppContext()).getLong("SectionId", -1);
+                if (id != loadedId) {
+                    adapter.updateData(id);
+                }
 
                 for (int i = 0; i < Sections.size(); i++) {
                     PhoneDatabase.insertSection(getContext(), Sections.get(i));
                 }
             }
-        }.execute();
-
+        };
+        this.asyncTask.execute();
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @SuppressLint("RtlHardcoded")

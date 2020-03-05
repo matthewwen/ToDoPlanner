@@ -16,9 +16,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.matthewwen.todoplanner.ApiRequest;
 import com.matthewwen.todoplanner.R;
+import com.matthewwen.todoplanner.ui.dialog.dialogPicker.DatePickerFragment;
+import com.matthewwen.todoplanner.ui.dialog.dialogPicker.TimePickerFragment;
 
 import java.util.Objects;
 
@@ -62,7 +65,6 @@ public class NewSectionDialog extends DialogFragment {
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.check_menu) {
                     final TextInputEditText name = view.findViewById(R.id.section_name_et);
-                    Log.v("MWEN", "section name: " + name);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -72,6 +74,22 @@ public class NewSectionDialog extends DialogFragment {
                     dismiss();
                 }
                 return false;
+            }
+        });
+        MaterialButton dateButton = view.findViewById(R.id.date_picker);
+        dateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getParentFragmentManager(), "datePicker");
+            }
+        });
+        MaterialButton timeButton = view.findViewById(R.id.time_picker);
+        timeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment newFragment = new TimePickerFragment();
+                newFragment.show(getParentFragmentManager(), "timePicker");
             }
         });
         return view;

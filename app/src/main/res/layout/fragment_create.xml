@@ -44,14 +44,32 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                android:layout_margin="10dp"
                 android:id="@+id/create_section_btn"
+                android:padding="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary"
                 android:text="Create Section"
                 />
 
+            <com.google.android.material.button.MaterialButton
+                android:layout_margin="10dp"
+                android:padding="20dp"
+                android:id="@+id/time_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pick Time"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_margin="10dp"
+                android:padding="20dp"
+                android:id="@+id/date_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pick Date"/>
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

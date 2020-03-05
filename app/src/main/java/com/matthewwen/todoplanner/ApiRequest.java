@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.matthewwen.MyApplication;
 import com.matthewwen.todoplanner.object.Section;
 import com.matthewwen.todoplanner.object.TodoTasks;
 
@@ -28,7 +29,6 @@ import okhttp3.Response;
 
 public class ApiRequest {
     private static final String TAG = "APIREQUEST";
-
     private static final String URL = "https://www.matthewwen.com/todo";
 
     @SuppressLint("DefaultLocale")
@@ -46,7 +46,7 @@ public class ApiRequest {
     }
 
     public static String getPassword(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString("password", "");
+        return PreferenceManager.getDefaultSharedPreferences(MyApplication.getAppContext()).getString("password", "");
     }
 
     public static String getHash(String password) {
@@ -91,12 +91,12 @@ public class ApiRequest {
         return returnStr;
     }
 
-    public static void create_task(Context context, String name, long section) {
+    public static void create_task(Context context, TodoTasks todoTasks) {
         String returnStr  = null;
         String msgForHash = String.format("{\"time\":\"%s\",\"password\":\"%s\"}", getSecurityDate(), getPassword(context));
         String hash       = getHash(msgForHash);
         @SuppressLint("DefaultLocale")
-        String mUrl = String.format("%s/task/create?name=%s&section=%d", URL, name, section);
+        String mUrl = String.format("%s/task/create?name=%s&section=%d", URL, todoTasks.name, todoTasks.section);
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(mUrl)

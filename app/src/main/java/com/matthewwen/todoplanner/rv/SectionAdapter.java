@@ -33,6 +33,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
     public Context context;
     public DrawerLayout drawerLayout;
     public Toolbar toolbar;
+    public AsyncTask<Void, Void, ArrayList<TodoTasks>> asyncTask;
 
     public SectionAdapter(Context context, ArrayList<Section> sectionList, TaskAdapter taskAdapter, DrawerLayout drawerLayout, Toolbar toolbar) {
         this.sectionList = sectionList;
@@ -40,6 +41,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
         this.context = context;
         this.drawerLayout = drawerLayout;
         this.toolbar = toolbar;
+        this.asyncTask = null;
     }
 
     @NonNull
@@ -63,7 +65,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
         editor.putLong("SectionId", p);
         editor.apply();
         final long position = p;
-        new AsyncTask<Void, Void, ArrayList<TodoTasks>>() {
+        asyncTask = new AsyncTask<Void, Void, ArrayList<TodoTasks>>() {
             @Override
             public ArrayList<TodoTasks> doInBackground(Void... voids) {
                 return get_tasks(context, position);
@@ -112,7 +114,8 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.SectionV
                     }
                 }
             }
-        }.execute();
+        };
+        asyncTask.execute();
     }
 
     @Override

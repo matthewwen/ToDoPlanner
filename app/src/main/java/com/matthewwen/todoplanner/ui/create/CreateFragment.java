@@ -12,17 +12,20 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.matthewwen.todoplanner.ApiRequest;
 import com.matthewwen.todoplanner.PhoneDatabase;
@@ -31,6 +34,8 @@ import com.matthewwen.todoplanner.object.Section;
 import com.matthewwen.todoplanner.object.TodoTasks;
 import com.matthewwen.todoplanner.rv.MenuAdapter;
 import com.matthewwen.todoplanner.ui.dialog.NewSectionDialog;
+import com.matthewwen.todoplanner.ui.dialog.dialogPicker.DatePickerFragment;
+import com.matthewwen.todoplanner.ui.dialog.dialogPicker.TimePickerFragment;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -77,15 +82,15 @@ public class CreateFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.check_menu) {
-                    Log.v("MWEN", "Enter Response to Create: " + myAdapter.id);
-                    final String name = Objects.requireNonNull(editText.getText()).toString();
+                    String name = Objects.requireNonNull(editText.getText()).toString();
+                    final TodoTasks newTodo = new TodoTasks(-1, name, 0,0,myAdapter.id);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            ApiRequest.create_task(getContext(), name, myAdapter.id);
+                            ApiRequest.create_task(getContext(), newTodo);
                         }
                     }).start();
-                    PhoneDatabase.insertTask(null, new TodoTasks(-1, name, 0,0,myAdapter.id));
+                    PhoneDatabase.insertTask(null, newTodo);
                     editText.setText("");
                     Toast.makeText(getContext(), "Created Task", Toast.LENGTH_LONG);
                 }
@@ -104,6 +109,24 @@ public class CreateFragment extends Fragment {
                 myAdapter.setList(Sections);
             }
         }.execute();
+
+        MaterialButton dueTimeButton = root.findViewById(R.id.time_picker);
+        dueTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment newFragment = new TimePickerFragment();
+                newFragment.show(getParentFragmentManager(), "timePicker");
+            }
+        });
+
+        MaterialButton dueDateButton = root.findViewById(R.id.date_picker);
+        dueDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getParentFragmentManager(), "datePicker");
+            }
+        });
 
         createViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

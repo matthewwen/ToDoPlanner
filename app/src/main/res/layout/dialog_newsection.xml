@@ -47,11 +47,21 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/select_date_btn"
+                android:layout_margin="10dp"
+                android:padding="20dp"
+                android:id="@+id/time_picker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="Set Date"/>
+                android:text="Pick Time"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_margin="10dp"
+                android:padding="20dp"
+                android:id="@+id/date_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pick Date"/>
 
         </LinearLayout>
 
